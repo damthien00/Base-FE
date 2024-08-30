@@ -1,0 +1,40 @@
+<div class="grid">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-2">
+            <div class="">
+                <h3>Chính sách bảo hành</h3>
+                <p-breadcrumb
+                    [model]="items"
+                    [home]="{ icon: 'pi pi-home' }"
+                ></p-breadcrumb>
+            </div>
+            <ng-template pTemplate="right">
+                <button
+                    pButton
+                    pRipple
+                    [routerLink]="['/products/create']"
+                    icon="pi pi-plus"
+                    label="Thêm sản phẩm"
+                ></button>
+            </ng-template>
+        </p-toolbar>
+        <div class="card">
+            <div class="grid p-fluid">
+                <div class="col-12 md:col-4">
+                    <h1>Quản lí chính sách bảo hành</h1>
+                    <h6>
+                        Thiết lập các chính sách bảo hành cho cửa hàng của bạn
+                    </h6>
+                    <button
+                        pButton
+                        pRipple
+                        [routerLink]="['/products/create']"
+                        icon="pi pi-plus"
+                        label="Thêm sản phẩm"
+                    ></button>
+                </div>
+                <div class="col-12 md:col-8">2</div>
+            </div>
+        </div>
+    </div>
+</div>

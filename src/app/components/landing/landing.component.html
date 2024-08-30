@@ -1,0 +1,405 @@
+
+<div class="header">
+    <div class="header__left">
+        <div class="p-toolbar-group-center search-product" style="min-width: 430px;">
+            <p-autoComplete #autoComplete [(ngModel)]="selectedProductAdvanced" [suggestions]="filteredProducts" [style]="{width:'100%'}"
+                (completeMethod)="filterProducts($event)" field="name"
+                (onFocus)="showAllProducts()"
+                [forceSelection]=true
+                placeholder="Thêm sản phẩm vào đơn (F3)">
+                <ng-template let-product pTemplate="item">
+                    <div (mousedown)="addProductToOrder(product)" class="flex align-items-center gap-2 product-item">
+                        <div *ngIf="product.productImages?.length > 0 && product.productImages[0]?.link; else noImage">
+                            <img [src]="'http://103.153.69.217:5055/api/files/images/' + product.productImages[0].link"
+                                [alt]="product.name" width="50" height="50" class="shadow-4" style="border-radius: 5px" />
+                        </div>
+                        <ng-template #noImage>
+                            <img src="https://via.placeholder.com/50" alt="No Image" width="50" height="50" class="shadow-4"
+                                style="border-radius: 5px" />
+                        </ng-template>
+                        <div class="product-details">
+                            <div class="product-name">
+                                <span>{{ product.name }}</span>
+                                <span>Mã: {{ product.id }}</span>
+                            </div>
+                            <div class="product-price">
+                                <span>{{ product.price | currency }}</span>
+                                <span>Có thể bán: <strong>{{ product.totalQuantity }}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-autoComplete>
+        </div>
+        <span class="barcode">
+            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" height="1em" width="1em"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M232,48V88a8,8,0,0,1-16,0V56H184a8,8,0,0,1,0-16h40A8,8,0,0,1,232,48ZM72,200H40V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16Zm152-40a8,8,0,0,0-8,8v32H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,224,160ZM32,96a8,8,0,0,0,8-8V56H72a8,8,0,0,0,0-16H32a8,8,0,0,0-8,8V88A8,8,0,0,0,32,96ZM80,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,80,80Zm104,88V88a8,8,0,0,0-16,0v80a8,8,0,0,0,16,0ZM144,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,144,80Zm-32,0a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,112,80Z">
+                </path>
+            </svg>
+        </span>
+        <div class="header__left-order-list">
+            <div *ngFor="let order of orders; let i = index">
+                <div class="header__left-order-item-box">
+                    <div (click)="onOrderClick(order)" class="header__left-order-item" [class.selected]="order.orderId === selectedOrder.orderId" >
+                        <div  class="header__left-order-name">Đơn {{ order.orderId }}</div>                    
+                    </div>
+                    
+                    <div class="order-close-icon"  (click)="deleteOrder(i)" >
+                        <svg class="MuiSvgIcon-root" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M14.59 8L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <!-- <p-dialog header="Đóng đơn hàng {{order.orderId}}" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+                        <span class="p-text-secondary block mb-5">Hệ thống sẽ không lưu lại thông tin của đơn hàng này. Bạn có chắc chắn đóng đơn hàng này không?</span>
+                        <div class="flex justify-content-end gap-2">
+                            <p-button label="Cancel" severity="secondary" (click)="visible = false" />
+                            <p-button label="Save"  (click)="deleteOrder($event,order.orderId)"/>
+                        </div>
+                    </p-dialog> -->
+                </div>
+            </div>
+            <span class="order-add-icon" (click)="addOrder()">
+                <i class="pi pi-plus"></i>
+            </span>
+        </div>
+    </div>
+    <div class="header__right">
+        <div class="header__right-item">
+            <div class="header__right-name">
+                Bùi Thị Bảo Anh
+            </div>
+            <div class="header__right-avatar">
+                <img src="" alt="" class=""/>
+            </div>
+        </div>
+        <div class="header__right-item">
+            <span class="bar-icon">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z">
+                    </path>
+                </svg>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="container__left">
+        <div  *ngIf="selectedOrder.products.length === 0" class="container__right-empty">
+            <div class="container__right-empty-content">
+                <svg class="MuiSvgIcon-root" focusable="false" viewBox="-17 0 446 446.03835" aria-hidden="true"
+                    style="height: 135px; width: 135px; color: rgb(236, 239, 244); margin: 0px auto 20px;">
+                    <path d="m188.914062 228.269531-156.367187-35.527343-32.5195312 27.105468 156.3593752 35.535156zm0 0"></path>
+                    <path
+                        d="m126.105469 154.078125c-1.710938-2.097656-3.328125-4.265625-4.871094-6.480469-.496094-.703125-.941406-1.421875-1.414063-2.136718-1.03125-1.597657-2.03125-3.132813-2.984374-4.742188-.488282-.800781-.96875-1.679688-1.433594-2.527344-.886719-1.601562-1.71875-3.199218-2.519532-4.890625-.390624-.796875-.800781-1.597656-1.160156-2.398437-.945312-2.078125-1.808594-4.191406-2.609375-6.328125-.125-.335938-.285156-.65625-.414062-.992188l-108.6796878 24.6875 32.5273438 27.113281zm0 0">
+                    </path>
+                    <path
+                        d="m121.769531 111.964844c1.097657 3.890625 2.460938 7.699218 4.082031 11.402344 3.265626 7.417968 7.527344 14.351562 12.671876 20.613281 2.601562 3.164062 5.410156 6.144531 8.414062 8.921875 32.359375 29.738281 81.691406 31.070312 115.605469 3.117187 33.914062-27.953125 42.027343-76.628906 19.011719-114.070312-23.015626-37.441407-70.109376-52.183594-110.367188-34.546875-40.253906 17.636718-61.339844 62.253906-49.417969 104.554687zm84.699219-15.902344c-16.097656.019531-29.691406-11.9375-31.722656-27.90625-2.03125-15.964844 8.136718-30.945312 23.722656-34.957031v-9.136719c0-4.417969 3.582031-8 8-8s8 3.582031 8 8v9.136719c14.082031 3.636719 23.945312 16.316406 24 30.863281 0 4.417969-3.582031 8-8 8s-8-3.582031-8-8c0-8.835938-7.164062-16-16-16-8.839844 0-16 7.164062-16 16s7.160156 16 16 16c16.09375-.019531 29.6875 11.9375 31.71875 27.902344 2.03125 15.96875-8.132812 30.949218-23.71875 34.960937v9.136719c0 4.417969-3.582031 8-8 8s-8-3.582031-8-8v-9.136719c-14.085938-3.636719-23.945312-16.316406-24-30.863281 0-4.417969 3.582031-8 8-8s8 3.582031 8 8c0 8.835938 7.160156 16 16 16 8.835938 0 16-7.164062 16-16s-7.164062-16-16-16zm0 0">
+                    </path>
+                    <path
+                        d="m295.148438 142.359375c-.945313 1.542969-1.9375 3.054687-2.96875 4.550781-.519532.800782-1.039063 1.535156-1.601563 2.289063-1.253906 1.726562-2.582031 3.40625-3.941406 5.0625-.3125.375-.585938.800781-.90625 1.152343l94.128906 19.921876 26.695313-26.691407-102.917969-23.421875c-.105469.273438-.242188.535156-.355469.800782-.863281 2.21875-1.800781 4.394531-2.8125 6.535156-.386719.800781-.800781 1.601562-1.21875 2.398437-.796875 1.640625-1.679688 3.257813-2.589844 4.839844-.496094.882813-1 1.722656-1.511718 2.5625zm0 0">
+                    </path>
+                    <path
+                        d="m374.46875 244.992188-118.226562 26.871093c-.582032.132813-1.175782.199219-1.773438.199219-1.871094 0-3.683594-.652344-5.121094-1.847656l-34.878906-29.074219v204.898437l160-36.375zm0 0">
+                    </path>
+                    <path d="m380.386719 192.742188-156.367188 35.527343 32.527344 27.113281 156.359375-35.535156zm0 0"></path>
+                    <path
+                        d="m345.140625 184.34375-73.273437-15.480469c-38.722657 31.488281-94.386719 30.90625-132.449219-1.375l-72.878907 16.574219 139.929688 31.792969zm0 0">
+                    </path>
+                    <path
+                        d="m198.46875 241.140625-34.882812 29.074219c-1.4375 1.195312-3.25 1.847656-5.117188 1.847656-.597656 0-1.195312-.066406-1.777344-.199219l-118.222656-26.871093v164.671874l160 36.359376zm0 0">
+                    </path>
+                </svg>
+                <h6>Đơn hàng của bạn chưa có sản phẩm nào</h6>
+                <button class="mt-4" pButton icon="pi pi-plus" label="Thêm sản phẩm ngay"></button>
+            </div>
+        </div>
+        <div class="table-product" *ngIf="selectedOrder.products.length > 0">
+            <p-table [value]="selectedOrder.products"  [tableStyle]="{ 'min-width': '50rem', 'overflow-y': 'auto' }">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>#</th>
+                        <th>Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th style="text-align:center">Giá</th>
+                        <th style="text-align:center">ĐVT</th>
+                        <th style="text-align:center">Số lượng</th>
+                        <th style="text-align:center">Thành tiền</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product let-i="rowIndex">
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td><div *ngIf="product.productImages?.length > 0 && product.productImages[0]?.link; else noImage">
+                            <img [src]="'http://103.153.69.217:5055/api/files/images/' + product.productImages[0].link" [alt]="product.name"
+                                width="50" height="50" class="shadow-4" />
+                        </div></td>
+                        <td>{{ product.name }}</td>
+                        <td style="text-align:center">{{ product.price | currency }}</td>
+                        <td style="text-align:center">{{ product.unit }}</td>
+                        <td style="text-align:center;">
+                            <div class="product-qty">
+                                <!-- <p-inputNumber [(ngModel)]="product.quantity" mode="decimal" [showButtons]="true" inputId="minmax-buttons" [min]="0" [max]="100">
+                                </p-inputNumber> -->
+                                <p-inputNumber [(ngModel)]="product.quantity" [showButtons]="true" buttonLayout="horizontal" inputId="horizontal"
+                                    spinnerMode="horizontal" [step]="0.5" decrementButtonClass=""
+                                    incrementButtonClass="" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                                    mode="decimal" min="0" (ngModelChange)="updateTotals()">
+                                </p-inputNumber>
+                            </div>
+                            <!-- {{ product.quantity }} -->
+                        </td>
+                        <td style="text-align:center">
+                            {{ product.price * product.quantity | currency }}
+                        </td>
+                        <td>
+                            <span class="trash-icon" (click)="deleteProduct(i)">
+                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M16 1.75V3h5.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H8V1.75C8 .784 8.784 0 9.75 0h4.5C15.216 0 16 .784 16 1.75Zm-6.5 0V3h5V1.75a.25.25 0 0 0-.25-.25h-4.5a.25.25 0 0 0-.25.25ZM4.997 6.178a.75.75 0 1 0-1.493.144L4.916 20.92a1.75 1.75 0 0 0 1.742 1.58h10.684a1.75 1.75 0 0 0 1.742-1.581l1.413-14.597a.75.75 0 0 0-1.494-.144l-1.412 14.596a.25.25 0 0 1-.249.226H6.658a.25.25 0 0 1-.249-.226L4.997 6.178Z">
+                                    </path>
+                                    <path
+                                        d="M9.206 7.501a.75.75 0 0 1 .793.705l.5 8.5A.75.75 0 1 1 9 16.794l-.5-8.5a.75.75 0 0 1 .705-.793Zm6.293.793A.75.75 0 1 0 14 8.206l-.5 8.5a.75.75 0 0 0 1.498.088l.5-8.5Z">
+                                    </path>
+                                </svg>
+                            </span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <div class="container__left-bottom">
+                <div class="note">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-file-edit"></i>
+                        <input pInputText placeholder="Ghi chú đơn hàng" class="header__search-input" />
+                    </span>
+                </div>
+                <div class="total-order">
+                    <div class="total-title">Tổng tiền hàng</div>
+                    <div class="total-title">{{ selectedOrder?.totalQuantity }}</div>
+                    <div class="total-title">{{ selectedOrder?.totalAmount  }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container__right">
+        <div class="container__right-search">
+            <div class="p-toolbar-group-center ">
+                <div *ngIf="selectedCustomerAdvanced"  class="flex align-items-center gap-2 customer-item customer-current">
+                    <!-- Add customer image if available -->
+                    <div class="customer-image">
+                        <!-- Placeholder image if customer image not available -->
+                        <!-- <img [src]="customer.image || 'https://via.placeholder.com/50'" alt="{{ customer.customerName }}" /> -->
+                    </div>
+                    <div class="product-details">
+                        <div class="product-name">
+                            <span>Tên khách: {{selectedCustomerAdvanced.name}}</span>
+                            <span>Mã: {{selectedCustomerAdvanced.id}}</span>
+                        </div>
+                        <div class="product-price">
+                            <span>Số điện thoại: {{selectedCustomerAdvanced.phoneNumber}}</span>
+                            <span>Địa chỉ: {{selectedCustomerAdvanced.wardName}} - {{selectedCustomerAdvanced.districtname}} - {{selectedCustomerAdvanced.cityName}}</span>
+                        </div>
+                    </div>
+                    <div (click)="deleteSelectCustomer()" class="order-close-icon">
+                        <svg class="MuiSvgIcon-root" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M14.59 8L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <p-autoComplete  #autoCompleteCustomer  *ngIf="!selectedCustomerAdvanced"  [(ngModel)]="selectedCustomer" [suggestions]="filteredCustomers" [style]="{width:'100%'}"
+                    (onFocus)="showAllCustomers()"
+                    (completeMethod)="filterCustomers($event)" field="name"
+                    placeholder="Thêm khách hàng vào đơn (F4)">
+                    <ng-template let-customer pTemplate="item">
+                        <div (mousedown)="addCustomerToOrder(customer)" class="flex align-items-center gap-2 customer-item ">
+                            <!-- Add customer image if available -->
+                            <div class="customer-image">
+                                <!-- Placeholder image if customer image not available -->
+                                <img [src]="customer.image || 'https://via.placeholder.com/50'" alt="{{ customer.customerName }}" />
+                            </div>
+                            <div class="product-details">
+                                <div class="product-name">
+                                    <span>{{ customer.name }}</span>
+                                    <span>Mã: {{ customer.id }}</span>
+                                </div>
+                                <div class="product-price">
+                                    <span>Số điện thoại: {{ customer.phoneNumber }}</span>
+                                    <span>Địa chỉ: {{ customer.wardName +' - '+ customer.districtname+' - '+ customer.cityName }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-autoComplete>
+            </div>
+        </div>
+        <div class="container__right-product">
+            <div class="container__right-product__list">
+                <div (click)="addProductToOrder(product)" class="container__right-product__item" *ngFor="let product of products">
+                    <div class="container__right-product__item-image">
+                        <div *ngIf="product.productImages?.length > 0 && product.productImages[0]?.link; else noImage">
+                            <img [src]="'http://103.153.69.217:5055/api/files/images/' + product.productImages[0].link" [alt]="product.name"
+                                width="50" height="50" style="border-radius: 5px"/>
+                        </div>
+                        <ng-template #noImage>
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="jss3869"
+                                style="color: rgb(232, 234, 235); height: 50px;">
+                                <path
+                                    d="M19 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2ZM5 19V5h14l.002 14H5Z"
+                                    fill="currentColor"></path>
+                                <path d="m10 14-1-1-3 4h12l-5-7-3 4ZM8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" fill="currentColor"></path>
+                            </svg>
+                        </ng-template>
+                    </div>
+                    <div class="container__right-product__item-info">
+                        <div class="container__right-product__item-name">
+                            {{product.name}}
+                        </div>
+                        <div class="container__right-product__item-info-qty">
+                            <span>Tồn:</span><span>{{product.totalQuantity}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container__right-bottom">
+            <div class="paganation">
+                <p-paginator [first]="first" [rows]="1" [totalRecords]="120" (onPageChange)="onPageChange($event)"
+                    [showJumpToPageDropdown]="true" [showPageLinks]="false"></p-paginator>
+            </div>
+            <p-button type="button" (click)="visibleSidebar2 = true" [style]="{width:'300px',padding: '15px','display': 'flex','justify-content': 'center'}">Thanh toán</p-button>
+        </div>
+    </div>
+</div>
+
+<p-sidebar [(visible)]="visibleSidebar2" position="right" [baseZIndex]="1000000" [style]="{width: '450px'}">
+    <ng-template pTemplate="header">
+        <div class="payment__header-left">
+            <span>Người bán:</span><span>Bùi Thị Bảo Anh</span>
+        </div>
+        <div class="payment__header-right">
+            <span>{{ selectedOrder.createdAt | date: 'dd/MM/yyyy' }}</span>
+            <span>{{ selectedOrder.createdAt | date: 'HH:mm' }}</span>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="content">
+        <div class="payment__content">
+            <h5 *ngIf="selectedOrder.customer.name" class="payment__customer-name">{{selectedOrder.customer.name}}</h5>
+            <h5 *ngIf="!selectedOrder.customer.name" class="payment__customer-name">Khách lẻ</h5>
+            <div class="payment__content-item">
+                <span>Tổng tiền hàng</span><span>{{selectedOrder?.totalAmount }}</span>
+            </div>
+            <div class="payment__content-item">
+                <span>Giảm giá ( F6 )</span>
+                <span>
+                    <span class="payment__unit-sale">
+                        <p-inputNumber [(ngModel)]="paymentInfo.discountAmount" (ngModelChange)="calculateTotal()"
+                            inputId="minmax" mode="decimal" [min]="0" [locale]="''" [placeholder]="'0'"
+                            [decimalSeparator]="','" [thousandSeparator]="'.'" [minFractionDigits]="0"
+                            [maxFractionDigits]="2">
+                        </p-inputNumber>
+                    </span>
+                    <span class="payment__unit-sale">
+                        <p-dropdown [options]="units" [(ngModel)]="selectedUnit" (ngModelChange)="calculateTotal()"
+                            optionLabel="name" placeholder="" />
+                    </span>
+                </span>
+            </div>
+            <div class="payment__content-item">
+                <span>Khách cần trả</span><span>{{ paymentInfo.amountPaid | currency:'VND':'symbol':'1.0-0':'' }}</span>
+            </div>
+            <div class="payment__content-item">
+                <span>Khách đã trả (F8)</span>
+                <span>
+                    <p-inputNumber 
+                    [(ngModel)]="paymentInfo.amountPaidByCustomer"
+                        (ngModelChange)="handlePaymentChange($event)" inputId="minmax" mode="decimal"
+                        [placeholder]="'0'" [min]="0" [locale]="''"></p-inputNumber>
+                </span>
+            </div>
+            <div class="payment__content-item">
+                <span>Tiền thừa khách trả</span><span>{{paymentInfo.moneyReturn }}</span>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <div class="flex align-items-center">
+                    <p-radioButton name="paymentMethod" value="cash" [(ngModel)]="paymentMethod"
+                        inputId="cash"></p-radioButton>
+                    <label for="cash" class="ml-2">Tiền mặt</label>
+                </div>
+                <div class="flex align-items-center">
+                    <p-radioButton name="paymentMethod" value="credit-card" [(ngModel)]="paymentMethod"
+                        inputId="credit-card"></p-radioButton>
+                    <label for="credit-card" class="ml-2">Chuyển khoản</label>
+                </div>
+            </div>
+            <div class="options__price-list">
+                <p-selectButton [options]="suggestedAmounts" [(ngModel)]="selectedOption" optionLabel="label"  (ngModelChange)="handleSelectOptionChange()">
+                    <ng-template let-item>
+                        <span class="options__price-item" >{{ item.label }}</span>
+                    </ng-template>
+                </p-selectButton>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <p-button (click)="payment()" [style]="{width:'100%',padding: '15px','display': 'flex','justify-content': 'center'}">Thanh
+            toán</p-button>
+    </ng-template>
+</p-sidebar>
+
+<!-- <div id="print-section" style="display: none;">
+    <div class="print-header">
+        <h1>CÔNG TY TNHH IN VẢI QUỐC HUY</h1>
+        <p>ĐC: Tổ dân phố bưu điện Yên Viên, GL, HN</p>
+        <h2>PHIẾU ĐỀ NGHỊ THANH TOÁN</h2>
+        <p>Tên khách hàng: {{printData.customer}}</p>
+        <p>SĐT: {{printData.phone}}</p>
+        <p>Ngày đề nghị thanh toán: {{printData.paymentDate | date:'dd/MM/yyyy'}}</p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Lệnh SX</th>
+                <th>Ngày đặt hàng</th>
+                <th>Tên mẫu</th>
+                <th>Hình ảnh</th>
+                <th>Đơn vị</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+                <th>Đã thanh toán</th>
+                <th>Đang nợ</th>
+                <th>Yêu cầu thanh toán</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of printData.orders; let i = index">
+                <td>{{i + 1}}</td>
+                <td>{{item.commandCode}}</td>
+                <td>{{item.mostRecentPayment | date:'dd/MM/yyyy'}}</td>
+                <td>{{item.templateName}}</td>
+                <td><img [src]="item.image" alt="Hình ảnh" width="50"></td>
+                <td>{{item.unit}}</td>
+                <td>{{item.quantity}}</td>
+                <td>{{item.unitPrice | currency:'VND'}}</td>
+                <td>{{item.amountPayable | currency:'VND'}}</td>
+                <td>{{item.hasBeenPaid | currency:'VND'}}</td>
+                <td>{{item.inDebt| currency:'VND'}}</td>
+                <td>{{item.paymentRequest | currency:'VND'}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>Tổng số tiền phải thanh toán: {{printData.totalAmount | currency:'VND'}}</p>
+    <p>Tổng số tiền đã thanh toán: {{printData.totalPaid | currency:'VND'}}</p>
+    <p>Yêu cầu thanh toán còn: {{printData.paymentRequestTotal | currency:'VND'}}</p>
+</div> -->
