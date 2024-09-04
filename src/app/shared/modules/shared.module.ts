@@ -18,6 +18,10 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { CalendarModule } from 'primeng/calendar';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { ChipsModule } from 'primeng/chips';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+
 // import { ToastModule } from 'primeng/toast';
 
 @NgModule({
@@ -28,13 +32,17 @@ import { SplitButtonModule } from 'primeng/splitbutton';
         ButtonModule,
         TableModule,
         CalendarModule,
+        ChipsModule,
         FileUploadModule,
+        AutoCompleteModule,
+        InputSwitchModule,
         SplitButtonModule,
         RippleModule,
         ToastModule,
         ToolbarModule,
         RatingModule,
         InputTextModule,
+
         InputTextareaModule,
         DropdownModule,
         RadioButtonModule,
@@ -47,7 +55,10 @@ import { SplitButtonModule } from 'primeng/splitbutton';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
+        ChipsModule,
         ButtonModule,
+        AutoCompleteModule,
+        InputSwitchModule,
         TableModule,
         FileUploadModule,
         RippleModule,

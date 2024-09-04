@@ -1,3 +1,19 @@
+// import { Component, OnInit } from '@angular/core';
+
+// @Component({
+//   selector: 'app-show',
+//   templateUrl: './show.component.html',
+//   styleUrls: ['./show.component.css']
+// })
+// export class ShowComponent implements OnInit {
+
+//   constructor() { }
+
+//   ngOnInit() {
+//   }
+
+// }
+
 import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/core/models/product';
 import { MessageService } from 'primeng/api';
@@ -10,64 +26,19 @@ import { CategoryService } from 'src/app/core/services/category.service';
 import { NodeService } from 'src/app/core/services/node.service';
 import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
 
-const warrantyOrders = [
-    {
-        id: 1,
-        code: 'PBH001',
-        customerName: 'Bùi Thị Bảo Anh',
-        phoneNumber: '0961462860',
-        productName: 'Máy cắt cỏ trục băm (Quạt cỏ) Honda TL662',
-        serialNumber: 'LI42T5008',
-        orderCode: 'DH0001',
-        expiryDate: '09/12/2024 23:59',
-        details: {
-            barcode: '4511413404133',
-            productName: 'Máy cắt cỏ trục băm (Quạt cỏ) Honda TL662',
-            customerName: 'Bùi Thị Bảo Anh',
-            orderDate: '09/01/2024',
-            branch: 'Chi nhánh Yên Mỹ',
-            warrantyPolicy: 'Bảo hành 12 tháng',
-            warrantyDuration: '12 tháng',
-            warrantyExpiryDate: '09/12/2024 23:59',
-            quantity: 1,
-        },
-    },
-];
-
-// Cấu trúc dữ liệu giả
-interface WarrantyOrder {
-    id: number;
-    code: string;
-    customerName: string;
-    phoneNumber: string;
-    productName: string;
-    serialNumber: string;
-    orderCode: string;
-    expiryDate: string;
-    details: WarrantyOrderDetails;
-}
-
-interface WarrantyOrderDetails {
-    barcode: string;
-    productName: string;
-    customerName: string;
-    orderDate: string;
-    branch: string;
-    warrantyPolicy: string;
-    warrantyDuration: string;
-    warrantyExpiryDate: string;
-    quantity: number;
-}
-
 @Component({
-    selector: 'app-warranty-certificate',
-    templateUrl: './warranty-certificate.component.html',
-    styleUrls: ['./warranty-certificate.component.css'],
+    selector: 'app-show',
+    templateUrl: './show.component.html',
+    styleUrls: ['./show.component.css'],
     providers: [MessageService],
 })
-export class WarrantyCertificateComponent implements OnInit {
+// @Component({
+//     selector: 'app-warranty-request',
+//     templateUrl: './warranty-request.component.html',
+//     styleUrls: ['./warranty-request.component.css'],
+// })
+export class ShowComponent implements OnInit {
     optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
-    warrantyOrders: WarrantyOrder[] = warrantyOrders;
     nodes!: any[];
     optionsStatus: any[] = [
         { name: 'Ẩn', value: 0 },
@@ -129,7 +100,7 @@ export class WarrantyCertificateComponent implements OnInit {
     }
 
     async ngOnInit() {
-        this.items = [{ label: 'Danh sách phiếu bảo hành' }];
+        this.items = [{ label: 'Danh sách yêu cầu bảo hành' }];
         // this.loading = true;
         let response = await this.productService.FilterProduct(
             this.optionsFillerProduct

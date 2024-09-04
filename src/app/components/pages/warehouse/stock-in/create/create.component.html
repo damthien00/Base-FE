@@ -1,0 +1,480 @@
+<div class="grid">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-2">
+            <div class="">
+                <h3>Tạo phiếu nhập kho</h3>
+                <p-breadcrumb
+                    [model]="items"
+                    [home]="{ icon: 'pi pi-home' }"
+                ></p-breadcrumb>
+            </div>
+            <ng-template pTemplate="right"></ng-template>
+        </p-toolbar>
+        <div class="grid">
+            <div class="col-8">
+                <div class="card" style="min-height: 525px">
+                    <p-table
+                        #dt
+                        [value]="stockInReceipt.inventoryStockInDetails"
+                        responsiveLayout="scroll"
+                        [rowHover]="true"
+                        dataKey="id"
+                    >
+                        <ng-template pTemplate="caption">
+                            <div
+                                class="flex flex-column gap-3 align-items-end md:flex-row md:"
+                            >
+                                <div class="grid p-fluid" style="width: 100%">
+                                    <div class="col-12 md:col-11">
+                                        <span
+                                            class="col-md-11 block mt-2 md:mt-0 p-input-icon-left box-search"
+                                        >
+                                            <i class="pi pi-search"></i>
+                                            <input
+                                                pInputText
+                                                type="text"
+                                                placeholder="Tìm kiếm sản phẩm theo tên,mã"
+                                                style="width: 100%"
+                                                (input)="
+                                                    onProductSearch($event)
+                                                "
+                                                (focus)="showProductList()"
+                                                #searchInput
+                                            />
+                                            <div
+                                                class="product__list"
+                                                *ngIf="showProducts"
+                                            >
+                                                <div
+                                                    *ngFor="
+                                                        let item of filteredDatas
+                                                    "
+                                                    class="product__item"
+                                                    (click)="
+                                                        addToCart(item, $event)
+                                                    "
+                                                >
+                                                    <div
+                                                        class="product__item-left"
+                                                    >
+                                                        <img
+                                                            [src]="
+                                                                item.productImage
+                                                            "
+                                                            alt="Product Image"
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        class="product__item-center"
+                                                    >
+                                                        <h1
+                                                            class="product-name"
+                                                        >
+                                                            {{
+                                                                item.productName
+                                                            }}
+                                                        </h1>
+                                                        <span
+                                                            class="product-code"
+                                                        >
+                                                            {{
+                                                                item.serialNumbers.join(
+                                                                    ", "
+                                                                )
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                    <div
+                                                        class="product__item-right"
+                                                    >
+                                                        <span
+                                                            class="product-price"
+                                                        >
+                                                            {{
+                                                                item.price
+                                                                    | currency
+                                                                        : "VND"
+                                                                        : "symbol"
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            class="product-inventory"
+                                                        >
+                                                            Có thể bán:
+                                                            <strong>{{
+                                                                item.inventory
+                                                            }}</strong>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- [(ngModel)]="this.optionsFillerProduct.KeyWord" -->
+                                        </span>
+                                    </div>
+                                    <div class="col-12 md:col-1">
+                                        <div
+                                            class="col-md-1"
+                                            (click)="onToggleActiveBarcode()"
+                                        >
+                                            <svg
+                                                [ngStyle]="{
+                                                    'border-radius': '4px',
+                                                    'background-color':
+                                                        activeBarcode
+                                                            ? '#2a2986'
+                                                            : 'transparent'
+                                                }"
+                                                class="block p-2"
+                                                _ngcontent-ng-c955548431=""
+                                                stroke-width="0"
+                                                viewBox="0 0 256 256"
+                                                height="42px"
+                                                width="42px"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                [attr.stroke]="
+                                                    activeBarcode
+                                                        ? '#fff'
+                                                        : '#cccbcc'
+                                                "
+                                                [attr.fill]="
+                                                    activeBarcode
+                                                        ? '#fff'
+                                                        : '#cccbcc'
+                                                "
+                                            >
+                                                <path
+                                                    _ngcontent-ng-c955548431=""
+                                                    d="M232,48V88a8,8,0,0,1-16,0V56H184a8,8,0,0,1,0-16h40A8,8,0,0,1,232,48ZM72,200H40V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16Zm152-40a8,8,0,0,0-8,8v32H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,224,160ZM32,96a8,8,0,0,0,8-8V56H72a8,8,0,0,0,0-16H32a8,8,0,0,0-8,8V88A8,8,0,0,0,32,96ZM80,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,80,80Zm104,88V88a8,8,0,0,0-16,0v80a8,8,0,0,0,16,0ZM144,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,144,80Zm-32,0a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,112,80Z"
+                                                ></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>#</th>
+                                <th>Ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th style="text-align: center">Giá nhập</th>
+                                <th style="text-align: center">ĐVT</th>
+                                <th style="text-align: center">Số lượng</th>
+                                <th style="text-align: center">Thành tiền</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-data let-i="rowIndex">
+                            <tr>
+                                <td style="width: 3%">
+                                    {{ i + 1 }}
+                                </td>
+                                <td style="width: 12.5%">
+                                    <img
+                                        [src]="data.productImage"
+                                        alt="Product Image"
+                                        style="
+                                            width: 50px;
+                                            height: 50px;
+                                            border-radius: 4px;
+                                        "
+                                    />
+                                </td>
+                                <td style="width: 22.5%">
+                                    {{ data.productName }}
+                                </td>
+                                <td style="width: 12.5%; text-align: center">
+                                    <p-inputNumber
+                                        inputId="integeronly"
+                                        [(ngModel)]="data.price"
+                                        (ngModelChange)="updateTotal(data)"
+                                        (onFocus)="
+                                            functionService.handleFocusPrice(
+                                                $event
+                                            )
+                                        "
+                                    />
+                                </td>
+                                <td style="width: 12.5%; text-align: center">
+                                    {{ data.unit }}
+                                </td>
+                                <td style="width: 12.5%; text-align: center">
+                                    <div class="flex align-items-center">
+                                        <p-inputNumber
+                                            [(ngModel)]="data.quantity"
+                                            (ngModelChange)="updateTotal(data)"
+                                            [showButtons]="true"
+                                            buttonLayout="horizontal"
+                                            (onFocus)="
+                                                functionService.handleFocusPrice(
+                                                    $event
+                                                )
+                                            "
+                                            inputId="horizontal"
+                                            spinnerMode="horizontal"
+                                            [min]="1"
+                                            [step]="1"
+                                            decrementButtonClass="p-button-danger"
+                                            incrementButtonClass="p-button-success"
+                                            incrementButtonIcon="pi pi-plus"
+                                            decrementButtonIcon="pi pi-minus"
+                                        />
+                                    </div>
+                                </td>
+                                <td style="width: 12.5%; text-align: center">
+                                    {{ data.total | numberFormat }}
+                                </td>
+                                <td style="width: 7%; text-align: center">
+                                    <i
+                                        class="pi pi-trash"
+                                        (click)="removeProduct(i)"
+                                    ></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="8" class="p-3 border-none">
+                                    <div class="flex flex-column">
+                                        <label for="" class="mb-2"
+                                            >Số khung/ số máy</label
+                                        >
+                                        <p-chips
+                                            [(ngModel)]="data.serialNumbers"
+                                            placeholder="Nhập và Enter/ Số khung, số máy"
+                                        >
+                                            <ng-template
+                                                let-item
+                                                pTemplate="item"
+                                            >
+                                                {{ item }}
+                                            </ng-template>
+                                        </p-chips>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div class="col-4">
+                <div
+                    class="card"
+                    style="position: sticky; top: 97px; min-height: 525px"
+                >
+                    <div class="grid p-fluid">
+                        <div class="col-12 md:col-12">
+                            <div class="supplier-select mb-5">
+                                <p-treeSelect
+                                    (onClear)="onClear()"
+                                    optionLabel="label"
+                                    [ngModelOptions]="{ standalone: true }"
+                                    [showClear]="true"
+                                    (onNodeSelect)="onNodeSelect($event)"
+                                    class="md:w-100 w-full"
+                                    containerStyleClass="w-full"
+                                    [(ngModel)]="selectedNodes"
+                                    [options]="treeCategory"
+                                    placeholder="Chọn nhà cung cấp"
+                                    [filter]="true"
+                                    [filterInputAutoFocus]="true"
+                                >
+                                    <ng-template let-node pTemplate="default">
+                                        <span>{{ node.name }}</span>
+                                    </ng-template>
+                                </p-treeSelect>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-6 md:mb-0">
+                                    Nhân viên: Bùi Thị Bảo Anh
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end"
+                                >
+                                    28/6/2024 13:23
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <!-- Tổng số sản phẩm -->
+
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Tổng số sản phẩm:
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
+                                >
+                                    {{
+                                        stockInReceipt.inventoryStockInDetails
+                                            .length
+                                    }}
+                                </div>
+                            </div>
+
+                            <div class="field grid">
+                                <!-- Tổng tiền hàng -->
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Tổng tiền hàng:
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
+                                >
+                                    {{
+                                        stockInReceipt.totalPrice | numberFormat
+                                    }}
+                                </div>
+                            </div>
+
+                            <div class="field grid">
+                                <!-- Giảm giá -->
+                                <div class="col-12 mb-2 md:col-6 md:mb-0">
+                                    Giảm giá:
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end input-number-custom"
+                                >
+                                    <p-inputNumber
+                                        inputId="integeronly"
+                                        [(ngModel)]="
+                                            stockInReceipt.totalDiscountAmount
+                                        "
+                                        (ngModelChange)="updatePaymentInfo()"
+                                        (onFocus)="openDiscountModal()"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="field grid">
+                                <!-- Cần trả nhà cung cấp -->
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Cần trả nhà cung cấp:
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end total_amount_paid"
+                                >
+                                    {{
+                                        stockInReceipt.totalAmountPaid
+                                            | numberFormat
+                                    }}
+                                </div>
+                            </div>
+
+                            <div class="field grid">
+                                <!-- Tiền trả nhà cung cấp -->
+                                <div
+                                    class="col-12 mb-2 md:col-6 md:mb-0 flex align-items-center"
+                                >
+                                    Tiền trả nhà cung cấp:
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end input-number-custom input-number-payment"
+                                >
+                                    <p-inputNumber
+                                        inputId="integeronly"
+                                        [(ngModel)]="
+                                            stockInReceipt.customerPayment
+                                        "
+                                        (ngModelChange)="updatePaymentInfo()"
+                                        (onFocus)="
+                                            functionService.handleFocusPrice(
+                                                $event
+                                            )
+                                        "
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <!-- Ghi chú -->
+                                <label htmlFor="email1">Ghi chú</label>
+                                <textarea
+                                    [(ngModel)]="stockInReceipt.note"
+                                    pInputTextarea
+                                    spellcheck="false"
+                                ></textarea>
+                            </div>
+                            <button
+                                pButton
+                                pRipple
+                                icon="pi pi-plus"
+                                label="Lưu"
+                                [routerLink]="['/warehouse/stock-in/create']"
+                            ></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog
+    [(visible)]="displayDiscountModal"
+    modal="true"
+    [closable]="false"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '30vw' }"
+>
+    <!-- Header -->
+    <ng-template pTemplate="header">
+        <h4>Giảm giá</h4>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="content">
+        <div class="field grid">
+            <!-- Tiền trả nhà cung cấp -->
+            <div class="col-12 mb-2 md:col-7 md:mb-0 flex align-items-center">
+                Giảm giá thường:
+                <div class="discount-options">
+                    <span
+                        class="active"
+                        (click)="onDiscountOptionClick('%')"
+                        [ngClass]="{
+                            active: temporaryDiscountUnit === '%'
+                        }"
+                        >%</span
+                    >
+                    <span
+                        (click)="onDiscountOptionClick('VND')"
+                        [ngClass]="{
+                            active: temporaryDiscountUnit === 'VND'
+                        }"
+                        >VNĐ</span
+                    >
+                </div>
+            </div>
+            <div class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end">
+                <p-inputNumber
+                    [(ngModel)]="temporaryDiscountRate"
+                    (ngModelChange)="updatePaymentInfo()"
+                    (onFocus)="functionService.handleFocusPrice($event)"
+                />
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- Footer -->
+    <ng-template pTemplate="footer">
+        <div class="flex gap-2 justify-content-end">
+            <button
+                pButton
+                pRipple
+                type="button"
+                label="Thoát"
+                icon="pi pi-times"
+                (click)="displayDiscountModal = false"
+                class="p-button-danger"
+            ></button>
+            <button
+                type="submit"
+                pButton
+                label="Lưu"
+                (click)="saveDiscount()"
+                icon="pi pi-check"
+                class="p-button-primary"
+            ></button>
+        </div>
+    </ng-template>
+</p-dialog>

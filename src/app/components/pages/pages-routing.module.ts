@@ -22,8 +22,15 @@ import { RouterModule } from '@angular/router';
             {
                 path: 'warehouse/stock-in',
                 loadChildren: () =>
-                    import('./warehouse/stock-in/stock-in.module').then(
-                        (m) => m.StockInModule
+                    import('./warehouse/stock-in/show/show.module').then(
+                        (m) => m.ShowModule
+                    ),
+            },
+            {
+                path: 'warehouse/stock-in/create',
+                loadChildren: () =>
+                    import('./warehouse/stock-in/create/create.module').then(
+                        (m) => m.CreateModule
                     ),
             },
             {
@@ -36,8 +43,8 @@ import { RouterModule } from '@angular/router';
             {
                 path: 'branch',
                 loadChildren: () =>
-                    import('./branch/branch.module').then(
-                        (m) => m.BranchModule
+                    import('./branch/show/show.module').then(
+                        (m) => m.ShowModule
                     ),
             },
 
@@ -51,16 +58,16 @@ import { RouterModule } from '@angular/router';
             {
                 path: 'warranty/warranty-request',
                 loadChildren: () =>
-                    import(
-                        './warranty/warranty-request/warranty-request.module'
-                    ).then((m) => m.WarrantyRequestModule),
+                    import('./warranty/warranty-request/show/show.module').then(
+                        (m) => m.ShowModule
+                    ),
             },
             {
                 path: 'warranty/warranty-policy',
                 loadChildren: () =>
-                    import(
-                        './warranty/warranty-policy/warranty-policy.module'
-                    ).then((m) => m.WarrantyPolicyModule),
+                    import('./warranty/warranty-policy/show/show.module').then(
+                        (m) => m.ShowModule
+                    ),
             },
 
             {

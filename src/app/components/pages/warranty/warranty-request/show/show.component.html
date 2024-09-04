@@ -1,0 +1,490 @@
+<div class="grid">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-2">
+            <div class="">
+                <h3>Phiếu bảo hành</h3>
+                <p-breadcrumb
+                    [model]="items"
+                    [home]="{ icon: 'pi pi-home' }"
+                ></p-breadcrumb>
+            </div>
+            <ng-template pTemplate="right">
+                <button
+                    pButton
+                    pRipple
+                    [routerLink]="['/products/create']"
+                    icon="pi pi-plus"
+                    label="Tạo yêu cầu bảo hành"
+                ></button>
+            </ng-template>
+        </p-toolbar>
+        <div class="card">
+            <p-toast></p-toast>
+            <p-table
+                #dt
+                [value]="products"
+                [columns]="cols"
+                responsiveLayout="scroll"
+                [rows]="10"
+                [globalFilterFields]="[
+                    'name',
+                    'country.name',
+                    'representative.name',
+                    'status'
+                ]"
+                [paginator]="true"
+                [rowsPerPageOptions]="[10, 20, 30]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="{first} - {last} trong tổng {totalRecords} sản phẩm"
+                [(selection)]="selectedProducts"
+                selectionMode="multiple"
+                [rowHover]="true"
+                dataKey="id"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex flex-column gap-3 align-items-end md:flex-row md:"
+                    >
+                        <div class="flex flex-column">
+                            <label
+                                for="email1"
+                                class="block text-900 text-large font-weight mb-2"
+                                >Tìm kiếm theo sản phẩm:</label
+                            >
+                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <i class="pi pi-search"></i>
+                                <input
+                                    pInputText
+                                    type="text"
+                                    [(ngModel)]="
+                                        this.optionsFillerProduct.KeyWord
+                                    "
+                                    placeholder="Tìm kiếm theo tên/SKU sản phẩm"
+                                    style="width: 350px"
+                                    class="sm:"
+                                />
+                            </span>
+                        </div>
+                        <div class="flex flex-column">
+                            <label
+                                for="email1"
+                                class="block text-900 text-large font-weight mb-2"
+                                >Ngày tạo:</label
+                            >
+                            <p-calendar
+                                [showIcon]="true"
+                                placeholder="Chọn khoảng thời gian"
+                                inputId="icon"
+                            ></p-calendar>
+                        </div>
+                        <div class="flex flex-column">
+                            <label
+                                for="email1"
+                                class="block text-900 text-large font-weight mb-2"
+                                >Trạng thái:</label
+                            >
+                            <p-dropdown
+                                [options]="this.optionsStatus"
+                                [(ngModel)]="this.statusFilter"
+                                optionLabel="name"
+                                [showClear]="true"
+                                placeholder="Chọn trạng thái"
+                            >
+                            </p-dropdown>
+                        </div>
+                        <button
+                            pButton
+                            pRipple
+                            label="Lọc"
+                            (click)="EvenFilter()"
+                        ></button>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">STT</th>
+                        <th pSortableColumn="code">Mã phiếu</th>
+                        <th style="width: 15rem" pSortableColumn="name">
+                            Tên khách hàng
+                        </th>
+                        <th>Số điện thoại</th>
+                        <th pSortableColumn="branch">Chi nhánh</th>
+                        <th pSortableColumn="price">Trạng thái</th>
+                        <th pSortableColumn="category">Ngày tạo yêu cầu</th>
+                    </tr>
+                </ng-template>
+                <ng-template
+                    pTemplate="body"
+                    let-product
+                    let-expanded="expanded"
+                >
+                    <tr>
+                        <td>
+                            <div
+                                *ngIf="
+                                    product.productVariants &&
+                                    product.productVariants.length > 0
+                                "
+                            >
+                                <p-button
+                                    type="button"
+                                    pRipple
+                                    [pRowToggler]="product"
+                                    [text]="true"
+                                    [rounded]="true"
+                                    [plain]="true"
+                                    [icon]="
+                                        expanded
+                                            ? 'pi pi-chevron-down'
+                                            : 'pi pi-chevron-right'
+                                    "
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div
+                                *ngIf="
+                                    product.productImages?.length > 0 &&
+                                        product.productImages[0]?.link;
+                                    else noImage
+                                "
+                            >
+                                <img
+                                    [src]="
+                                        'http://103.153.69.217:5055/api/files/images/' +
+                                        product.productImages[0].link
+                                    "
+                                    [alt]="product.name"
+                                    width="50"
+                                    height="50"
+                                    class="shadow-4"
+                                />
+                            </div>
+                        </td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.categoryName }}</td>
+                        <td>{{ product.price | currency : "USD" }}</td>
+                        <td>{{ product.totalQuantity }}</td>
+                        <td>
+                            {{ product.totalQuantity }}
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="rowexpansion" let-product>
+                    <tr>
+                        <td colspan="12">
+                            <div class="p-3">
+                                <p-table
+                                    [value]="product.productVariants"
+                                    dataKey="id"
+                                >
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th pSortableColumn="id">
+                                                Ảnh <p-sortIcon field="price" />
+                                            </th>
+                                            <th pSortableColumn="customer">
+                                                Phiên bản
+                                                <p-sortIcon field="customer" />
+                                            </th>
+                                            <th pSortableColumn="date">
+                                                Tồn kho
+                                                <p-sortIcon field="date" />
+                                            </th>
+                                            <th pSortableColumn="amount">
+                                                Giá<p-sortIcon field="amount" />
+                                            </th>
+                                            <th pSortableColumn="status">
+                                                Trạng thái
+                                                <p-sortIcon field="status" />
+                                            </th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-order>
+                                        <tr>
+                                            <td>
+                                                <img
+                                                    [src]="
+                                                        'http://103.153.69.217:5055/api/files/images/' +
+                                                        order.linkImage
+                                                    "
+                                                    [alt]="order.name"
+                                                    width="50"
+                                                    height="50"
+                                                    class="shadow-4"
+                                                />
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <h6>
+                                                        {{
+                                                            product.name +
+                                                                " - " +
+                                                                order.valuePropeties1 +
+                                                                " - " +
+                                                                order.valuePropeties2
+                                                        }}
+                                                    </h6>
+                                                    <span>{{ order.sku }}</span>
+                                                </div>
+                                            </td>
+                                            <td>{{ order.quantity }}</td>
+                                            <td>
+                                                {{
+                                                    order.price
+                                                        | currency : "USD"
+                                                }}
+                                            </td>
+                                            <td>
+                                                <p-tag
+                                                    [value]="order.status"
+                                                    [severity]="
+                                                        getStatusSeverity(
+                                                            order.status
+                                                        )
+                                                    "
+                                                />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                    <!-- <ng-template pTemplate="emptymessage">
+                                        <tr>
+                                            <td colspan="6">There are no order for this product yet.</td>
+                                        </tr>
+                                    </ng-template> -->
+                                </p-table>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog
+            [(visible)]="productDialog"
+            [style]="{ width: '450px' }"
+            header="Product Details"
+            [modal]="true"
+            class="p-fluid"
+        >
+            <ng-template pTemplate="content">
+                <img
+                    [src]="'assets/demo/images/product/' + product.image"
+                    [alt]="product.image"
+                    width="150"
+                    class="mt-0 mx-auto mb-5 block shadow-2"
+                    *ngIf="product.image"
+                />
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input
+                        type="text"
+                        pInputText
+                        id="name"
+                        [(ngModel)]="product.name"
+                        required
+                        autofocus
+                        [ngClass]="{
+                            'ng-invalid ng-dirty': submitted && !product.name
+                        }"
+                    />
+                    <small
+                        class="ng-dirty ng-invalid"
+                        *ngIf="submitted && !product.name"
+                        >Name is required.</small
+                    >
+                </div>
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea
+                        id="description"
+                        pInputTextarea
+                        [(ngModel)]="product.description"
+                        required
+                        rows="3"
+                        cols="20"
+                    ></textarea>
+                </div>
+                <div class="field">
+                    <label for="status">Inventory Status</label>
+                    <p-dropdown
+                        [(ngModel)]="product.inventoryStatus"
+                        inputId="inventoryStatus"
+                        optionValue="label"
+                        [options]="statuses"
+                        placeholder="Select"
+                    >
+                        <ng-template pTemplate="selectedItem">
+                            <span
+                                *ngIf="product && product.inventoryStatus"
+                                [class]="
+                                    'product-badge status-' +
+                                    product.inventoryStatus
+                                        .toString()
+                                        .toLowerCase()
+                                "
+                                >{{ product.inventoryStatus }}</span
+                            >
+                        </ng-template>
+                        <ng-template let-option pTemplate="item">
+                            <span
+                                [class]="'product-badge status-' + option.value"
+                                >{{ option.label }}</span
+                            >
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+
+                <div class="field">
+                    <label class="mb-3">Category</label>
+                    <div class="formgrid grid">
+                        <div class="field-radiobutton col-6">
+                            <p-radioButton
+                                id="category1"
+                                name="category"
+                                value="Accessories"
+                                [(ngModel)]="product.category"
+                            ></p-radioButton>
+                            <label for="category1">Accessories</label>
+                        </div>
+                        <div class="field-radiobutton col-6">
+                            <p-radioButton
+                                id="category2"
+                                name="category"
+                                value="Clothing"
+                                [(ngModel)]="product.category"
+                            ></p-radioButton>
+                            <label for="category2">Clothing</label>
+                        </div>
+                        <div class="field-radiobutton col-6">
+                            <p-radioButton
+                                id="category3"
+                                name="category"
+                                value="Electronics"
+                                [(ngModel)]="product.category"
+                            ></p-radioButton>
+                            <label for="category3">Electronics</label>
+                        </div>
+                        <div class="field-radiobutton col-6">
+                            <p-radioButton
+                                id="category4"
+                                name="category"
+                                value="Fitness"
+                                [(ngModel)]="product.category"
+                            ></p-radioButton>
+                            <label for="category4">Fitness</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formgrid grid">
+                    <div class="field col">
+                        <label for="price">Price</label>
+                        <p-inputNumber
+                            id="price"
+                            [(ngModel)]="product.price"
+                            mode="currency"
+                            currency="USD"
+                            locale="en-US"
+                        ></p-inputNumber>
+                    </div>
+                    <div class="field col">
+                        <label for="quantity">Quantity</label>
+                        <p-inputNumber
+                            id="quantity"
+                            [(ngModel)]="product.quantity"
+                        ></p-inputNumber>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button
+                    pButton
+                    pRipple
+                    label="Cancel"
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    (click)="hideDialog()"
+                ></button>
+                <button
+                    pButton
+                    pRipple
+                    label="Save"
+                    icon="pi pi-check"
+                    class="p-button-text"
+                    (click)="saveProduct()"
+                ></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog
+            [(visible)]="deleteProductDialog"
+            header="Confirm"
+            [modal]="true"
+            [style]="{ width: '450px' }"
+        >
+            <div class="flex align-items-center justify-content-center">
+                <i
+                    class="pi pi-exclamation-triangle mr-3"
+                    style="font-size: 2rem"
+                ></i>
+                <span *ngIf="product"
+                    >Are you sure you want to delete <b>{{ product.name }}</b
+                    >?</span
+                >
+            </div>
+            <ng-template pTemplate="footer">
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    label="No"
+                    (click)="deleteProductDialog = false"
+                ></button>
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-check"
+                    class="p-button-text"
+                    label="Yes"
+                    (click)="confirmDelete()"
+                ></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog
+            [(visible)]="deleteProductsDialog"
+            header="Confirm"
+            [modal]="true"
+            [style]="{ width: '450px' }"
+        >
+            <div class="flex align-items-center justify-content-center">
+                <i
+                    class="pi pi-exclamation-triangle mr-3"
+                    style="font-size: 2rem"
+                ></i>
+                <span>Are you sure you want to delete selected products?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    label="No"
+                    (click)="deleteProductsDialog = false"
+                ></button>
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-check"
+                    class="p-button-text"
+                    label="Yes"
+                    (click)="confirmDeleteSelected()"
+                ></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

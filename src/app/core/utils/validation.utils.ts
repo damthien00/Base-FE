@@ -6,6 +6,17 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
 })
 export class ValidationService {
     //Kiểm tra ngày sinh lớn hơn ngày hiện tại
+
+    // Validate Email
+    validateEmail(control: any) {
+        const emailRegex =
+            /^(?=.*[a-zA-Z])[\w.-]*[a-zA-Z][\w.-]*@[a-zA-Z\d-]+(\.[a-zA-Z]{2,4})+$/;
+        if (control.value && !emailRegex.test(control.value)) {
+            return { invalidEmail: true };
+        }
+        return null;
+    }
+
     dateOfBirthValidator(control: any) {
         const selectedDate = new Date(control.value);
         const currentDate = new Date();
@@ -35,16 +46,6 @@ export class ValidationService {
             return { invalidDateOfDueDate: true };
         }
 
-        return null;
-    }
-
-    // Validate Email
-    validateEmail(control: any) {
-        const emailRegex =
-            /^(?=.*[a-zA-Z])[\w.-]*[a-zA-Z][\w.-]*@[a-zA-Z\d-]+(\.[a-zA-Z]{2,4})+$/;
-        if (control.value && !emailRegex.test(control.value)) {
-            return { invalidEmail: true };
-        }
         return null;
     }
 

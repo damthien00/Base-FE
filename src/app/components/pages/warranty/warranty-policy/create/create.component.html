@@ -1,0 +1,121 @@
+<p-dialog
+    [(visible)]="displayModal"
+    modal="true"
+    [closable]="false"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '50vw' }"
+>
+    <!-- Header -->
+    <ng-template pTemplate="header">
+        <h4>Thêm chính sách bảo hành</h4>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="content">
+        <form [formGroup]="createWarrantyPolicyForm" (ngSubmit)="onSubmit()">
+            <div class="grid p-fluid">
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label htmlFor="name1"
+                            >Tên chính sách bảo hành<span class="red-asterisk"
+                                >*</span
+                            ></label
+                        >
+                        <input
+                            pInputText
+                            id="name1"
+                            type="text"
+                            spellcheck="false"
+                            placeholder="Nhập tên chính sách bảo hành"
+                            formControlName="name"
+                        />
+                        <div
+                            *ngIf="
+                                createWarrantyPolicyForm.get('name')?.invalid &&
+                                (createWarrantyPolicyForm.get('name')?.dirty ||
+                                    createWarrantyPolicyForm.get('name')
+                                        ?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="createWarrantyPolicyForm.get('name')?.errors?.['required']"
+                                class="error-message"
+                            >
+                                Vui lòng nhập tên chính sách bảo hành
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label htmlFor="name1"
+                            >Kỳ hạn bảo hành<span class="red-asterisk"
+                                >*</span
+                            ></label
+                        >
+                        <div class="flex">
+                            <p-inputNumber
+                                inputId="warranty_period"
+                                [(ngModel)]="value2"
+                                formControlName="warranty_period"
+                            />
+                            <p-dropdown
+                                [options]="this.optionsTime"
+                                [(ngModel)]="this.selectedTime"
+                                optionLabel="name"
+                                formControlName="typeTime"
+                            >
+                            </p-dropdown>
+                        </div>
+                        <div
+                            *ngIf="
+                                createWarrantyPolicyForm.get('warranty_period')
+                                    ?.invalid &&
+                                (createWarrantyPolicyForm.get('warranty_period')
+                                    ?.dirty ||
+                                    createWarrantyPolicyForm.get(
+                                        'warranty_period'
+                                    )?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="createWarrantyPolicyForm.get('warranty_period')?.errors?.['required']"
+                                class="error-message"
+                            >
+                                Vui lòng nhập kì hạn bảo hành
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-12 md:col-3">
+                    <div class="field">
+                        <label htmlFor="name1"></label>
+                    </div>
+                </div> -->
+            </div>
+        </form>
+    </ng-template>
+
+    <!-- Footer -->
+    <ng-template pTemplate="footer">
+        <div class="flex gap-2 justify-content-end">
+            <button
+                pButton
+                pRipple
+                type="button"
+                label="Hủy"
+                icon="pi pi-times"
+                (click)="displayModal = false"
+                class="p-button-danger"
+            ></button>
+            <button
+                type="submit"
+                pButton
+                label="Lưu"
+                icon="pi pi-check"
+                class="p-button-primary"
+            ></button>
+        </div>
+    </ng-template>
+</p-dialog>

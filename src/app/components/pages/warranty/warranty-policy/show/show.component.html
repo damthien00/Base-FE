@@ -1,0 +1,121 @@
+<div class="grid">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-2">
+            <div class="">
+                <h3>Chính sách bảo hành</h3>
+                <p-breadcrumb
+                    [model]="items"
+                    [home]="{ icon: 'pi pi-home' }"
+                ></p-breadcrumb>
+            </div>
+            <ng-template pTemplate="right"> </ng-template>
+        </p-toolbar>
+        <div class="card">
+            <div class="grid p-fluid">
+                <div class="col-12 md:col-4">
+                    <h4 class="mb-3">Quản lí chính sách bảo hành</h4>
+                    <p>
+                        Thiết lập các chính sách bảo hành cho cửa hàng của bạn
+                    </p>
+                    <button
+                        pButton
+                        pRipple
+                        icon="pi pi-plus"
+                        (click)="openCreateModal()"
+                        style="width: 250px"
+                        label="Thêm chính sách bảo hành"
+                    ></button>
+                </div>
+                <div class="col-12 md:col-8">
+                    <!-- [value]="" -->
+                    <p-table
+                        responsiveLayout="scroll"
+                        [rows]="10"
+                        [paginator]="true"
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                        [showCurrentPageReport]="true"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        selectionMode="multiple"
+                        [rowHover]="true"
+                        dataKey="id"
+                    >
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên chính sách</th>
+                                <th>Kỳ hạn bảo hành</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body">
+                            <tr>
+                                <td style="width: 5%; min-width: 10rem">
+                                    <span class="p-column-title">STT</span>
+                                    1
+                                </td>
+                                <td style="width: 23%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Tên chính sách</span
+                                    >
+                                    Bảo hành 12 tháng
+                                </td>
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Kỳ hạn bảo hành</span
+                                    >
+                                    27/3/2024
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 5%; min-width: 10rem">
+                                    <span class="p-column-title">STT</span>
+                                    2
+                                </td>
+                                <td style="width: 23%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Tên chính sách</span
+                                    >
+                                    Bảo hành 24 tháng
+                                </td>
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Kỳ hạn bảo hành</span
+                                    >
+                                    15/8/2024
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 5%; min-width: 10rem">
+                                    <span class="p-column-title">STT</span>
+                                    3
+                                </td>
+                                <td style="width: 23%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Tên chính sách</span
+                                    >
+                                    Bảo hành 36 tháng
+                                </td>
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Kỳ hạn bảo hành</span
+                                    >
+                                    01/01/2025
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-create
+    #createModal
+    (warrantyPolictyCreated)="onWarrantPolicyCreated($event)"
+></app-create>
+
+<app-edit
+    #editModal
+    (warrantyPolictyUpdated)="onWarrantPolicyUpdated($event)"
+></app-edit>

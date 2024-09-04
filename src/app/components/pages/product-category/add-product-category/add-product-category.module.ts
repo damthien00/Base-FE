@@ -6,7 +6,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ButtonModule } from 'primeng/button';
-// import { FormLayoutDemoRoutingModule } from './formlayoutdemo-routing.module';
 import { AddProductCategoryComponent } from './add-product-category.component';
 import { TreeSelectModule } from 'primeng/treeselect';
 

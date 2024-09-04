@@ -1,0 +1,132 @@
+.box-search{
+    display:relative;
+}
+
+.product__list{
+    position:absolute;
+    border-radius: 4px;
+    top: 50px;
+    background-color: #fff;
+    box-shadow: 0 0 5px 0 #ccc;
+    width: 100%;
+    padding: 7px;
+    z-index: 999;
+}
+
+.product__item{
+    display:flex;
+    padding: 7px 14px;
+    border-radius: 4px;
+    transition: 0.25s linear;
+}
+
+.product__item:hover {
+    background-color: rgb(42, 41, 134, 0.1);
+}
+
+.product__item-left{
+    flex: 1;
+}
+
+.product__item-left img{
+    height:50px;
+    width: 50px;
+    border-radius: 4px;
+} 
+
+.product__item-center{
+    flex: 8;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+} 
+
+.product__item-right{
+    flex:3;
+    display: flex;
+    flex-direction: column;
+}
+
+.product__item-right span{
+    text-align: right;
+}
+
+.product-name{
+    font-size:15px;
+    font-weight: 400;
+    margin-bottom: 4px;
+}
+
+.product-code{
+    font-size: 12px;
+    font-weight: 400;
+    color: #a09f9f;
+}
+
+.product-price{
+    font-weight: 400;
+    font-size: 16px;
+    margin-bottom: 3px;
+}
+
+.product-inventory {
+    font-size: 13px;
+    color: #a09f9f;
+    font-weight: 400;
+}
+
+.product-inventory strong{
+    color: red;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.pi-trash{
+    display: block;
+    padding: 11px;
+    border-radius:40px;
+    transition: all 0.25s;
+}
+
+.pi-trash:hover{
+    background-color:#e6e6e6;
+}
+
+.discount-options{
+    display:flex;
+    margin-left:10px
+}
+
+.discount-options span{
+    cursor: pointer;
+    display: flex;
+    padding: 10px;
+    width: 60px;
+    height: 41px;
+    justify-content: center;
+    border: 1px solid var(--primary-color);
+    color:var(--primary-color); ;
+}
+
+.discount-options .active {
+    display: flex;
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.discount-options span:first-child {
+    border-right: none;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.discount-options span:last-child {
+    border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+}
+
+.total_amount_paid{
+    font-size:21px;
+    font-weight: 500;
+    color: var(--primary-color);
+}
