@@ -21,16 +21,17 @@
         <div class="card">
             <p-table
                 #dt
-                [value]=""
+                [value]="branchs"
                 responsiveLayout="scroll"
                 [rows]="10"
-                [paginator]="true"
+                [paginator]="false"
                 [rowsPerPageOptions]="[10, 20, 30]"
                 [showCurrentPageReport]="true"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                 selectionMode="multiple"
                 [rowHover]="true"
                 dataKey="id"
+                (onPage)="onPageChange($event)"
             >
                 <!-- [(selection)]="selectedProducts" -->
                 <ng-template pTemplate="caption">
@@ -51,17 +52,15 @@
                                     placeholder="Tìm theo tên chi nhánh"
                                     style="width: 350px"
                                     class="sm:"
+                                    [(ngModel)]="this.keySearch"
                                 />
-                                <!-- [(ngModel)]="
-                                        this.optionsFillerProduct.KeyWord
-                                    " -->
                             </span>
                         </div>
                         <button
                             pButton
                             pRipple
                             label="Lọc"
-                            (click)="EvenFilter()"
+                            (click)="loadBranchs()"
                         ></button>
                         <!-- <button pButton pRipple label="Lọc"></button> -->
                         <!-- (click)="EvenFilter()" -->
@@ -76,50 +75,35 @@
                         <th>Trạng thái</th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-category>
+                <ng-template pTemplate="body" let-branch let-i="rowIndex">
                     <tr>
                         <td style="width: 5%; min-width: 10rem">
-                            <span class="p-column-title">Id</span>
-                            {{ category.id }}
+                            <span class="p-column-title">STT</span>
+                            {{ i + 1 }}
                         </td>
-                        <td style="width: 23%; min-width: 10rem">
+                        <td style="width: 17%; min-width: 7rem">
                             <span class="p-column-title">Name</span>
-                            {{ category.name }}
+                            {{ branch.name }}
                         </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">ParentName</span>
-                            {{ category.parentName }}
+                        <td style="width: 22%; min-width: 10rem">
+                            <span class="p-column-title">Address</span>
+                            {{ branch.address }} - {{ branch.wardName }} -
+                            {{ branch.districtName }} -
+                            {{ branch.cityName }}
                         </td>
                         <td style="width: 14%; min-width: 8rem">
-                            <span class="p-column-title">Level</span>
-                            {{ category.level }}
-                        </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">CreateName</span>
-                            <!-- {{ product.category }} -->
-                        </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Status</span>
-                            {{ category.status }}
+                            <span class="p-column-title">PhoneNumber</span>
+                            {{ branch.phoneNumber }}
                         </td>
 
-                        <td>
-                            <div class="flex">
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-pencil"
-                                    class="p-button-rounded p-button-success mr-2"
-                                    (click)="editProduct(product)"
-                                ></button>
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-trash"
-                                    class="p-button-rounded p-button-warning"
-                                    (click)="deleteProduct(product)"
-                                ></button>
-                            </div>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title">Status</span>
+                            <span *ngIf="branch.isActive === 0"
+                                >Đang hoạt động</span
+                            >
+                            <span *ngIf="branch.isActive === 1"
+                                >Ngừng hoạt động</span
+                            >
                         </td>
                     </tr>
                 </ng-template>
@@ -128,7 +112,11 @@
     </div>
 </div>
 
-<app-create #createModal (branchCreated)="onBranchCreated($event)"></app-create>
+<app-create
+    #createModal
+    (branchCreated)="onBranchCreated($event)"
+    (loadBranchs)="loadBranchs()"
+></app-create>
 
 <!-- <app-edit
     #editModal

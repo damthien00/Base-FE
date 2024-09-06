@@ -1,3 +1,4 @@
+import { WarrantyPolicyService } from './../../../../../core/services/warranty-policy.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { CreateComponent } from '../create/create.component';
@@ -12,7 +13,8 @@ export class ShowComponent implements OnInit {
     @ViewChild('createModal') createModal!: CreateComponent;
     @ViewChild('editModal') editModal!: EditComponent;
     items: MenuItem[] | undefined;
-    constructor() {}
+    warrantyPolicies: any;
+    constructor(private warrantyPolicyService: WarrantyPolicyService) {}
     ngOnInit() {
         this.items = [
             { label: 'Bảo hành' },
@@ -40,5 +42,11 @@ export class ShowComponent implements OnInit {
     openEditModal(category: any): void {
         // this.editModal.categoryId = category.id;
         this.editModal.showModalDialog();
+    }
+
+    loadBranchs() {
+        this.warrantyPolicyService.getWarrantyPolicies().subscribe((data) => {
+            this.warrantyPolicies = data.data.items;
+        });
     }
 }

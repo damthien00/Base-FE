@@ -1,19 +1,19 @@
-<p-dialog
-    [(visible)]="displayModal"
-    modal="true"
-    [closable]="false"
-    [draggable]="false"
-    [resizable]="false"
-    [style]="{ width: '50vw' }"
->
-    <!-- Header -->
-    <ng-template pTemplate="header">
-        <h4>Thêm chi nhánh</h4>
-    </ng-template>
+<form [formGroup]="createBranchForm" (ngSubmit)="onSubmit()">
+    <p-dialog
+        [(visible)]="displayModal"
+        modal="true"
+        [closable]="false"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: '50vw' }"
+    >
+        <!-- Header -->
+        <ng-template pTemplate="header">
+            <h4>Thêm chi nhánh</h4>
+        </ng-template>
 
-    <!-- Body -->
-    <ng-template pTemplate="content">
-        <form [formGroup]="createBranchForm" (ngSubmit)="onSubmit()">
+        <!-- Body -->
+        <ng-template pTemplate="content">
             <div class="grid p-fluid">
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
@@ -28,18 +28,17 @@
                             type="text"
                             spellcheck="false"
                             placeholder="Nhập tên chi nhánh"
-                            formControlName="branch_name"
+                            formControlName="name"
                         />
                         <div
                             *ngIf="
-                                createBranchForm.get('branch_name')?.invalid &&
-                                (createBranchForm.get('branch_name')?.dirty ||
-                                    createBranchForm.get('branch_name')
-                                        ?.touched)
+                                createBranchForm.get('name')?.invalid &&
+                                (createBranchForm.get('name')?.dirty ||
+                                    createBranchForm.get('name')?.touched)
                             "
                         >
                             <div
-                                *ngIf="createBranchForm.get('branch_name')?.errors?.['required']"
+                                *ngIf="createBranchForm.get('name')?.errors?.['required']"
                                 class="error-message"
                             >
                                 Vui lòng nhập tên chi nhánh
@@ -49,32 +48,42 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="phone_number"
+                        <label htmlFor="phoneNumber"
                             >Số điện thoại<span class="red-asterisk"
                                 >*</span
                             ></label
                         >
                         <input
                             pInputText
-                            id="phone_number"
+                            id="phoneNumber"
                             type="text"
                             spellcheck="false"
                             placeholder="Nhập số điện thoại"
-                            formControlName="phone_number"
+                            formControlName="phoneNumber"
                         />
                         <div
                             *ngIf="
-                                createBranchForm.get('phone_number')?.invalid &&
-                                (createBranchForm.get('phone_number')?.dirty ||
-                                    createBranchForm.get('phone_number')
+                                createBranchForm.get('phoneNumber')?.invalid &&
+                                (createBranchForm.get('phoneNumber')?.dirty ||
+                                    createBranchForm.get('phoneNumber')
                                         ?.touched)
                             "
                         >
                             <div
-                                *ngIf="createBranchForm.get('phone_number')?.errors?.['required']"
+                                *ngIf="createBranchForm.get('phoneNumber')?.errors?.['required']"
                                 class="error-message"
                             >
                                 Vui lòng nhập số điện thoại chi nhánh
+                            </div>
+                            <div
+                                *ngIf="
+                                    createBranchForm
+                                        .get('phoneNumber')
+                                        ?.hasError('pattern')
+                                "
+                                class="error-message"
+                            >
+                                Số điện thoại phải có đúng 10 số nguyên
                             </div>
                         </div>
                     </div>
@@ -108,12 +117,7 @@
                             </div>
 
                             <div
-                                *ngIf="
-                                    form
-                                        .get('email')
-                                        ?.hasError('invalidEmail') &&
-                                    form.get('email')?.touched
-                                "
+                                *ngIf="createBranchForm.get('email')?.errors?.['pattern']"
                                 class="error-message"
                             >
                                 Email không hợp lệ.
@@ -156,59 +160,67 @@
                             >Khu vực<span class="red-asterisk">*</span></label
                         >
                         <p-dropdown
-                            [options]="countries"
-                            [(ngModel)]="selectedCountry"
-                            optionLabel="name"
+                            [options]="districts"
+                            [(ngModel)]="selectedDistrict"
+                            optionLabel="CityName"
                             [filter]="true"
-                            formControlName="ward"
-                            filterBy="name"
+                            formControlName="districtID"
+                            filterBy="CityName"
                             [showClear]="true"
-                            placeholder="Select a Country"
+                            (onChange)="onDistrictChange($event)"
+                            placeholder="Chọn khu vực"
                         >
                             <ng-template
                                 pTemplate="selectedItem"
                                 let-selectedOption
                             >
                                 <div class="flex align-items-center gap-2">
-                                    <div>{{ selectedOption?.name }}</div>
+                                    <div *ngIf="selectedOption">
+                                        {{ selectedOption?.cityName }} -
+                                        {{ selectedOption?.name }}
+                                    </div>
                                 </div>
                             </ng-template>
                             <ng-template let-country pTemplate="item">
                                 <div class="flex align-items-center gap-2">
-                                    <div>{{ country.name }}</div>
+                                    <div>
+                                        {{ country.cityName }} -
+                                        {{ country.name }}
+                                    </div>
                                 </div>
                             </ng-template>
                         </p-dropdown>
                         <div
                             *ngIf="
-                                createBranchForm.get('address')?.invalid &&
-                                (createBranchForm.get('address')?.dirty ||
-                                    createBranchForm.get('address')?.touched)
+                                createBranchForm.get('districtID')?.invalid &&
+                                (createBranchForm.get('districtID')?.dirty ||
+                                    createBranchForm.get('districtID')?.touched)
                             "
                         >
                             <div
-                                *ngIf="createBranchForm.get('address')?.errors?.['required']"
+                                *ngIf="createBranchForm.get('districtID')?.errors?.['required']"
                                 class="error-message"
                             >
-                                Vui lòng nhập tên chính sách bảo hành
+                                Vui lòng nhập phường, huyện
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="address"
+                        <label htmlFor="wardID"
                             >Phường xã<span class="red-asterisk">*</span></label
                         >
                         <p-dropdown
-                            [options]="countries"
-                            [(ngModel)]="selectedCountry"
+                            [options]="wards"
+                            [(ngModel)]="selectedWard"
                             optionLabel="name"
                             [filter]="true"
-                            formControlName="ward"
+                            formControlName="wardID"
                             filterBy="name"
                             [showClear]="true"
-                            placeholder="Select a Country"
+                            placeholder="Chọn xã"
+                            [disabled]="!selectedDistrict"
                         >
                             <ng-template
                                 pTemplate="selectedItem"
@@ -226,53 +238,53 @@
                         </p-dropdown>
                         <div
                             *ngIf="
-                                createBranchForm.get('address')?.invalid &&
-                                (createBranchForm.get('address')?.dirty ||
-                                    createBranchForm.get('address')?.touched)
+                                createBranchForm.get('wardID')?.invalid &&
+                                (createBranchForm.get('wardID')?.dirty ||
+                                    createBranchForm.get('wardID')?.touched)
                             "
                         >
                             <div
-                                *ngIf="createBranchForm.get('address')?.errors?.['required']"
+                                *ngIf="createBranchForm.get('wardID')?.errors?.['required']"
                                 class="error-message"
                             >
-                                Vui lòng nhập tên chính sách bảo hành
+                                Vui lòng chọn phường xã
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- <div class="col-12 md:col-6">
-                    <div class="field mb-0 flex align-items-center gap-2"></div>
-                </div> -->
                 <div class="col-12 md:col-6">
                     <div class="field mb-0 flex align-items-center gap-2">
-                        <p-inputSwitch [(ngModel)]="valSwitch"></p-inputSwitch>
+                        <p-inputSwitch
+                            formControlName="isActive"
+                            [(ngModel)]="valSwitch"
+                        ></p-inputSwitch>
                         <label htmlFor="address">Hoạt động</label>
                         <!-- <p-inputSwitch [(ngModel)]="checked" /> -->
                     </div>
                 </div>
             </div>
-        </form>
-    </ng-template>
+        </ng-template>
 
-    <!-- Footer -->
-    <ng-template pTemplate="footer">
-        <div class="flex gap-2 justify-content-end">
-            <button
-                pButton
-                pRipple
-                type="button"
-                label="Hủy"
-                icon="pi pi-times"
-                (click)="displayModal = false"
-                class="p-button-danger"
-            ></button>
-            <button
-                type="submit"
-                pButton
-                label="Lưu"
-                icon="pi pi-check"
-                class="p-button-primary"
-            ></button>
-        </div>
-    </ng-template>
-</p-dialog>
+        <!-- Footer -->
+        <ng-template pTemplate="footer">
+            <div class="flex gap-2 justify-content-end">
+                <button
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Hủy"
+                    icon="pi pi-times"
+                    (click)="displayModal = false"
+                    class="p-button-danger"
+                ></button>
+                <button
+                    type="submit"
+                    pButton
+                    label="Lưu"
+                    icon="pi pi-check"
+                    class="p-button-primary"
+                ></button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</form>

@@ -24,12 +24,16 @@
         "dom"
       ]
     },
-    "exclude": ["node_modules", "**/node_modules/*"],
+    // "exclude": ["node_modules", "**/node_modules/*"],
     "angularCompilerOptions": {
       "enableI18nLegacyMessageIdFormat": false,
-      "strictInjectionParameters": false,
-      "strictInputAccessModifiers": false,
+      "strictInjectionParameters": true,
+      "strictInputAccessModifiers": true,
       "strictTemplates": false
-    }
-  }
+    },
+     "include": [
+    "src",
+    "typings"
+  ]
+}
   

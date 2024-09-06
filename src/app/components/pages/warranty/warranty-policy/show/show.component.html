@@ -31,7 +31,8 @@
                     <p-table
                         responsiveLayout="scroll"
                         [rows]="10"
-                        [paginator]="true"
+                        [value]="warrantyPolicies"
+                        [paginator]="false"
                         [rowsPerPageOptions]="[10, 20, 30]"
                         [showCurrentPageReport]="true"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
@@ -47,59 +48,28 @@
                             </tr>
                         </ng-template>
 
-                        <ng-template pTemplate="body">
+                        <ng-template
+                            pTemplate="body"
+                            let-warrantyPolicy
+                            let-i="rowIndex"
+                        >
                             <tr>
                                 <td style="width: 5%; min-width: 10rem">
                                     <span class="p-column-title">STT</span>
-                                    1
+                                    {{ i + 1 }}
                                 </td>
                                 <td style="width: 23%; min-width: 10rem">
                                     <span class="p-column-title"
                                         >Tên chính sách</span
                                     >
-                                    Bảo hành 12 tháng
+                                    {{ warrantyPolicy.name }}
                                 </td>
                                 <td style="width: 14%; min-width: 10rem">
                                     <span class="p-column-title"
                                         >Kỳ hạn bảo hành</span
                                     >
-                                    27/3/2024
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 5%; min-width: 10rem">
-                                    <span class="p-column-title">STT</span>
-                                    2
-                                </td>
-                                <td style="width: 23%; min-width: 10rem">
-                                    <span class="p-column-title"
-                                        >Tên chính sách</span
-                                    >
-                                    Bảo hành 24 tháng
-                                </td>
-                                <td style="width: 14%; min-width: 10rem">
-                                    <span class="p-column-title"
-                                        >Kỳ hạn bảo hành</span
-                                    >
-                                    15/8/2024
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 5%; min-width: 10rem">
-                                    <span class="p-column-title">STT</span>
-                                    3
-                                </td>
-                                <td style="width: 23%; min-width: 10rem">
-                                    <span class="p-column-title"
-                                        >Tên chính sách</span
-                                    >
-                                    Bảo hành 36 tháng
-                                </td>
-                                <td style="width: 14%; min-width: 10rem">
-                                    <span class="p-column-title"
-                                        >Kỳ hạn bảo hành</span
-                                    >
-                                    01/01/2025
+                                    {{ warrantyPolicy.term }}
+                                    {{ warrantyPolicy.termType }}
                                 </td>
                             </tr>
                         </ng-template>

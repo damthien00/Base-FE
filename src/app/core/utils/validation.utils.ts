@@ -9,6 +9,7 @@ export class ValidationService {
 
     // Validate Email
     validateEmail(control: any) {
+        console.log(1);
         const emailRegex =
             /^(?=.*[a-zA-Z])[\w.-]*[a-zA-Z][\w.-]*@[a-zA-Z\d-]+(\.[a-zA-Z]{2,4})+$/;
         if (control.value && !emailRegex.test(control.value)) {
