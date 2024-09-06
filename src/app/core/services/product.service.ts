@@ -1,74 +1,125 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Product } from 'src/app/core/models/product';
 import { environment } from 'src/environments/environment';
-// import { OptionsFilterProduct } from '../model/product-test';
+import { Observable, catchError, throwError } from 'rxjs';
+import { OptionsSearchProduct, Products } from '../models/product';
+import { OptionsFilterProduct } from '../models/options-filter-product';
 
-import { OptionsFilterProduct } from 'src/app/core/models/product-test';
 
 @Injectable()
 export class ProductService {
     public url = environment.url;
-    constructor(private http: HttpClient) {}
-
+    constructor(private http: HttpClient) { }
+  
+    private handleError(error: HttpErrorResponse): Observable<any> {
+      console.error('An error occurred:', error);
+      return throwError('Something bad happened; please try again later.');
+    }
+  
+    async getProducts(pageSize: number, pageNumber: number): Promise<any> {
+      try {
+        let response = await this.http.get<any>(`${this.url}/api/products/get-products-for-store?pagesize=${pageSize}&pagenumber=${pageNumber}`).toPromise();
+        return response;
+      } catch (error) {
+        return JSON.parse(JSON.stringify(error));
+      }
+    }
+  
     FilterProduct(options: OptionsFilterProduct): Promise<any> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                let response = await this.http
-                    .post<OptionsFilterProduct>(
-                        `${this.url}/api/products/filter-products-for-store`,
-                        options
-                    )
-                    .toPromise();
-                resolve(response);
-            } catch (error) {
-                reject(JSON.parse(JSON.stringify(error)));
-            }
-        });
-    }
-
-    async getProductsTest(pageSize: number, pageNumber: number): Promise<any> {
+      return new Promise(async (resolve, reject) => {
         try {
-            let response = await this.http
-                .get<any>(
-                    `${this.url}/api/products/get-products-for-store?pagesize=${pageSize}&pagenumber=${pageNumber}`
-                )
-                .toPromise();
-            return response;
+          let response = await this.http.post<OptionsFilterProduct>(`${this.url}/api/products/filter-products-for-store`, options).toPromise();
+          resolve(response);
         } catch (error) {
-            return JSON.parse(JSON.stringify(error));
+          reject(JSON.parse(JSON.stringify(error)));
         }
+      })
     }
-
-    getProductsSmall() {
-        return this.http
-            .get<any>('assets/demo/data/products-small.json')
-            .toPromise()
-            .then((res) => res.data as Product[])
-            .then((data) => data);
+  
+    FilterProductVariants(options: OptionsFilterProduct): Promise<any> {
+      return new Promise(async (resolve, reject) => {
+        try {
+          let response = await this.http.post<OptionsFilterProduct>(`${this.url}/api/productvariants/filter`, options).toPromise();
+          resolve(response);
+        } catch (error) {
+          reject(JSON.parse(JSON.stringify(error)));
+        }
+      })
     }
-
-    getProducts() {
-        return this.http
-            .get<any>('assets/demo/data/products.json')
-            .toPromise()
-            .then((res) => res.data as Product[])
-            .then((data) => data);
+    
+    SearchProductVariants(options: OptionsSearchProduct): Promise<any> {
+      return new Promise(async (resolve, reject) => {
+        try {
+          let response = await this.http.post<OptionsSearchProduct>(`${this.url}/api/productvariants/filter`, options).toPromise();
+          resolve(response);
+        } catch (error) {
+          reject(JSON.parse(JSON.stringify(error)));
+        }
+      })
     }
-
-    getProductsMixed() {
-        return this.http
-            .get<any>('assets/demo/data/products-mixed.json')
-            .toPromise()
-            .then((res) => res.data as Product[])
-            .then((data) => data);
+  
+    createProduct(data: any): Observable<any> {
+      return this.http.post<any>(`${this.url}/api/products/create-with-file`, data)
+        .pipe(
+          catchError(this.handleError)
+        );
     }
-
-    getProductsWithOrdersSmall() {
-        return this.http
-            .get<any>('assets/demo/data/products-orders-small.json')
-            .toPromise()
-            .then((res) => res.data as Product[])
-            .then((data) => data);
+  
+    deletProduct(idPRoduct: number): Promise<any> {
+      return new Promise(async (resolve, reject) => {
+        try {
+          let response = await this.http.delete<any>(`${this.url}/api/products/delete/${idPRoduct}`).toPromise();
+          if (response.statusCode == 200) {
+            resolve(response);
+          }
+          reject(response);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+    ChangeStatusProduct(idPRoduct: number): Promise<any> {
+      return new Promise(async (resolve, reject) => {
+        try {
+          let response = await this.http.get<any>(`${this.url}/api/products/change-product-status/${idPRoduct}`).toPromise();
+          if (response.statusCode == 200) {
+            resolve(response);
+          }
+          reject(response);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+  
+     // Lấy thông tin của một sản phẩm dựa trên ID
+     getProductbyId(id: number): Observable<Products> {
+      const url = `${this.url}/api/products/get-product-and-variant/${id}`;
+      return this.http.get<Products>(url).pipe(
+        catchError(this.handleError)
+      );
+    }
+  
+    updateProductAndVariant(product: any): Observable<any> {
+      const url = `${this.url}/api/products/update`;
+      return this.http.put<any>(url, product);
+    }
+  
+    getCategoryAll(): Observable<any> {
+      return this.http.get<any>(`${this.url}/api/productcategory/get-all-none-pagination`);
+    }
+  
+    CheckBarcode(barCode: string): Observable<{ data: boolean; [key: string]: any }> {
+      return this.http.get<{ data: boolean; [key: string]: any }>(`${this.url}/api/products/checkbarcode?barCode=${barCode}`);
+    }
+  
+    checkBarcodeUpdate(barcode: string, productId: number) {
+      const url = `${this.url}/api/products/checkbarcode?barCode=${barcode}&id=${productId}`;
+      return this.http.get<any>(url);
+    }
+  
+    getShipmentProductByCode(productCode: string): Observable<any> {
+      const encodedProductCode = encodeURIComponent(productCode);
+      return this.http.get<any>(`${this.url}/api/shipments/getshipmentproduct?productCode=${encodedProductCode}`);
     }
 }

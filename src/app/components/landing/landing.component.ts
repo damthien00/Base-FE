@@ -5,10 +5,10 @@ import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { Product } from 'src/app/core/models/order';
-import { OptionsFilterProduct } from 'src/app/core/models/product-test';
 import { ProductService } from 'src/app/core/services/product.service';
 import { AutoComplete } from 'primeng/autocomplete';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
 
 interface PageEvent {
     first: number;

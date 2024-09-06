@@ -15,6 +15,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DialogModule } from 'primeng/dialog';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [],
@@ -33,6 +34,8 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
         InputNumberModule,
         InputTextareaModule,
         RatingModule,
+        FormsModule,
+        ReactiveFormsModule
     ],
 })
-export class PagesModule {}
+export class PagesModule { }

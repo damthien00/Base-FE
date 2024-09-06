@@ -14,7 +14,7 @@
                     pRipple
                     icon="pi pi-plus"
                     label="Thêm danh mục"
-                    (click)="openCreateModal()"
+                    (click)="openDialog()"
                 ></button>
             </ng-template>
         </p-toolbar>
@@ -124,15 +124,132 @@
                 </ng-template>
             </p-table>
         </div>
+
+        <div class="dialog-background" *ngIf="showDialog">
+            <div class="dialog-container">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title">Thêm danh mục</h5>
+                  <p-button
+                    icon="pi pi-times"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    [style]="{ 'border-radius': '25%' }"
+                    (click)="closeDialog(categoryForm)"
+                  ></p-button>
+                </div>
+      
+                <form #categoryForm="ngForm" (ngSubmit)="onSubmitAdd(categoryForm)">
+                  <div class="row mb-12">
+                    <label for="inputText" class="col-sm-12 col-form-label"
+                      >Tên danh mục<span class="red-asterisk">*</span></label
+                    >
+                    <div class="col-sm-12">
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        [(ngModel)]="categoriess.name"
+                        class="form-control"
+                        (input)="checkNameLength()"
+                        required
+                      />
+                      <div *ngIf="showNameError" class="error-message">
+                        Tên danh mục không được bỏ trống
+                      </div>
+                      <div *ngIf="showNameError2" class="error-message">
+                        Tên danh mục không được trùng nhau
+                      </div>
+                      <div *ngIf="showNameError4" class="text-danger">
+                        Tên phải lớn hơn 3 ký tự && nhỏ hơn 100 ký tự
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-12">
+                    <label class="col-sm-12 col-form-label">Danh mục cha</label>
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <div class="flex justify-content-center category-select">
+                          <p-treeSelect
+                            containerStyleClass="w-full"
+                            [options]="categorieandchild"
+                            [(ngModel)]="selectedCategory"
+                            optionLabel="label"
+                            placeholder="Chọn danh mục"
+                            [showClear]="true"
+                            [style]="{ width: '100%' }"
+                            (onNodeSelect)="onNodeSelect($event)"
+                            (onNodeUnselect)="onNodeUnselect($event)"
+                            (onFocus)="onTreeSelectFocus()"
+                          >
+                            <ng-template let-node pTemplate="default">
+                              <span>{{ node.label }}</span>
+                            </ng-template>
+                          </p-treeSelect>
+                          <div *ngIf="showNameError5" class="text-danger">
+                            Danh mục đã vượt quá cấp 5.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-12">
+                    <label for="inputDes" class="col-sm-12 col-form-label"
+                      >Mô tả</label
+                    >
+                    <div class="col-sm-12">
+                      <textarea
+                        class="form-control"
+                        style="height: 100px"
+                        id="description"
+                        name="description"
+                        [(ngModel)]="categoriess.description"
+                        (input)="checkDescriptionLength()"
+                        required
+                      ></textarea>
+                      <div *ngIf="showNameError3" class="error-message">
+                        Mô tả không được nhập quá 500 ký tự.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-12">
+                    <label for="inputHide" class="col-sm-12 col-form-label"
+                      >Hiển thị</label
+                    >
+                    <div class="col-sm-12">
+                      <!-- Trong template của bạn -->
+                      <p-inputSwitch
+                        [style]="{ height: '20px' }"
+                        [(ngModel)]="checked"
+                        (onChange)="onchangeforswitch()"
+                        name="switchControl"
+                      ></p-inputSwitch>
+                    </div>
+                  </div>
+                  <div class="row mb-12">
+                    <div class="col-sm-12 buttonsl">
+                      <button
+                        pButton
+                        pRipple
+                        label="Đóng"
+                        class="p-button-success buttoncloses"
+                        type="button"
+                        (click)="closeDialog(categoryForm)"
+                      ></button>
+                      <button
+                        pButton
+                        pRipple
+                        label="Lưu"
+                        class="p-button-success butttonsave"
+                        type="submit"
+                      ></button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<app-add-product-category
-    #createModal
-    (categoryCreated)="onCategoryCreated($event)"
-></app-add-product-category>
-<app-edit-product-category
-    #editModal
-    (categoryUpdated)="onCategoryUpdated($event)"
-></app-edit-product-category>
-<!-- </div> -->

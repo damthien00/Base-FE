@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ShowProductCategoryComponent } from './show-product-category.component';
-import { AddProductCategoryModule } from '../add-product-category/add-product-category.module'; // Nhập module chứa AddProductCategoryComponent
-import { EditProductCategoryModule } from '../edit-product-category/edit-product-category.module'; // Nhập module chứa EditProductCategoryComponent
 import { SharedModule } from 'src/app/shared/modules/shared.module';
+import { TreeSelectModule } from 'primeng/treeselect';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { MessagesModule } from 'primeng/messages';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
     imports: [
@@ -12,9 +14,11 @@ import { SharedModule } from 'src/app/shared/modules/shared.module';
                 { path: '', component: ShowProductCategoryComponent },
             ]),
         ],
-        AddProductCategoryModule, // Nhập module chứa AddProductCategoryComponent
-        EditProductCategoryModule, // Nhập module chứa EditProductCategoryComponent
         SharedModule,
+        TreeSelectModule,
+        InputSwitchModule,
+        MessagesModule,
+        ToastModule
     ],
     declarations: [ShowProductCategoryComponent],
 })

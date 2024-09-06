@@ -15,7 +15,7 @@ import { map } from 'rxjs/operators';
 export class CategoryService {
     public url = environment.url;
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
     getTreeCategory(): Promise<any> {
         return this.http
             .get<any>(`${this.url}/api/productcategory/get-all-tree-category`)
