@@ -71,10 +71,10 @@ import { RouterModule } from '@angular/router';
             },
 
             {
-                path: 'products/create',
+                path: 'products/create-product',
                 loadChildren: () =>
-                    import('./products/create/create.module').then(
-                        (m) => m.CreateModule
+                    import('./products/create-product/create-product.module').then(
+                        (m) => m.CreateProductModule
                     ),
             },
             {
