@@ -18,23 +18,23 @@ export class CategoryService {
     constructor(private http: HttpClient) { }
     getTreeCategory(): Promise<any> {
         return this.http
-            .get<any>(`${this.url}/api/productcategory/get-all-tree-category`)
+            .get<any>(`${this.url}/api/product-category/get-all-tree-category`)
             .toPromise();
     }
     getCategorys(pageSize: number, pageNumber: number): Observable<any> {
         return this.http.get<any>(
-            `${this.url}/api/productcategory/get-all?pageSize=${pageSize}&pageNumber=${pageNumber}`
+            `${this.url}/api/product-category/get-all?pageSize=${pageSize}&pageNumber=${pageNumber}`
         );
     }
     getCategoryAll(): Observable<any> {
         return this.http.get<any>(
-            `${this.url}/api/productcategory/get-all-none-pagination`
+            `${this.url}/api/product-category/get-all-none-pagination`
         );
     }
 
     createCategory(data: any): Observable<any> {
         return this.http
-            .post<any>(`${this.url}/api/productcategory/create`, data)
+            .post<any>(`${this.url}/api/product-category/create`, data)
             .pipe(catchError(this.handleError));
     }
 
@@ -48,7 +48,7 @@ export class CategoryService {
             try {
                 let response = await this.http
                     .get<any>(
-                        `${this.url}/api/productcategory/get-by-name?name=${name}`
+                        `${this.url}/api/product-category/get-by-name?name=${name}`
                     )
                     .toPromise();
                 resolve(response);
@@ -62,11 +62,11 @@ export class CategoryService {
         });
     }
     getCategoryById(id: number): Observable<any> {
-        const url = `${this.url}/api/productcategory/get-one/${id}`;
+        const url = `${this.url}/api/product-category/get-one/${id}`;
         return this.http.get<any>(url);
     }
     updateCategory(categoryData: any): Observable<any> {
-        const url = `${this.url}/api/productcategory/update`; // Endpoint API cho việc cập nhật thương hiệu
+        const url = `${this.url}/api/product-category/update`; // Endpoint API cho việc cập nhật thương hiệu
         return this.http.put<any>(url, categoryData);
     }
     checkCategoryExistenceUpdate(
@@ -74,17 +74,17 @@ export class CategoryService {
         id: number
     ): Observable<boolean> {
         return this.http.get<boolean>(
-            `${this.url}/api/productcategory/CheckExistenceUpdate?name=${name}&id=${id}`
+            `${this.url}/api/product-category/CheckExistenceUpdate?name=${name}&id=${id}`
         );
     }
     updateStatus(id: number, isDeleted: number): Observable<any> {
-        const url = `${this.url}/api/productcategory/UpdateStatus/${id}/${isDeleted}`;
+        const url = `${this.url}/api/product-category/UpdateStatus/${id}/${isDeleted}`;
         return this.http.put<any>(url, {});
     }
 
     searchCategories(term: string): Observable<any[]> {
         return this.http.get<any[]>(
-            `${this.url}/api/productcategory/filter-with-name-or-id?name_or_id=${term}`
+            `${this.url}/api/product-category/filter-with-name-or-id?name_or_id=${term}`
         );
     }
 
@@ -103,13 +103,13 @@ export class CategoryService {
     }
 
     getSubcategories(parentId?: number): Observable<any> {
-        const url = `${this.url}/api/productcategory/get-all-immediate-child/${parentId}`;
+        const url = `${this.url}/api/product-category/get-all-immediate-child/${parentId}`;
         return this.http.get<any>(url);
     }
 
     getCategoriesAndChild(): Observable<TreeNode[]> {
         return this.http
-            .get<any>(`${this.url}/api/productcategory/get-all-tree-category`)
+            .get<any>(`${this.url}/api/product-category/get-all-tree-category`)
             .pipe(map((response: any) => this.mapToTreeNodes(response.data)));
     }
 

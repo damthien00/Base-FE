@@ -1,77 +1,54 @@
-import { Product } from './../../../../core/models/order';
-import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { MenuItem } from 'primeng/api';
-import { Table } from 'primeng/table';
-
-import { ProductService } from 'src/app/core/services/product.service';
-import { CategoryService } from 'src/app/core/services/category.service';
-import { NodeService } from 'src/app/core/services/node.service';
-import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
+import { Component, Injector, OnInit } from '@angular/core';
+import { environment } from 'src/environments/environment';
+import { MenuItem, MessageService } from 'primeng/api';
 import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
+import { CategoryService } from 'src/app/core/services/category.service';
+import { ProductService } from 'src/app/core/services/product.service';
+import { NodeService } from 'src/app/core/services/node.service';
 
 @Component({
     templateUrl: './show.component.html',
+    styleUrl: './show.component.scss',
     providers: [MessageService],
 })
 export class ShowComponent implements OnInit {
+    imageUrl: string = environment.url;
     optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
-    nodes!: any[];
-    optionsStatus: any[] = [
-        { name: 'Ẩn', value: 0 },
-        { name: 'Hoạt động', value: 1 },
-        { name: 'Hết hàng', value: 2 },
-    ];
-    selectedNodes: any;
-    statusFilter: any;
-    expandedRows = {};
-
-    expandAll() {
-        this.expandedRows = this.products.reduce(
-            (acc, p) => (acc[p.id] = true) && acc,
-            {}
-        );
-    }
-    collapseAll() {
-        this.expandedRows = {};
-    }
-
     items: MenuItem[] | undefined;
-
-    home: MenuItem | undefined;
-
-    productDialog: boolean = false;
-
-    deleteProductDialog: boolean = false;
-
-    deleteProductsDialog: boolean = false;
-
-    products: Product[] = [];
-
-    product: Product = {};
-
-    selectedProducts: Product[] = [];
-
-    submitted: boolean = false;
-
-    cols: any[] = [];
-
-    statuses: any[] = [];
-
-    rowsPerPageOptions = [5, 10, 20];
-
+    products: any[] = [];
+    treeCategory: any[] = [];
+    optionsStatus: any[] = [
+      { name: 'Ẩn', value: 0 },
+      { name: 'Hoạt động', value: 1 },
+      { name: 'Hết hàng', value: 2 },
+    ];
+    showAllVariants: Map<number, number> = new Map<number, number>();
+  
+    checked: boolean = false;
+    listchecked: boolean[] = [];
+    statusFilter: any;
+    optionsCategory!: any[];
+  
+    totalRecords = 20;
     pageSize = 30;
     pageNumber = 1;
-    totalRecords = 20;
-    treeCategory: any[] = [];
+    loading = false;
+  
+    selectedNodes: any;
+  
+    messages: any[] = [];
+  
+    showContent: boolean = false;
+  
+    showDiaLogDelete: boolean = false;
+    productDelete!: any;
+    DOMElementDelete: any;
 
     constructor(
         private productCateogryService: CategoryService,
         private productService: ProductService,
         private messageService: MessageService,
-        private nodeService: NodeService
     ) {
-        this.nodeService.getFiles().then((files) => (this.nodes = files));
         this.optionsFillerProduct.pageIndex = this.pageNumber;
         this.optionsFillerProduct.pageSize = this.pageSize;
     }
@@ -81,239 +58,284 @@ export class ShowComponent implements OnInit {
             { label: 'Sản phẩm', route: '/products/show' },
             { label: 'Danh sách sản phẩm' },
         ];
-        // this.loading = true;
+        this.loading = true;
         let response = await this.productService.FilterProduct(
-            this.optionsFillerProduct
+          this.optionsFillerProduct
         );
         let responseGetTreeCategory =
-            await this.productCateogryService.getTreeCategory();
-        // this.loading = false;
-        console.log(responseGetTreeCategory);
+          await this.productCateogryService.getTreeCategory();
+        this.loading = false;
+    
         this.treeCategory = responseGetTreeCategory.data;
         this.products = response.data;
         this.totalRecords = response.totalRecordsCount;
-        // console.log(b);
+        for (let index = 0; index < this.products.length; index++) {
+          this.showAllVariants.set(
+            this.products[index].id,
+            this.products[index].productVariants.length > 3 ? 1 : 0
+          );
+        }
     }
 
-    openNew() {
-        this.product = {};
-        this.submitted = false;
-        this.productDialog = true;
-    }
-
-    onClear() {
+    toggleContent() {
+        this.showContent = !this.showContent;
+      }
+    
+      onClear() {
         this.optionsFillerProduct.CategoryId = null;
         let label = document.querySelector(
-            '.category-select .p-treeselect-label'
+          '.show-product-component p-treeSelect .p-treeselect-label'
         );
         if (label) {
-            label.innerHTML = 'Chọn danh mục';
+          label.innerHTML = 'Danh mục';
         }
-    }
-
-    onNodeSelect(event: any) {
-        console.log(event);
-        this.optionsFillerProduct.CategoryId = this.selectedNodes?.id;
+      }
+      onNodeUnselect(event: any) {
+        const unselectedNode = event.node;
+        console.log(unselectedNode);
+      }
+      onNodeSelect() {
+        this.optionsFillerProduct.CategoryId = this.selectedNodes.id;
         let label = document.querySelector(
-            '.category-select .p-treeselect-label'
+          '.show-product-component p-treeSelect .p-treeselect-label'
         );
         if (label) {
-            label.innerHTML = this.selectedNodes?.name || '';
+          label.innerHTML = this.selectedNodes.name;
         }
-    }
-
-    deleteSelectedProducts() {
-        this.deleteProductsDialog = true;
-    }
-
-    editProduct(product: Product) {
-        this.product = { ...product };
-        this.productDialog = true;
-    }
-
-    deleteProduct(product: Product) {
-        this.deleteProductDialog = true;
-        this.product = { ...product };
-    }
-
-    confirmDeleteSelected() {
-        this.deleteProductsDialog = false;
-        this.products = this.products.filter(
-            (val) => !this.selectedProducts.includes(val)
-        );
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Products Deleted',
-            life: 3000,
-        });
-        this.selectedProducts = [];
-    }
-
-    confirmDelete() {
-        this.deleteProductDialog = false;
-        this.products = this.products.filter(
-            (val) => val.id !== this.product.id
-        );
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Product Deleted',
-            life: 3000,
-        });
-        this.product = {};
-    }
-
-    hideDialog() {
-        this.productDialog = false;
-        this.submitted = false;
-    }
-
-    // saveProduct() {
-    //     this.submitted = true;
-
-    //     if (this.product.name?.trim()) {
-    //         if (this.product.id) {
-    //             // @ts-ignore
-    //             this.product.inventoryStatus = this.product.inventoryStatus
-    //                 .value
-    //                 ? this.product.inventoryStatus.value
-    //                 : this.product.inventoryStatus;
-    //             this.products[this.findIndexById(this.product.id)] =
-    //                 this.product;
-    //             this.messageService.add({
-    //                 severity: 'success',
-    //                 summary: 'Successful',
-    //                 detail: 'Product Updated',
-    //                 life: 3000,
-    //             });
-    //         } else {
-    //             this.product.id = this.createId();
-    //             this.product.code = this.createId();
-    //             this.product.image = 'product-placeholder.svg';
-    //             // @ts-ignore
-    //             this.product.inventoryStatus = this.product.inventoryStatus
-    //                 ? this.product.inventoryStatus.value
-    //                 : 'INSTOCK';
-    //             this.products.push(this.product);
-    //             this.messageService.add({
-    //                 severity: 'success',
-    //                 summary: 'Successful',
-    //                 detail: 'Product Created',
-    //                 life: 3000,
-    //             });
-    //         }
-
-    //         this.products = [...this.products];
-    //         this.productDialog = false;
-    //         this.product = {};
-    //     }
-    // }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.products.length; i++) {
-            if (this.products[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    createId(): string {
-        let id = '';
-        const chars =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal(
-            (event.target as HTMLInputElement).value,
-            'contains'
-        );
-    }
-
-    onRowExpand(event: TableRowExpandEvent) {
-        this.messageService.add({
-            severity: 'info',
-            summary: 'Product Expanded',
-            detail: event.data.name,
-            life: 3000,
-        });
-    }
-
-    getSeverity(status: string) {
-        switch (status) {
-            case 'INSTOCK':
-                return 'success';
-            case 'LOWSTOCK':
-                return 'warning';
-            case 'OUTOFSTOCK':
-                return 'danger';
-            default:
-                return '';
-        }
-    }
-
-    getStatusSeverity(status: string) {
-        switch (status) {
-            case 'PENDING':
-                return 'warning';
-            case 'DELIVERED':
-                return 'success';
-            case 'CANCELLED':
-                return 'danger';
-            default:
-                return '';
-        }
-    }
-
-    onRowCollapse(event: TableRowCollapseEvent) {
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Product Collapsed',
-            detail: event.data.name,
-            life: 3000,
-        });
-    }
-    async EvenFilter() {
-        this.optionsFillerProduct.Status = this.statusFilter
-            ? this.statusFilter.value
-            : null;
-        this.optionsFillerProduct.pageIndex = 1;
-
-        console.log(this.optionsFillerProduct);
-        // this.loading = true;
+      }
+      closeDiaLogDelete() {
+        this.showDiaLogDelete = false;
+        this.DOMElementDelete = null;
+        this.productDelete = null;
+      }
+      openDiaLogDelete($event: Event, product: any) {
+        this.showDiaLogDelete = true;
+        this.DOMElementDelete = $event.target as any;
+        this.productDelete = product;
+      }
+      async ClickDelete() {
+        this.loading = true;
         await this.productService
-            .FilterProduct(this.optionsFillerProduct)
-            .then((response) => {
-                this.products = response.data;
-                this.totalRecords = response.totalRecordsCount;
-                //   for (let index = 0; index < this.products.length; index++) {
-                //     this.showAllVariants.set(this.products[index].id, this.products[index].productVariants.length > 3 ? 1 : 0);
-                //    }
+          .deletProduct(this.productDelete.id)
+          .then(async () => {
+            this.messages = [
+              {
+                severity: 'success',
+                summary: 'Thành công',
+                detail: 'Xóa sản phẩm thành công',
+                life: 3000,
+              },
+            ];
+            let response = await this.productService.getProducts(
+              this.pageSize,
+              this.pageNumber
+            );
+            this.products = response.data;
+            this.totalRecords = response.totalRecordsCount;
+          })
+          .catch(() => {
+            this.messages = [
+              {
+                severity: 'error',
+                summary: 'Thất bại',
+                detail: 'Có lỗi xảy ra',
+                life: 3000,
+              },
+            ];
+          })
+          .finally(() => {
+            this.loading = false;
+            this.closeDiaLogDelete();
+          });
+      }
+      async ClickChangeStatus($event: Event, product: any) {
+        if ($event) {
+          await this.productService.ChangeStatusProduct(product.id).then(() => {
+            product.status = product.status === 1 ? 0 : 1;
+            let elementButtonStatus = $event.target as any;
+            elementButtonStatus.innerText =
+              elementButtonStatus.innerText === 'Ẩn' ? 'Hoạt động' : 'Ẩn';
+            let listProduct_Status =
+              elementButtonStatus.parentElement.parentElement.querySelectorAll(
+                '.n-product-status > div'
+              );
+            listProduct_Status.forEach(async (element: any) => {
+              if (element.innerText !== 'Hết hàng') {
+                element.style['background-color'] =
+                  elementButtonStatus.innerText === 'Ẩn' ? '#50f595' : '#d9d9d9';
+                element.innerText =
+                  elementButtonStatus.innerText === 'Ẩn' ? 'Hoạt động' : 'Ẩn';
+              }
             });
-        // this.loading = false;
-    }
-
-    checkStartPriceValue() {
+          });
+        }
+      }
+      async EvenFilter() {
+        this.optionsFillerProduct.Status = this.statusFilter
+          ? this.statusFilter.value
+          : null;
+        this.optionsFillerProduct.pageIndex = 1;
+    
+        this.loading = true;
+        await this.productService
+          .FilterProduct(this.optionsFillerProduct)
+          .then((response) => {
+            this.products = response.data;
+            this.totalRecords = response.totalRecordsCount;
+            for (let index = 0; index < this.products.length; index++) {
+              this.showAllVariants.set(
+                this.products[index].id,
+                this.products[index].productVariants.length > 3 ? 1 : 0
+              );
+            }
+          });
+        this.loading = false;
+      }
+      async SectionMainHead_Click_All(event: Event) {
+        const oldheadactive = document.querySelector(
+          '.show-product-component .section-main-head .head-active'
+        ) as any;
+        oldheadactive.className = '';
+        const newheadactive = event.target as any;
+        newheadactive.className = 'head-active';
+    
+        this.loading = true;
+        let response = await this.productService.getProducts(this.pageSize, 1);
+        this.loading = false;
+    
+        this.products = response.data;
+        this.totalRecords = response.totalRecordsCount;
+        for (let index = 0; index < this.products.length; index++) {
+          this.showAllVariants.set(
+            this.products[index].id,
+            this.products[index].productVariants.length > 3 ? 1 : 0
+          );
+        }
+      }
+      async SectionMainHead_Click_Status1(event: Event) {
+        const oldheadactive = document.querySelector(
+          '.show-product-component .section-main-head .head-active'
+        ) as any;
+        oldheadactive.className = '';
+        const newheadactive = event.target as any;
+        newheadactive.className = 'head-active';
+    
+        this.optionsFillerProduct = new OptionsFilterProduct();
+        this.optionsFillerProduct.Status = 1;
+        this.optionsFillerProduct.pageSize = this.pageSize;
+    
+        this.loading = true;
+        let response = await this.productService.FilterProduct(
+          this.optionsFillerProduct
+        );
+        this.loading = false;
+    
+        this.products = response.data;
+        this.totalRecords = response.totalRecordsCount;
+        for (let index = 0; index < this.products.length; index++) {
+          this.showAllVariants.set(
+            this.products[index].id,
+            this.products[index].productVariants.length > 3 ? 1 : 0
+          );
+        }
+      }
+      async SectionMainHead_Click_Status0(event: Event) {
+        const oldheadactive = document.querySelector(
+          '.show-product-component .section-main-head .head-active'
+        ) as any;
+        oldheadactive.className = '';
+        const newheadactive = event.target as any;
+        newheadactive.className = 'head-active';
+    
+        this.optionsFillerProduct = new OptionsFilterProduct();
+        this.optionsFillerProduct.Status = 0;
+        this.optionsFillerProduct.pageSize = this.pageSize;
+    
+        this.loading = true;
+        let response = await this.productService.FilterProduct(
+          this.optionsFillerProduct
+        );
+        this.loading = false;
+    
+        this.products = response.data;
+        this.totalRecords = response.totalRecordsCount;
+        for (let index = 0; index < this.products.length; index++) {
+          this.showAllVariants.set(
+            this.products[index].id,
+            this.products[index].productVariants.length > 3 ? 1 : 0
+          );
+        }
+      }
+      async SectionMainHead_Click_Status2(event: Event) {
+        const oldheadactive = document.querySelector(
+          '.show-product-component .section-main-head .head-active'
+        ) as any;
+        oldheadactive.className = '';
+        const newheadactive = event.target as any;
+        newheadactive.className = 'head-active';
+    
+        this.optionsFillerProduct = new OptionsFilterProduct();
+        this.optionsFillerProduct.Status = 2;
+        this.optionsFillerProduct.pageSize = this.pageSize;
+    
+        this.loading = true;
+        let response = await this.productService.FilterProduct(
+          this.optionsFillerProduct
+        );
+        this.loading = false;
+    
+        this.products = response.data;
+        this.totalRecords = response.totalRecordsCount;
+        for (let index = 0; index < this.products.length; index++) {
+          this.showAllVariants.set(
+            this.products[index].id,
+            this.products[index].productVariants.length > 3 ? 1 : 0
+          );
+        }
+      }
+      async onPageChange(event: any) {
+        this.optionsFillerProduct.pageSize = event.rows;
+        this.pageSize = event.rows;
+        this.optionsFillerProduct.pageIndex = event.page + 1;
+    
+        this.loading = true;
+        let response = await this.productService.FilterProduct(
+          this.optionsFillerProduct
+        );
+        this.loading = false;
+    
+        this.products = response.data;
+        this.totalRecords = response.totalRecordsCount;
+        for (let index = 0; index < this.products.length; index++) {
+          this.showAllVariants.set(
+            this.products[index].id,
+            this.products[index].productVariants.length > 3 ? 1 : 0
+          );
+        }
+      }
+      toggleShowAllVariants(index: number) {
+        this.showAllVariants.set(
+          index,
+          this.showAllVariants.get(index) === 1 ? 2 : 1
+        );
+      }
+      checkStartPriceValue() {
         if (this.optionsFillerProduct.StartPrice != null) {
-            if (this.optionsFillerProduct.StartPrice < 1000) {
-                this.optionsFillerProduct.StartPrice = null;
-            }
+          if (this.optionsFillerProduct.StartPrice < 1000) {
+            this.optionsFillerProduct.StartPrice = null;
+          }
         }
-    }
-    checkEndPriceValue() {
+      }
+      checkEndPriceValue() {
         if (this.optionsFillerProduct.EndPrice != null) {
-            if (this.optionsFillerProduct.EndPrice < 1000) {
-                this.optionsFillerProduct.EndPrice = null;
-            }
+          if (this.optionsFillerProduct.EndPrice < 1000) {
+            this.optionsFillerProduct.EndPrice = null;
+          }
         }
-    }
+      }
+      totalSellCount(arr: any) {
+        return arr.reduce((accumulator: number, currentItem: any) => {
+          return accumulator + currentItem.sellCounts;
+        }, 0);
+      }
 }

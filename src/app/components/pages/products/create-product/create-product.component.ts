@@ -23,7 +23,6 @@ interface selected {
   id: number;
 }
 
-
 @Component({
   selector: 'app-create-product',
   templateUrl: './create-product.component.html',
@@ -58,6 +57,7 @@ export class CreateProductComponent implements OnInit{
   isInputVisible2 = true;
   formattedPrice: string | null = null;
   formattedPriceSale: string | null = null;
+  isSerialProduct: boolean = false;
 
   productForm!: FormGroup;
   selectedCategory: TreeNode | null = null;
@@ -94,7 +94,7 @@ export class CreateProductComponent implements OnInit{
   addVariants2: boolean = false;
   buttonVariants: boolean = true;
   buttonVariants2: boolean = true
-
+  showDescriptionEditor = false;
   data: any[] = [{}];
 
   units = [{ name: 'Kg' }, { name: 'Lít' }, { name: 'Cái' }];
@@ -133,13 +133,14 @@ export class CreateProductComponent implements OnInit{
       collectionId: [null],
       barcode: [null],
       sku: [null],
-      mass: [null],
+      mass: [null, [Validators.required, Validators.min(0.01)]],
       width: [null, [Validators.required, Validators.pattern('^[1-9][0-9]*$')]],
       hight: [null, [Validators.required, Validators.pattern('^[1-9][0-9]*$')]],
       length: [
         null,
         [Validators.required, Validators.pattern('^[1-9][0-9]*$')],
       ],
+      productType: ['regular'],
       base64_FileIamges: [[], [Validators.required]],
       base64_FileVideo: [null, []],
       propeties1: [null, Validators.required],
@@ -150,7 +151,7 @@ export class CreateProductComponent implements OnInit{
       globalWare: [null, Validators.required],
       base64_FileImage: ['', [Validators.required]],
       status: new FormControl<boolean>(true),
-      unit: [null],
+      unit: ['kg'],
       warning: [false],
       numberDay: [{ value: '', disabled: true }, Validators.required],
       unitName: [null]
@@ -176,6 +177,14 @@ export class CreateProductComponent implements OnInit{
           this.getWareControlName(i, j),
           this.fb.control('', Validators.required)
         );
+        this.productForm.addControl(
+          this.getSkuControlName(i, j),
+          this.fb.control('', Validators.required)
+        );
+        this.productForm.addControl(
+          this.getBarcodeControlName(i, j),
+          this.fb.control('', Validators.required)
+        );
       }
     }
 
@@ -190,8 +199,78 @@ export class CreateProductComponent implements OnInit{
       { label: 'Thêm mới' }
     ];
     this.getAllBrands();
-    this.getAllCols();
     this.getCategoriesAndChild();
+
+    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
+      this.updatePriceControls(newSellingPrice);
+    });
+
+    this.productForm.get('totalQuantity')?.valueChanges.subscribe((newtotalQuantity) => {
+      this.updateWareControls(newtotalQuantity);
+    });
+
+    this.productForm.get('productType').valueChanges.subscribe((value) => {
+      if (value === 'serial') {
+        // Nếu chọn sản phẩm Serial/iMei thì đặt totalQuantity về null
+        this.productForm.get('totalQuantity').setValue(null);
+      }
+    });
+  }
+
+  updatePriceControls(newPrice: string) {
+    // Loop through each row and cell to update the price controls
+    this.valueProperties1Array.controls.forEach((control, i) => {
+      this.valueProperties2Array.controls.forEach((subControl, j) => {
+        const priceControlName = this.getPriceControlName(i, j);
+        const priceControl = this.productForm.get(priceControlName);
+  
+        if (priceControl) {
+          priceControl.setValue(newPrice);
+        }
+      });
+    });
+  }
+
+  updateWareControls(newWare: string) {
+    this.valueProperties1Array.controls.forEach((control, i) => {
+      this.valueProperties2Array.controls.forEach((subControl, j) => {
+        const wareControlName = this.getWareControlName(i, j);
+        const wareControl = this.productForm.get(wareControlName);
+  
+        if (wareControl) {
+          wareControl.setValue(newWare);
+        }
+      });
+    });
+  }
+
+  toggleDescriptionEditor() {
+    this.showDescriptionEditor = !this.showDescriptionEditor;
+  }
+
+  preventNegative(event: KeyboardEvent): void {
+    if (event.key === '-' || event.key === 'e') {
+      event.preventDefault();
+    }
+  }
+  
+  onKeyPress(event: KeyboardEvent) {
+    const inputChar = event.key;
+    if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
+      event.preventDefault();
+    }
+  }
+  
+  isNumberOrDecimalKey(inputChar: string, inputElement: EventTarget): boolean {
+    const input = (inputElement as HTMLInputElement).value;
+  
+    // Allow digits and one decimal point, but prevent more than one decimal point
+    if (inputChar === '.' && input.includes('.')) {
+      return false;
+    }
+  
+    // Allow digits and decimal point
+    return /^[0-9.]$/.test(inputChar);
   }
 
   getAllBrands(): void {
@@ -304,6 +383,14 @@ export class CreateProductComponent implements OnInit{
         this.getWareControlName(index, j),
         this.fb.control('', Validators.required)
       );
+      this.productForm.addControl(
+        this.getSkuControlName(index, j),
+        this.fb.control('', Validators.required)
+      );
+      this.productForm.addControl(
+        this.getBarcodeControlName(index, j),
+        this.fb.control('', Validators.required)
+      );
     }
   }
 
@@ -317,6 +404,14 @@ export class CreateProductComponent implements OnInit{
       );
       this.productForm.addControl(
         this.getWareControlName(i, this.valueProperties2Array.length - 1),
+        this.fb.control('', Validators.required)
+      );
+      this.productForm.addControl(
+        this.getSkuControlName(i, this.valueProperties2Array.length - 1),
+        this.fb.control('', Validators.required)
+      );
+      this.productForm.addControl(
+        this.getBarcodeControlName(i, this.valueProperties2Array.length - 1),
         this.fb.control('', Validators.required)
       );
     }
@@ -485,6 +580,14 @@ export class CreateProductComponent implements OnInit{
   getWareControlName(i: number, j: number): string {
     return `quantity${i}-${j}`;
   }
+
+  getBarcodeControlName(i: number, j: number): string {
+    return `barcode${i}-${j}`;
+  }
+  
+  getSkuControlName(i: number, j: number): string {
+    return `sku${i}-${j}`;
+  }
   
   applyGlobalPrice(): void {
     // Lấy giá trị của globalPrice từ biểu mẫu
@@ -547,24 +650,6 @@ export class CreateProductComponent implements OnInit{
     return control ? control.value : null;
   }
 
-  onKeyPress(event: KeyboardEvent) {
-    const inputChar = event.key;
-    if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
-      event.preventDefault();
-    }
-  }
-  
-  isNumberOrDecimalKey(inputChar: string, inputElement: EventTarget): boolean {
-    const input = (inputElement as HTMLInputElement).value;
-  
-    // Allow digits and one decimal point, but prevent more than one decimal point
-    if (inputChar === '.' && input.includes('.')) {
-      return false;
-    }
-  
-    // Allow digits and decimal point
-    return /^[0-9.]$/.test(inputChar);
-  }
 
   getPriceControlError(i: number, j: number) {
     const control = this.productForm.get(this.getPriceControlName(i, j));
@@ -665,12 +750,12 @@ export class CreateProductComponent implements OnInit{
     this.isSubmitting = true;
     const productData = this.productForm.value;
 
-    // let hasError = false;
+    let hasError = false;
 
-    // if (!productData.name || productData.name.length === 0) {
-    //   this.showNameError2 = true;
-    //   hasError = true;
-    // }
+    if (!productData.name || productData.name.length === 0) {
+      this.showNameError2 = true;
+      hasError = true;
+    }
 
     // if (
     //   !productData.name ||
@@ -690,10 +775,10 @@ export class CreateProductComponent implements OnInit{
     // }
 
 
-    // if (!productData.categoryId || productData.categoryId.length === 0) {
-    //   this.showNameError4 = true;
-    //   hasError = true;
-    // }
+    if (!productData.categoryId || productData.categoryId.length === 0) {
+      this.showNameError4 = true;
+      hasError = true;
+    }
 
     // if (this.addVariants) {
     //   this.showNameError5 = false;
@@ -735,18 +820,18 @@ export class CreateProductComponent implements OnInit{
     //   hasError = true;
     // }
 
-    // if (hasError) {
-    //   this.messages = [
-    //     {
-    //       severity: 'error',
-    //       summary: 'Không thể lưu vì:',
-    //       detail: 'Sản phẩm đang có lỗi cần được chỉnh sửa',
-    //       life: 3000,
-    //     },
-    //   ];
-    //   this.isSubmitting = false;
-    //   return;
-    // }
+    if (hasError) {
+      this.messages = [
+        {
+          severity: 'error',
+          summary: 'Không thể lưu vì:',
+          detail: 'Sản phẩm đang có lỗi cần được chỉnh sửa',
+          life: 3000,
+        },
+      ];
+      this.isSubmitting = false;
+      return;
+    }
 
     const product: Products = {
       name: productData.name,
@@ -757,7 +842,8 @@ export class CreateProductComponent implements OnInit{
       collectionId: productData.collectionId || 0,
       sellingPrice: productData.sellingPrice || 0,
       importPrice: productData.importPrice || 0,
-      barcode: productData.barcode,
+      sku: productData.sku,
+      barcode: productData.barcode || productData.sku,
       totalQuantity: productData.totalQuantity || 0,
       mass: productData.mass || 0,
       width: productData.width,
@@ -783,6 +869,8 @@ export class CreateProductComponent implements OnInit{
         const value2 = productData.valuePropeties2[j] || null;
         const prices = productData[this.getPriceControlName(i, j)] || null;
         const quantity = productData[this.getWareControlName(i, j)] || null;
+        const sku = productData[this.getSkuControlName(i, j)] || null;
+        const barcode = productData[this.getBarcodeControlName(i, j)] || null;
         // if (!prices && prices <= 1000) {
         //   this.showNameError8 = true;
         //   return
@@ -791,6 +879,8 @@ export class CreateProductComponent implements OnInit{
         if (prices !== null) {
           hasVariants = true;
           const variant: ProductVariant = {
+            sku: sku,
+            barcode: barcode || sku,
             price: prices,
             quantity: quantity,
             propeties1: product.propeties1,
@@ -822,7 +912,7 @@ export class CreateProductComponent implements OnInit{
           },
         ];
         setTimeout(() => {
-          // this.router.navigate(['admin/quanlysanpham/danhsachsanpham']);
+          this.router.navigate(['/products/show-product']);
           this.isSubmitting = false;
         }, 1000);
       },

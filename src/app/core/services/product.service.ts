@@ -18,7 +18,7 @@ export class ProductService {
   
     async getProducts(pageSize: number, pageNumber: number): Promise<any> {
       try {
-        let response = await this.http.get<any>(`${this.url}/api/products/get-products-for-store?pagesize=${pageSize}&pagenumber=${pageNumber}`).toPromise();
+        let response = await this.http.get<any>(`${this.url}/api/product/get-products-for-store?pagesize=${pageSize}&pagenumber=${pageNumber}`).toPromise();
         return response;
       } catch (error) {
         return JSON.parse(JSON.stringify(error));
@@ -28,7 +28,7 @@ export class ProductService {
     FilterProduct(options: OptionsFilterProduct): Promise<any> {
       return new Promise(async (resolve, reject) => {
         try {
-          let response = await this.http.post<OptionsFilterProduct>(`${this.url}/api/products/filter-products-for-store`, options).toPromise();
+          let response = await this.http.post<OptionsFilterProduct>(`${this.url}/api/product/filter-products-for-store`, options).toPromise();
           resolve(response);
         } catch (error) {
           reject(JSON.parse(JSON.stringify(error)));
@@ -59,7 +59,7 @@ export class ProductService {
     }
   
     createProduct(data: any): Observable<any> {
-      return this.http.post<any>(`${this.url}/api/products/create-with-file`, data)
+      return this.http.post<any>(`${this.url}/api/product/create-with-file`, data)
         .pipe(
           catchError(this.handleError)
         );
@@ -68,7 +68,7 @@ export class ProductService {
     deletProduct(idPRoduct: number): Promise<any> {
       return new Promise(async (resolve, reject) => {
         try {
-          let response = await this.http.delete<any>(`${this.url}/api/products/delete/${idPRoduct}`).toPromise();
+          let response = await this.http.delete<any>(`${this.url}/api/product/delete/${idPRoduct}`).toPromise();
           if (response.statusCode == 200) {
             resolve(response);
           }
@@ -81,7 +81,7 @@ export class ProductService {
     ChangeStatusProduct(idPRoduct: number): Promise<any> {
       return new Promise(async (resolve, reject) => {
         try {
-          let response = await this.http.get<any>(`${this.url}/api/products/change-product-status/${idPRoduct}`).toPromise();
+          let response = await this.http.get<any>(`${this.url}/api/product/change-product-status/${idPRoduct}`).toPromise();
           if (response.statusCode == 200) {
             resolve(response);
           }
@@ -94,14 +94,14 @@ export class ProductService {
   
      // Lấy thông tin của một sản phẩm dựa trên ID
      getProductbyId(id: number): Observable<Products> {
-      const url = `${this.url}/api/products/get-product-and-variant/${id}`;
+      const url = `${this.url}/api/product/get-product-and-variant/${id}`;
       return this.http.get<Products>(url).pipe(
         catchError(this.handleError)
       );
     }
   
     updateProductAndVariant(product: any): Observable<any> {
-      const url = `${this.url}/api/products/update`;
+      const url = `${this.url}/api/product/update`;
       return this.http.put<any>(url, product);
     }
   
@@ -110,11 +110,11 @@ export class ProductService {
     }
   
     CheckBarcode(barCode: string): Observable<{ data: boolean; [key: string]: any }> {
-      return this.http.get<{ data: boolean; [key: string]: any }>(`${this.url}/api/products/checkbarcode?barCode=${barCode}`);
+      return this.http.get<{ data: boolean; [key: string]: any }>(`${this.url}/api/product/checkbarcode?barCode=${barCode}`);
     }
   
     checkBarcodeUpdate(barcode: string, productId: number) {
-      const url = `${this.url}/api/products/checkbarcode?barCode=${barcode}&id=${productId}`;
+      const url = `${this.url}/api/product/checkbarcode?barCode=${barcode}&id=${productId}`;
       return this.http.get<any>(url);
     }
   

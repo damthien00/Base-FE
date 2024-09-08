@@ -24,18 +24,26 @@
                         </div>
                         <div class="processing">
                             <div class="processing-checkbox">
-                                <p-radioButton name="pizza" value="Cheese" inputId="ingredient1"></p-radioButton>
-                                <label style="padding-left: 10px;" for="ny">Sản phẩm thường</label>
+                              <input type="radio" id="sanphamthuong" formControlName="productType" value="regular" />
+                              <label style="padding-left: 10px;" for="sanphamthuong">Sản phẩm thường</label>
                             </div>
                             <div style="margin-left: 100px;" class="processing-checkbox">
-                                <p-radioButton name="pizza" value="Cheese" inputId="ingredient2"></p-radioButton>
-                                <label style="padding-left: 10px;" for="ny">Sản phẩm Serial/iMei</label>
+                              <input type="radio" id="sanphamserial" formControlName="productType" value="serial" />
+                              <label style="padding-left: 10px;" for="sanphamserial">Sản phẩm Serial/iMei</label>
                             </div>
                         </div>
                     </div>
                     <div class="box">
                         <div class="border-manager">
                             <span>THÔNG TIN SẢN PHẨM</span>
+                            <div style="margin-top: -27px;" class="horizontal-row">
+                              <p-inputSwitch
+                                name="switchControl"
+                                [style]="{ height: '20px', 'margin-top': '7px' }"
+                                formControlName="status"
+                              ></p-inputSwitch>
+                              <span style="margin-left: 10px">Cho phép bán</span>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="col-lg-12">
@@ -45,7 +53,7 @@
                                         <p-dropdown
                                           formControlName="brandId"
                                           [options]="brands"
-                                          [style]="{ height: '43px', width: '89%' }"
+                                          [style]="{ height: '43px', width: '100%' }"
                                           optionLabel="name"
                                           [showClear]="true"
                                           placeholder="Chọn thương hiệu"
@@ -77,6 +85,21 @@
                                               <span>{{ node.label }}</span>
                                             </ng-template>
                                           </p-treeSelect>
+                                          <div
+                                          *ngIf="
+                                            (productForm.get('categoryId')?.invalid &&
+                                              (productForm.get('categoryId')?.dirty ||
+                                                productForm.get('categoryId')?.touched)) ||
+                                            showNameError4
+                                          "
+                                        >
+                                          <div
+                                            *ngIf="productForm.get('categoryId')?.errors?.['required']"
+                                            class="error-message"
+                                          >
+                                            Danh mục không được bỏ trống
+                                          </div>
+                                        </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <label class="labelip">SKU </label>
@@ -105,7 +128,36 @@
                                                 formControlName="name"
                                                 placeholder="Nhập tên sản phẩm"
                                                 maxlength="100"
-                                            /> 
+                                            />
+                                            <div
+                                            *ngIf="
+                                              (productForm.get('name')?.invalid &&
+                                                (productForm.get('name')?.dirty ||
+                                                  productForm.get('name')?.touched)) ||
+                                              showNameError2 ||
+                                              showNameError10 ||
+                                              showNameError11
+                                            "
+                                          >
+                                            <div
+                                              *ngIf="productForm.get('name')?.errors?.['required']"
+                                              class="error-message"
+                                            >
+                                              Tên sản phẩm không được để trống
+                                            </div>
+                                            <div
+                                              *ngIf="productForm.get('name')?.errors?.['invalidName'] && !productForm.get('name')?.errors?.['required']"
+                                              class="error-message"
+                                            >
+                                              Tên không được chứa toàn ký tự trắng
+                                            </div>
+                                            <div
+                                              *ngIf="productForm.get('name')?.errors?.['invalidLength']"
+                                              class="error-message"
+                                            >
+                                              Tên phải từ 6 đến 100 ký tự
+                                            </div>
+                                          </div> 
                                     </div>
                                     <div class="col-lg-4">
                                         <label class="labelip">Mã vạch </label>
@@ -117,20 +169,34 @@
                                         formControlName="barcode"
                                         placeholder="Nhập mã vạch"
                                         maxlength="100"
+                                        (keypress)="onKeyPress($event)"
                                         /> 
                                     </div>
                                     <div class="col-lg-4">
-                                        <label class="labelip">Khối lượng</label>
+                                      <label class="labelip">Khối lượng</label>
+                                      <div class="input-group">
                                         <input
-                                            type="text"
+                                          type="text"
+                                          class="form-control"
+                                          pInputText
+                                          [style]="{ height: '40px', width: '70%' }"
+                                          formControlName="mass"
+                                          placeholder="Nhập khối lượng"
+                                          min="0.01"
+                                          step="0.01"
+                                          (keypress)="onKeyPress($event)"
+                                        />
+                                        <div class="input-group-append">
+                                          <select
                                             class="form-control"
-                                            pInputText
-                                            [style]="{ height: '40px', width: '100%' }"
-                                            formControlName="mass"
-                                            placeholder="Nhập tên mẫu"
-                                            maxlength="100"
-                                            /> 
-                                    </div>             
+                                            formControlName="unit"
+                                            [style]="{ height: '40px' }">
+                                            <option value="kg" selected>kg</option>
+                                            <option value="g">g</option>
+                                          </select>
+                                        </div>
+                                      </div>
+                                    </div>                                     
                                 </div>
                             </div>
                             <div class="col-lg-12">
@@ -157,6 +223,7 @@
                                         formControlName="sellingPrice"
                                         placeholder="Nhập giá bán"
                                         maxlength="100"
+                                        (keypress)="onKeyPress($event)"
                                         /> 
                                     </div>
                                     <div class="col-lg-4">
@@ -169,13 +236,14 @@
                                             formControlName="importPrice"
                                             placeholder="Nhập giá nhập"
                                             maxlength="100"
+                                            (keypress)="onKeyPress($event)"
                                             /> 
                                     </div>             
                                 </div>
                             </div>                     
                             <div class="col-lg-12">
                                 <div class="row">
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-4"  *ngIf="productForm.get('productType').value === 'regular'">
                                         <label class="labelip">Kho hàng</label>
                                             <input
                                                 type="text"
@@ -190,9 +258,11 @@
                                 </div>
                             </div>
                             <div class="col-lg-12">
-                                <label class="labelip">Ẩn mô tả sản phẩm</label>
-                                <p-editor  formControlName="description" [style]="{ height: '320px' }"></p-editor>                          
-                            </div>
+                              <label style="color: rgb(139, 127, 248); cursor: pointer;" class="labelip" (click)="toggleDescriptionEditor()">
+                                {{ showDescriptionEditor ? 'Ẩn mô tả sản phẩm' : 'Hiển thị mô tả sản phẩm' }}
+                              </label>                          
+                              <p-editor *ngIf="showDescriptionEditor" formControlName="description" [style]="{ height: '320px' }"></p-editor>  
+                            </div>                      
                             <div class="col-lg-12">
                                 <div class="product-content">
                                   <label class="labelip">Ảnh sản phẩm</label>
@@ -397,11 +467,11 @@
                                         <ng-template pTemplate="header">
                                           <tr>
                                             <th style="width: 5%">STT</th>
-                                            <th style="width: 20%">Tên phân loại</th>
+                                            <th style="width: 30%">Tên phân loại</th>
                                             <th style="width: 20%">SKU phân loại</th>
                                             <th style="width: 10%">Mã vạch/Mã Barcode</th>
                                             <th style="width: 10%">Giá bán</th>
-                                            <th>Tồn kho</th>
+                                            <th  *ngIf="productForm.get('productType').value === 'regular'">Tồn kho</th>
                                           </tr>
                                         </ng-template>
                                         <ng-template
@@ -439,17 +509,20 @@
                                                 <input
                                                   class="form-control"
                                                   type="text"
-                                                  [formControlName]="getPriceControlName(i, j)"
-                                                  (keypress)="onKeyPress($event)"
+                                                  [formControlName]="getSkuControlName(i, j)"
                                                   [style]="{ height: '35px', width: '200px' }"
                                                 />
-                                                <div
-                                                  *ngIf="getPriceControlError(i, j)"
-                                                  class="text-danger"
-                                                >
-                                                  {{ getPriceControlError(i, j) }}
-                                                </div>
-                                              </td>
+                                            </td>
+                                            <td>
+                                              <input
+                                                class="form-control"
+                                                type="text"
+                                                [formControlName]="getBarcodeControlName(i, j)"
+                                                (keypress)="onKeyPress($event)"
+                                                [style]="{ height: '35px', width: '200px' }"
+                                              />
+                                              
+                                            </td>
                                             <td>
                                               <input
                                                 class="form-control"
@@ -465,16 +538,7 @@
                                                 {{ getPriceControlError(i, j) }}
                                               </div>
                                             </td>
-                                            <td>
-                                              <input
-                                                class="form-control"
-                                                type="text"
-                                                [formControlName]="getWareControlName(i, j)"
-                                                (keypress)="onKeyPress($event)"
-                                                [style]="{ height: '35px', width: '200px' }"
-                                              />
-                                            </td>
-                                            <td>
+                                            <td  *ngIf="productForm.get('productType').value === 'regular'">
                                               <input
                                                 class="form-control"
                                                 type="text"

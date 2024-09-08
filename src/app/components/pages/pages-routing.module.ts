@@ -13,10 +13,10 @@ import { RouterModule } from '@angular/router';
             },
 
             {
-                path: 'products/show',
+                path: 'products/show-product',
                 loadChildren: () =>
-                    import('./products/show/show.module').then(
-                        (m) => m.ShowModule
+                    import('./products/show-product/show-product.module').then(
+                        (m) => m.ShowProductModule
                     ),
             },
             {

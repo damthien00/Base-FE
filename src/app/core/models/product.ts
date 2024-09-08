@@ -38,6 +38,7 @@ export interface Products {
 
 export interface ProductVariant {
     sku?: string;
+    barcode?: string
     width?: number;
     height?: number;
     length?: number;

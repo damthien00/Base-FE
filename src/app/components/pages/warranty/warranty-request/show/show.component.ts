@@ -15,16 +15,17 @@
 // }
 
 import { Component, OnInit } from '@angular/core';
-import { Product } from 'src/app/core/models/product';
 import { MessageService } from 'primeng/api';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { OptionsFilterProduct } from 'src/app/core/models/product-test';
+
 
 import { ProductService } from 'src/app/core/services/product.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { NodeService } from 'src/app/core/services/node.service';
 import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
+import { Product } from 'src/app/core/models/order';
+import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
 
 @Component({
     selector: 'app-show',
@@ -189,46 +190,46 @@ export class ShowComponent implements OnInit {
         this.submitted = false;
     }
 
-    saveProduct() {
-        this.submitted = true;
+    // saveProduct() {
+    //     this.submitted = true;
 
-        if (this.product.name?.trim()) {
-            if (this.product.id) {
-                // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus
-                    .value
-                    ? this.product.inventoryStatus.value
-                    : this.product.inventoryStatus;
-                this.products[this.findIndexById(this.product.id)] =
-                    this.product;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000,
-                });
-            } else {
-                this.product.id = this.createId();
-                this.product.code = this.createId();
-                this.product.image = 'product-placeholder.svg';
-                // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus
-                    ? this.product.inventoryStatus.value
-                    : 'INSTOCK';
-                this.products.push(this.product);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000,
-                });
-            }
+    //     if (this.product.name?.trim()) {
+    //         if (this.product.id) {
+    //             // @ts-ignore
+    //             this.product.inventoryStatus = this.product.inventoryStatus
+    //                 .value
+    //                 ? this.product.inventoryStatus.value
+    //                 : this.product.inventoryStatus;
+    //             this.products[this.findIndexById(this.product.id)] =
+    //                 this.product;
+    //             this.messageService.add({
+    //                 severity: 'success',
+    //                 summary: 'Successful',
+    //                 detail: 'Product Updated',
+    //                 life: 3000,
+    //             });
+    //         } else {
+    //             this.product.id = this.createId();
+    //             this.product.code = this.createId();
+    //             this.product.image = 'product-placeholder.svg';
+    //             // @ts-ignore
+    //             this.product.inventoryStatus = this.product.inventoryStatus
+    //                 ? this.product.inventoryStatus.value
+    //                 : 'INSTOCK';
+    //             this.products.push(this.product);
+    //             this.messageService.add({
+    //                 severity: 'success',
+    //                 summary: 'Successful',
+    //                 detail: 'Product Created',
+    //                 life: 3000,
+    //             });
+    //         }
 
-            this.products = [...this.products];
-            this.productDialog = false;
-            this.product = {};
-        }
-    }
+    //         this.products = [...this.products];
+    //         this.productDialog = false;
+    //         this.product = {};
+    //     }
+    // }
 
     findIndexById(id: string): number {
         let index = -1;

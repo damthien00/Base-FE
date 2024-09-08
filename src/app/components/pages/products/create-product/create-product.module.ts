@@ -11,6 +11,7 @@ import { CreateProductComponent } from './create-product.component';
 import { CheckboxModule } from 'primeng/checkbox';
 import { EditorModule } from 'primeng/editor';
 import { ButtonModule } from 'primeng/button';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @NgModule({
   imports: [
@@ -24,7 +25,8 @@ import { ButtonModule } from 'primeng/button';
     FormsModule,
     EditorModule,
     CommonModule,
-    ButtonModule
+    ButtonModule,
+    RadioButtonModule
   ],
   declarations: [CreateProductComponent]
 })

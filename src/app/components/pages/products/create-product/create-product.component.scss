@@ -114,4 +114,25 @@ span {
     border-radius: 4px;
     padding: 10px 0 !important;
   }
+
+  /* Tăng kích thước của radio button */
+input[type="radio"] {
+  width: 20px;               /* Đặt chiều rộng */
+  height: 20px;              /* Đặt chiều cao */
+  border: 2px solid #007bff; /* Đặt màu viền */
+  border-radius: 50%;        /* Tạo hình tròn */       /* Loại bỏ viền khi được chọn */
+  cursor: pointer;           /* Đổi con trỏ khi di chuột */
+  position: relative;        /* Đặt vị trí tương đối cho pseudo-element */
+}
+
+/* Tạo hiệu ứng khi radio button được chọn */
+input[type="radio"]:checked {
+  background-color: #007bff; /* Đặt màu nền khi được chọn */
+}
+
+/* Tạo hiệu ứng hover */
+input[type="radio"]:hover {
+  border-color: #0056b3; /* Đổi màu viền khi hover */
+}
+
   
