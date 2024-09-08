@@ -1,19 +1,21 @@
-<p-dialog
-    [(visible)]="displayModal"
-    modal="true"
-    [closable]="false"
-    [draggable]="false"
-    [resizable]="false"
-    [style]="{ width: '50vw' }"
->
-    <!-- Header -->
-    <ng-template pTemplate="header">
-        <h4>Thêm chính sách bảo hành</h4>
-    </ng-template>
+<p-toast />
 
-    <!-- Body -->
-    <ng-template pTemplate="content">
-        <form [formGroup]="createWarrantyPolicyForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="createWarrantyPolicyForm" (ngSubmit)="onSubmit()">
+    <p-dialog
+        [(visible)]="displayModal"
+        modal="true"
+        [closable]="false"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: '50vw' }"
+    >
+        <!-- Header -->
+        <ng-template pTemplate="header">
+            <h4>Thêm chính sách bảo hành</h4>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="content">
             <div class="grid p-fluid">
                 <div class="col-12 md:col-6">
                     <div class="field">
@@ -57,30 +59,25 @@
                         <div class="flex">
                             <p-inputNumber
                                 inputId="warranty_period"
-                                [(ngModel)]="value2"
-                                formControlName="warranty_period"
+                                formControlName="term"
                             />
                             <p-dropdown
                                 [options]="this.optionsTime"
-                                [(ngModel)]="this.selectedTime"
                                 optionLabel="name"
-                                formControlName="typeTime"
+                                formControlName="termType"
                             >
                             </p-dropdown>
                         </div>
                         <div
                             *ngIf="
-                                createWarrantyPolicyForm.get('warranty_period')
-                                    ?.invalid &&
-                                (createWarrantyPolicyForm.get('warranty_period')
-                                    ?.dirty ||
-                                    createWarrantyPolicyForm.get(
-                                        'warranty_period'
-                                    )?.touched)
+                                createWarrantyPolicyForm.get('term')?.invalid &&
+                                (createWarrantyPolicyForm.get('term')?.dirty ||
+                                    createWarrantyPolicyForm.get('term')
+                                        ?.touched)
                             "
                         >
                             <div
-                                *ngIf="createWarrantyPolicyForm.get('warranty_period')?.errors?.['required']"
+                                *ngIf="createWarrantyPolicyForm.get('term')?.errors?.['required']"
                                 class="error-message"
                             >
                                 Vui lòng nhập kì hạn bảo hành
@@ -94,28 +91,28 @@
                     </div>
                 </div> -->
             </div>
-        </form>
-    </ng-template>
+        </ng-template>
 
-    <!-- Footer -->
-    <ng-template pTemplate="footer">
-        <div class="flex gap-2 justify-content-end">
-            <button
-                pButton
-                pRipple
-                type="button"
-                label="Hủy"
-                icon="pi pi-times"
-                (click)="displayModal = false"
-                class="p-button-danger"
-            ></button>
-            <button
-                type="submit"
-                pButton
-                label="Lưu"
-                icon="pi pi-check"
-                class="p-button-primary"
-            ></button>
-        </div>
-    </ng-template>
-</p-dialog>
+        <!-- Footer -->
+        <ng-template pTemplate="footer">
+            <div class="flex gap-2 justify-content-end">
+                <button
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Hủy"
+                    icon="pi pi-times"
+                    (click)="displayModal = false"
+                    class="p-button-danger"
+                ></button>
+                <button
+                    type="submit"
+                    pButton
+                    label="Lưu"
+                    icon="pi pi-check"
+                    class="p-button-primary"
+                ></button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</form>

@@ -77,8 +77,9 @@ export class ShowComponent implements OnInit {
         this.createModal.showModalDialog();
     }
 
-    // openEditModal(category: any): void {
-    //     // this.editModal.categoryId = category.id;
-    //     this.editModal.showModalDialog();
-    // }
+    openEditModal(branch: any): void {
+        console.log(branch);
+        // this.editModal.categoryId = category.id;
+        this.editModal.showModalDialog(branch);
+    }
 }

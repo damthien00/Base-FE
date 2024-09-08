@@ -1,3 +1,278 @@
-<p>
-  edit works!
-</p>
+<p-toast />
+<form [formGroup]="updateBranchForm" (ngSubmit)="onSubmit()">
+    <p-dialog
+        [(visible)]="displayModal"
+        modal="true"
+        [closable]="false"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: '50vw' }"
+    >
+        <!-- Header -->
+        <ng-template pTemplate="header">
+            <h4>Sửa chi nhánh</h4>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="content">
+            <div class="grid p-fluid">
+                <div class="col-12 md:col-6">
+                    <div class="field mb-0">
+                        <label htmlFor="name1"
+                            >Tên chi nhánh<span class="red-asterisk"
+                                >*</span
+                            ></label
+                        >
+                        <input
+                            pInputText
+                            id="name1"
+                            type="text"
+                            spellcheck="false"
+                            placeholder="Nhập tên chi nhánh"
+                            formControlName="name"
+                        />
+                        <div
+                            *ngIf="
+                                updateBranchForm.get('name')?.invalid &&
+                                (updateBranchForm.get('name')?.dirty ||
+                                    updateBranchForm.get('name')?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="updateBranchForm.get('name')?.errors?.['required']"
+                                class="error-message"
+                            >
+                                Vui lòng nhập tên chi nhánh
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field mb-0">
+                        <label htmlFor="phoneNumber"
+                            >Số điện thoại<span class="red-asterisk"
+                                >*</span
+                            ></label
+                        >
+                        <input
+                            pInputText
+                            id="phoneNumber"
+                            type="text"
+                            spellcheck="false"
+                            placeholder="Nhập số điện thoại"
+                            formControlName="phoneNumber"
+                        />
+                        <div
+                            *ngIf="
+                                updateBranchForm.get('phoneNumber')?.invalid &&
+                                (updateBranchForm.get('phoneNumber')?.dirty ||
+                                    updateBranchForm.get('phoneNumber')
+                                        ?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="updateBranchForm.get('phoneNumber')?.errors?.['required']"
+                                class="error-message"
+                            >
+                                Vui lòng nhập số điện thoại chi nhánh
+                            </div>
+                            <div
+                                *ngIf="
+                                    updateBranchForm
+                                        .get('phoneNumber')
+                                        ?.hasError('pattern')
+                                "
+                                class="error-message"
+                            >
+                                Số điện thoại phải có đúng 10 số nguyên
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field mb-0">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            pInputText
+                            id="email"
+                            type="text"
+                            spellcheck="false"
+                            placeholder="Nhập email"
+                            formControlName="email"
+                        />
+
+                        <div
+                            *ngIf="
+                                updateBranchForm.get('email')?.invalid &&
+                                (updateBranchForm.get('email')?.dirty ||
+                                    updateBranchForm.get('email')?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="updateBranchForm.get('email')?.errors?.['pattern']"
+                                class="error-message"
+                            >
+                                Email không hợp lệ.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field mb-0">
+                        <label htmlFor="address"
+                            >Địa chỉ<span class="red-asterisk">*</span></label
+                        >
+                        <input
+                            pInputText
+                            id="address"
+                            type="text"
+                            spellcheck="false"
+                            placeholder="Nhập địa chỉ"
+                            formControlName="address"
+                        />
+                        <div
+                            *ngIf="
+                                updateBranchForm.get('address')?.invalid &&
+                                (updateBranchForm.get('address')?.dirty ||
+                                    updateBranchForm.get('address')?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="updateBranchForm.get('address')?.errors?.['required']"
+                                class="error-message"
+                            >
+                                Vui lòng nhập địa chỉ chi nhánh
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field mb-0">
+                        <label htmlFor="address"
+                            >Khu vực<span class="red-asterisk">*</span></label
+                        >
+                        <p-dropdown
+                            [options]="districts"
+                            optionLabel="cityName"
+                            [filter]="true"
+                            formControlName="districtID"
+                            filterBy="cityName"
+                            [showClear]="true"
+                            (onChange)="onDistrictChange($event)"
+                            placeholder="Chọn khu vực"
+                        >
+                            <ng-template
+                                pTemplate="selectedItem"
+                                let-selectedOption
+                            >
+                                <div class="flex align-items-center gap-2">
+                                    <div *ngIf="selectedOption">
+                                        {{ selectedOption?.cityName }} -
+                                        {{ selectedOption?.name }}
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template let-country pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                    <div>
+                                        {{ country.cityName }} -
+                                        {{ country.name }}
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                        <div
+                            *ngIf="
+                                updateBranchForm.get('districtID')?.invalid &&
+                                (updateBranchForm.get('districtID')?.dirty ||
+                                    updateBranchForm.get('districtID')?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="updateBranchForm.get('districtID')?.errors?.['required']"
+                                class="error-message"
+                            >
+                                Vui lòng nhập phường, huyện
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field mb-0">
+                        <label htmlFor="wardID"
+                            >Phường xã<span class="red-asterisk">*</span></label
+                        >
+                        <p-dropdown
+                            [options]="wards"
+                            optionLabel="name"
+                            [filter]="true"
+                            formControlName="wardID"
+                            filterBy="name"
+                            [showClear]="true"
+                            placeholder="Chọn xã"
+                            [disabled]="!selectedDistrict"
+                        >
+                            <ng-template
+                                pTemplate="selectedItem"
+                                let-selectedOption
+                            >
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ selectedOption?.name }}</div>
+                                </div>
+                            </ng-template>
+                            <ng-template let-country pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ country.name }}</div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                        <div
+                            *ngIf="
+                                updateBranchForm.get('wardID')?.invalid &&
+                                (updateBranchForm.get('wardID')?.dirty ||
+                                    updateBranchForm.get('wardID')?.touched)
+                            "
+                        >
+                            <div
+                                *ngIf="updateBranchForm.get('wardID')?.errors?.['required']"
+                                class="error-message"
+                            >
+                                Vui lòng chọn phường xã
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="field mb-0 flex align-items-center gap-2">
+                        <p-inputSwitch
+                            formControlName="isActive"
+                        ></p-inputSwitch>
+                        <label htmlFor="address">Hoạt động</label>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+        <!-- Footer -->
+        <ng-template pTemplate="footer">
+            <div class="flex gap-2 justify-content-end">
+                <button
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Hủy"
+                    icon="pi pi-times"
+                    (click)="displayModal = false; updateBranchForm.reset()"
+                    class="p-button-danger"
+                ></button>
+                <button
+                    type="submit"
+                    pButton
+                    label="Lưu"
+                    icon="pi pi-check"
+                    class="p-button-primary"
+                ></button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</form>

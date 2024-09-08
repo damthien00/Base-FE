@@ -1,3 +1,4 @@
+<p-toast />
 <form [formGroup]="createBranchForm" (ngSubmit)="onSubmit()">
     <p-dialog
         [(visible)]="displayModal"
@@ -90,9 +91,7 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="email"
-                            >Email<span class="red-asterisk">*</span></label
-                        >
+                        <label htmlFor="email">Email</label>
                         <input
                             pInputText
                             id="email"
@@ -109,13 +108,6 @@
                                     createBranchForm.get('email')?.touched)
                             "
                         >
-                            <div
-                                *ngIf="createBranchForm.get('email')?.errors?.['required']"
-                                class="error-message"
-                            >
-                                Vui lòng nhập email
-                            </div>
-
                             <div
                                 *ngIf="createBranchForm.get('email')?.errors?.['pattern']"
                                 class="error-message"
@@ -162,10 +154,10 @@
                         <p-dropdown
                             [options]="districts"
                             [(ngModel)]="selectedDistrict"
-                            optionLabel="CityName"
+                            optionLabel="cityName"
                             [filter]="true"
                             formControlName="districtID"
-                            filterBy="CityName"
+                            filterBy="cityName"
                             [showClear]="true"
                             (onChange)="onDistrictChange($event)"
                             placeholder="Chọn khu vực"
@@ -256,7 +248,6 @@
                     <div class="field mb-0 flex align-items-center gap-2">
                         <p-inputSwitch
                             formControlName="isActive"
-                            [(ngModel)]="valSwitch"
                         ></p-inputSwitch>
                         <label htmlFor="address">Hoạt động</label>
                         <!-- <p-inputSwitch [(ngModel)]="checked" /> -->
@@ -274,7 +265,7 @@
                     type="button"
                     label="Hủy"
                     icon="pi pi-times"
-                    (click)="displayModal = false"
+                    (click)="displayModal = false; createBranchForm.reset()"
                     class="p-button-danger"
                 ></button>
                 <button

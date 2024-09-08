@@ -1,3 +1,5 @@
+import { OptionsFilterDistrict } from './../../../../core/DTOs/address/optionsFilterDistrict';
+import { OptionsFilterBranch } from 'src/app/core/DTOs/branch/optionsFilterBranchs';
 import { AddressService } from './../../../../core/services/address.service';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
@@ -6,19 +8,23 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
+import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { DropdownFilterOptions } from 'primeng/dropdown';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { ValidationService } from 'src/app/core/utils/validation.utils';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-create',
     templateUrl: './create.component.html',
     styleUrls: ['./create.component.css'],
+    providers: [MessageService],
 })
 export class CreateComponent implements OnInit {
     @Output() bracnchCreated = new EventEmitter<any>();
     @Output() loadBranchs = new EventEmitter<any>();
     displayModal: boolean = false;
+    // optionsFilterDistrict = new OptionsFilterDistrict();
     optionsTime: any[] = [
         { name: 'Ngày', value: 'day' },
         { name: 'Tháng', value: 'month' },
@@ -27,6 +33,7 @@ export class CreateComponent implements OnInit {
         { name: 'Tuần', value: 'week' },
     ];
     districts: any;
+    filterDistricts: any;
     selectedTime: any;
     createBranchForm: FormGroup;
     keyWord: any = '';
@@ -35,11 +42,14 @@ export class CreateComponent implements OnInit {
     filterValue: string | undefined = '';
     wards: any;
     selectedWard: any;
+
+    // districts: any[] | undefined;
     constructor(
         private formBuilder: FormBuilder,
         private validationService: ValidationService,
         private addressService: AddressService,
-        private branchService: BranchService
+        private branchService: BranchService,
+        private messageService: MessageService
     ) {
         this.createBranchForm = this.formBuilder.group({
             name: [null, [Validators.required]],
@@ -50,7 +60,6 @@ export class CreateComponent implements OnInit {
             email: [
                 '',
                 [
-                    Validators.required,
                     Validators.pattern(
                         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
                     ),
@@ -79,9 +88,30 @@ export class CreateComponent implements OnInit {
         });
     }
 
+    onDistrictChange(event: any) {
+        const districtId = event.value.id;
+        this.addressService.getWards(districtId).subscribe((data) => {
+            this.wards = data.data;
+        });
+    }
+
     ngOnInit() {
         this.selectedTime = this.optionsTime[0];
         this.loadDistricts();
+    }
+
+    searchDistrict(event: AutoCompleteCompleteEvent) {
+        this.keyWord = event.query;
+        this.filterDistricts1();
+    }
+
+    filterDistricts1() {
+        this.addressService.getDistricts(this.keyWord).subscribe((data) => {
+            this.filterDistricts = data.data.map((item: any) => {
+                console.log(item);
+                return `${item.cityName}-${item.name}`;
+            });
+        });
     }
 
     loadDistricts() {
@@ -103,15 +133,9 @@ export class CreateComponent implements OnInit {
         options.filter(event);
     }
 
-    onDistrictChange(event) {
-        const districtId = event.value.id;
-        this.addressService.getWards(districtId).subscribe((data) => {
-            this.wards = data.data;
-        });
-    }
-
     onSubmit() {
         if (this.createBranchForm.valid) {
+            console.log(this.createBranchForm.value);
             const formData = {
                 name: this.createBranchForm.value.name,
                 phoneNumber: this.createBranchForm.value.phoneNumber,
@@ -129,6 +153,11 @@ export class CreateComponent implements OnInit {
                 (response) => {
                     this.displayModal = false;
                     this.createBranchForm.reset();
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Thành công',
+                        detail: 'Thêm chi nhánh thành công',
+                    });
                     this.loadBranchs.emit();
                 },
                 (error) => {
@@ -137,6 +166,7 @@ export class CreateComponent implements OnInit {
                 }
             );
         } else {
+            this.createBranchForm.markAllAsTouched();
         }
     }
 }
