@@ -69,7 +69,21 @@
                                         >Kỳ hạn bảo hành</span
                                     >
                                     {{ warrantyPolicy.term }}
-                                    {{ warrantyPolicy.termType }}
+                                    <span *ngIf="warrantyPolicy.termType === 1"
+                                        >ngày</span
+                                    >
+                                    <span *ngIf="warrantyPolicy.termType === 2"
+                                        >tuần</span
+                                    >
+                                    <span *ngIf="warrantyPolicy.termType === 3"
+                                        >tháng</span
+                                    >
+                                    <span *ngIf="warrantyPolicy.termType === 4"
+                                        >quý</span
+                                    >
+                                    <span *ngIf="warrantyPolicy.termType === 5"
+                                        >năm</span
+                                    >
                                 </td>
                             </tr>
                         </ng-template>
@@ -83,6 +97,7 @@
 <app-create
     #createModal
     (warrantyPolictyCreated)="onWarrantPolicyCreated($event)"
+    (loadWarrantyPolicies)="loadWarrantyPolicies()"
 ></app-create>
 
 <app-edit

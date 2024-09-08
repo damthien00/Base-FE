@@ -68,16 +68,23 @@
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>STT</th>
+                        <th style="text-align: center">STT</th>
                         <th>Tên chi nhánh</th>
                         <th>Địa chỉ</th>
                         <th>Số điện thoại</th>
                         <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-branch let-i="rowIndex">
                     <tr>
-                        <td style="width: 5%; min-width: 10rem">
+                        <td
+                            style="
+                                width: 2%;
+                                min-width: 2rem;
+                                text-align: center;
+                            "
+                        >
                             <span class="p-column-title">STT</span>
                             {{ i + 1 }}
                         </td>
@@ -98,12 +105,31 @@
 
                         <td style="width: 14%; min-width: 10rem">
                             <span class="p-column-title">Status</span>
-                            <span *ngIf="branch.isActive === 0"
+                            <span *ngIf="branch.isActive === 1"
                                 >Đang hoạt động</span
                             >
-                            <span *ngIf="branch.isActive === 1"
+                            <span *ngIf="branch.isActive === 0"
                                 >Ngừng hoạt động</span
                             >
+                        </td>
+                        <td style="width: 5%; text-align: center">
+                            <span
+                                class="pi pi-eye p-1"
+                                (click)="viewDetails(branch)"
+                                title="Xem chi tiết"
+                            >
+                            </span>
+                            <span
+                                class="pi pi-pencil p-1"
+                                (click)="openEditModal(branch)"
+                                title="Sửa"
+                            >
+                            </span>
+                            <span
+                                class="pi pi-trash p-1"
+                                (click)="deleteBranch(branch)"
+                                title="Xóa"
+                            ></span>
                         </td>
                     </tr>
                 </ng-template>
@@ -117,8 +143,4 @@
     (branchCreated)="onBranchCreated($event)"
     (loadBranchs)="loadBranchs()"
 ></app-create>
-
-<!-- <app-edit
-    #editModal
-    (branchUpdated)="onBranchUpdated($event)"
-></app-edit> -->
+<app-edit #editModal (branchUpdated)="onBranchUpdated($event)"></app-edit>

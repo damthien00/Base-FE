@@ -20,6 +20,7 @@ export class ShowComponent implements OnInit {
             { label: 'Bảo hành' },
             { label: 'Chính sách bảo hành', route: '/inputtext' },
         ];
+        this.loadWarrantyPolicies();
     }
 
     onWarrantPolicyCreated(newWarrantPolicy: any): void {
@@ -44,8 +45,9 @@ export class ShowComponent implements OnInit {
         this.editModal.showModalDialog();
     }
 
-    loadBranchs() {
+    loadWarrantyPolicies() {
         this.warrantyPolicyService.getWarrantyPolicies().subscribe((data) => {
+            console.log(data);
             this.warrantyPolicies = data.data.items;
         });
     }

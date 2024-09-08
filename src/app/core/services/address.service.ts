@@ -22,17 +22,15 @@ export class AddressService {
     constructor(private http: HttpClient) {}
     public url = environment.url;
 
-    getDistricts(
-        optionsFilterDistrict: OptionsFilterDistrict
-    ): Observable<any> {
-        const { cityName, name } = optionsFilterDistrict;
+    getDistricts(keyword: any): Observable<any> {
+        // const { cityName, name } = optionsFilterDistrict;
         let url = `${this.url}/api/address/get-districts?`;
-        if (name) {
-            url += `&name=${name}`;
+        if (keyword) {
+            url += `&cityName=${keyword}`;
         }
-        if (name) {
-            url += `&cityName=${cityName}`;
-        }
+        // if (name) {
+        //     url += `&cityName=${cityName}`;
+        // }
         return this.http.get<any>(url);
     }
 
