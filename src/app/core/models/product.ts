@@ -16,6 +16,7 @@ export interface Products {
     hight? : number | null;
     length? : number | null;
     unitId?: number;
+    productType?: number
     base64_FileVideo1?: string | null;
     base64_FileVideo?: string | null;
     linkVideo?: string | null;
