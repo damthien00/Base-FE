@@ -8,7 +8,7 @@ import {
   ChangeDetectorRef,
   ElementRef,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray, FormControl, AbstractControl } from '@angular/forms';
 import { TreeNode } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Brand } from 'src/app/core/models/brands';
@@ -114,7 +114,8 @@ export class CreateProductComponent implements OnInit{
         Validators.compose([
           Validators.required,
           Validators.minLength(6),
-          Validators.maxLength(101)
+          Validators.maxLength(101),
+          this.validateName.bind(this)
         ]),
       ],
       description: [
@@ -140,7 +141,7 @@ export class CreateProductComponent implements OnInit{
         null,
         [Validators.required, Validators.pattern('^[1-9][0-9]*$')],
       ],
-      productType: ['regular'],
+      productType: [0],
       base64_FileIamges: [[], [Validators.required]],
       base64_FileVideo: [null, []],
       propeties1: [null, Validators.required],
@@ -202,15 +203,19 @@ export class CreateProductComponent implements OnInit{
     this.getCategoriesAndChild();
 
     this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
-      this.updatePriceControls(newSellingPrice);
+      if (this.addVariants) {
+        this.updatePriceControls(newSellingPrice);
+      }
     });
 
     this.productForm.get('totalQuantity')?.valueChanges.subscribe((newtotalQuantity) => {
-      this.updateWareControls(newtotalQuantity);
+      if (this.addVariants) {
+        this.updateWareControls(newtotalQuantity);
+      }
     });
 
     this.productForm.get('productType').valueChanges.subscribe((value) => {
-      if (value === 'serial') {
+      if (value === 1) {
         // Nếu chọn sản phẩm Serial/iMei thì đặt totalQuantity về null
         this.productForm.get('totalQuantity').setValue(null);
       }
@@ -218,7 +223,10 @@ export class CreateProductComponent implements OnInit{
   }
 
   updatePriceControls(newPrice: string) {
-    // Loop through each row and cell to update the price controls
+    if (!this.addVariants) {
+      return;
+    }
+
     this.valueProperties1Array.controls.forEach((control, i) => {
       this.valueProperties2Array.controls.forEach((subControl, j) => {
         const priceControlName = this.getPriceControlName(i, j);
@@ -231,7 +239,42 @@ export class CreateProductComponent implements OnInit{
     });
   }
 
+  validateName(control: AbstractControl): { [key: string]: any } | null {
+    const value = control.value as string;
+    let startIndex = 0;
+    let endIndex = value.length - 1;
+
+    while (
+      startIndex < value.length &&
+      (value[startIndex] === ' ' || value[startIndex] === '')
+    ) {
+      startIndex++;
+    }
+
+    while (
+      endIndex >= 0 &&
+      (value[endIndex] === ' ' || value[endIndex] === '')
+    ) {
+      endIndex--;
+    }
+
+    if (startIndex > endIndex) {
+      return { invalidName: true };
+    }
+
+    const trimmedLength = endIndex - startIndex + 1;
+    if (trimmedLength < 6 || trimmedLength > 101) {
+      return { invalidLength: true };
+    }
+
+    return null;
+  }
+
   updateWareControls(newWare: string) {
+    if (!this.addVariants) {
+      return;
+    }
+
     this.valueProperties1Array.controls.forEach((control, i) => {
       this.valueProperties2Array.controls.forEach((subControl, j) => {
         const wareControlName = this.getWareControlName(i, j);
@@ -757,22 +800,22 @@ export class CreateProductComponent implements OnInit{
       hasError = true;
     }
 
-    // if (
-    //   !productData.name ||
-    //   productData.name.trim().length < 6 ||
-    //   productData.name.trim().length > 100
-    // ) {
-    //   this.showNameError10 = true;
-    //   hasError = true;
-    // }
+    if (
+      !productData.name ||
+      productData.name.trim().length < 6 ||
+      productData.name.trim().length > 100
+    ) {
+      this.showNameError10 = true;
+      hasError = true;
+    }
 
-    // if (
-    //   !productData.name ||
-    //   (productData.name.length > 0 && productData.name.trim().length === 0)
-    // ) {
-    //   this.showNameError11 = true;
-    //   hasError = true;
-    // }
+    if (
+      !productData.name ||
+      (productData.name.length > 0 && productData.name.trim().length === 0)
+    ) {
+      this.showNameError11 = true;
+      hasError = true;
+    }
 
 
     if (!productData.categoryId || productData.categoryId.length === 0) {
@@ -858,6 +901,7 @@ export class CreateProductComponent implements OnInit{
       warning: productData.warning ? 1 : 0,
       unitName: productData.unitName,
       numberDay: productData.numberDay,
+      productType: productData.productType
     };
 
     let hasVariants = false;

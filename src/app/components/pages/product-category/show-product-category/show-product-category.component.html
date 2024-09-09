@@ -10,6 +10,7 @@
             </div>
             <ng-template pTemplate="right">
                 <button
+                    style="border-radius: 10px;"
                     pButton
                     pRipple
                     icon="pi pi-plus"
@@ -44,7 +45,7 @@
                                     pInputText
                                     type="text"
                                     placeholder="Tìm kiếm theo tên/SKU sản phẩm"
-                                    style="width: 350px"
+                                    style="width: 350px; height: 33px;"
                                     class="sm:"
                                 />
                                 <!-- [(ngModel)]="
@@ -52,7 +53,7 @@
                                     " -->
                             </span>
                         </div>
-                        <button pButton pRipple label="Lọc"></button>
+                        <button style="border-radius: 10px; width: 100px; height: 33px;" pButton pRipple label="Lọc"></button>
                         <!-- (click)="EvenFilter()" -->
                     </div>
                 </ng-template>
