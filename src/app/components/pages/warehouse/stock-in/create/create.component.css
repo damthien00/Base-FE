@@ -130,3 +130,35 @@
     font-weight: 500;
     color: var(--primary-color);
 }
+
+.variant-item-label{
+    font-size:13px;
+    padding: 5px 10px;
+    border-radius:20px;
+    background-color:#2a2a82;
+    color: #fff;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.variant-item{
+    display:flex;
+    gap: 10px;
+    padding: 3px;
+    align-items: center;
+    margin-bottom:10px;
+}
+
+.variant-item-close{
+    padding: 0 5px;
+    border-radius:50px;
+    height: fit-content;
+    transition: 0.15S linear;
+    cursor: pointer;
+}
+
+.variant-item-close:hover {
+    background-color:#3e219c;
+}

@@ -172,7 +172,7 @@
                                 <td style="width: 3%">
                                     {{ i + 1 }}
                                 </td>
-                                <td style="width: 12.5%">
+                                <td style="width: 8%">
                                     <img
                                         [src]="data.productImage"
                                         alt="Product Image"
@@ -183,13 +183,13 @@
                                         "
                                     />
                                 </td>
-                                <td style="width: 22.5%">
-                                    {{ data.productName }}
+                                <td style="width: 15.5%">
+                                    {{ data.name }}
                                 </td>
                                 <td style="width: 12.5%; text-align: center">
                                     <p-inputNumber
                                         inputId="integeronly"
-                                        [(ngModel)]="data.price"
+                                        [(ngModel)]="data.sellingPrice"
                                         (ngModelChange)="updateTotal(data)"
                                         (onFocus)="
                                             functionService.handleFocusPrice(
@@ -198,15 +198,14 @@
                                         "
                                     />
                                 </td>
-                                <td style="width: 12.5%; text-align: center">
-                                    {{ data.unit }}
+                                <td style="width: 9%; text-align: center">
+                                    {{ data.unitName }}
                                 </td>
-                                <td style="width: 12.5%; text-align: center">
+                                <td style="width: 13.5%; text-align: center">
                                     <div class="flex align-items-center">
                                         <p-inputNumber
                                             [(ngModel)]="data.quantity"
                                             (ngModelChange)="updateTotal(data)"
-                                            [showButtons]="true"
                                             buttonLayout="horizontal"
                                             (onFocus)="
                                                 functionService.handleFocusPrice(
@@ -215,7 +214,7 @@
                                             "
                                             inputId="horizontal"
                                             spinnerMode="horizontal"
-                                            [min]="1"
+                                            [min]="0"
                                             [step]="1"
                                             decrementButtonClass="p-button-danger"
                                             incrementButtonClass="p-button-success"
@@ -240,17 +239,86 @@
                                         <label for="" class="mb-2"
                                             >Số khung/ số máy</label
                                         >
-                                        <p-chips
-                                            [(ngModel)]="data.serialNumbers"
-                                            placeholder="Nhập và Enter/ Số khung, số máy"
+                                        <div
+                                            class="variant-item"
+                                            *ngFor="
+                                                let variant of data.productImeis;
+                                                let i = index
+                                            "
                                         >
-                                            <ng-template
-                                                let-item
-                                                pTemplate="item"
+                                            <span class="variant-item-label"
+                                                >{{ variant.frameNumber }}/{{
+                                                    variant.engineNumber
+                                                }}
+                                                <span
+                                                    class="variant-item-close"
+                                                    (click)="
+                                                        removeImeiItem(data, i)
+                                                    "
+                                                    >x</span
+                                                ></span
                                             >
-                                                {{ item }}
-                                            </ng-template>
-                                        </p-chips>
+                                            <span class="variant-item-input">
+                                                <input
+                                                    pInputText
+                                                    type="text"
+                                                    spellcheck="false"
+                                                    placeholder="Nhập số khung"
+                                                    [(ngModel)]="
+                                                        variant.frameNumber
+                                                    "
+                                                />
+                                            </span>
+                                            <span class="variant-item-input">
+                                                <input
+                                                    pInputText
+                                                    id="email"
+                                                    type="text"
+                                                    spellcheck="false"
+                                                    [(ngModel)]="
+                                                        variant.engineNumber
+                                                    "
+                                                    placeholder="Nhập số máy"
+                                                />
+                                            </span>
+                                            <span
+                                                *ngIf="variant.isValid"
+                                                class="error-message"
+                                                >{{
+                                                    variant.isValidMessage
+                                                }}</span
+                                            >
+                                        </div>
+                                        <div class="variant-item">
+                                            <span class="variant-item-input">
+                                                <input
+                                                    pInputText
+                                                    type="text"
+                                                    [(ngModel)]="
+                                                        data.frameNumber
+                                                    "
+                                                    spellcheck="false"
+                                                    placeholder="Nhập và Enter/Số khung"
+                                                    (keydown.enter)="
+                                                        onEnterTest(data)
+                                                    "
+                                                />
+                                            </span>
+                                            <span class="variant-item-input">
+                                                <input
+                                                    pInputText
+                                                    type="text"
+                                                    [(ngModel)]="
+                                                        data.engineNumber
+                                                    "
+                                                    spellcheck="false"
+                                                    placeholder="Nhập và Enter/Số máy"
+                                                    (keydown.enter)="
+                                                        onEnterTest(data)
+                                                    "
+                                                />
+                                            </span>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -398,7 +466,7 @@
                                 pRipple
                                 icon="pi pi-plus"
                                 label="Lưu"
-                                [routerLink]="['/warehouse/stock-in/create']"
+                                (click)="onSubmit()"
                             ></button>
                         </div>
                     </div>

@@ -10,6 +10,8 @@ import {
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
 import { NodeService } from 'src/app/core/services/node.service';
+import { ProductService } from 'src/app/core/services/product.service';
+import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
 
 export interface WarehouseReceipt {
     id?: number;
@@ -45,8 +47,12 @@ export class CreateComponent implements OnInit {
     temporaryDiscountUnit: string = 'VND';
 
     displayDiscountModal = false;
+    optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
+    frameNumber: any;
+    engineNumber: any;
     constructor(
         private nodeService: NodeService,
+        private productService: ProductService,
         public functionService: FunctionService
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
@@ -159,7 +165,15 @@ export class CreateComponent implements OnInit {
 
     showProductList(): void {
         this.showProducts = true;
-        this.filteredDatas = this.datas;
+        this.loadProducts();
+    }
+
+    async loadProducts() {
+        let response = await this.productService.FilterProduct(
+            this.optionsFillerProduct
+        );
+        this.filteredDatas = response.data;
+        console.log(this.filteredDatas);
     }
 
     @HostListener('document:click', ['$event'])
@@ -237,10 +251,12 @@ export class CreateComponent implements OnInit {
                 productId: item.id,
                 productImage: item.productImage,
                 productName: item.productName,
-                quantity: 1,
+                quantity: 0,
                 price: item.price,
                 unit: item.unit,
-                total: item.price,
+                total: 0,
+                frameNumber: '',
+                engineNumber: '',
             };
             this.stockInReceipt.inventoryStockInDetails.push(newDetail);
         }
@@ -325,5 +341,71 @@ export class CreateComponent implements OnInit {
         this.stockInReceipt.totalDiscountAmount = this.calculateTotalDiscount();
         this.updatePaymentInfo();
         this.displayDiscountModal = false;
+    }
+
+    onEnterTest(product: any) {
+        console.log(product);
+        const imeiItem = {
+            frameNumber: product.frameNumber,
+            engineNumber: product.engineNumber,
+        };
+        // Nếu mảng productImeis chưa tồn tại, khởi tạo nó
+        if (!product.productImeis) {
+            product.productImeis = [];
+        }
+
+        // Đẩy đối tượng mới vào mảng productImeis
+        product.productImeis.push(imeiItem);
+        product.quantity = product.productImeis.length;
+        product.total = product.quantity * product.price;
+        this.updatePaymentInfo();
+        // Xóa giá trị trong form sau khi đẩy vào mảng
+        product.frameNumber = '';
+        product.engineNumber = '';
+    }
+
+    removeImeiItem(product: any, index: number) {
+        console.log(product);
+        console.log(index);
+        product.productImeis.splice(index, 1);
+        product.quantity = product.productImeis.length;
+        product.total = product.quantity * product.price;
+        this.updatePaymentInfo();
+    }
+
+    onSubmit() {
+        this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
+            if (product.productImeis) {
+                product.productImeis.forEach((imei) => {
+                    if (!imei.frameNumber || !imei.engineNumber) {
+                        imei.isValid = true;
+                        if (!imei.frameNumber && !imei.engineNumber) {
+                            imei.isValidMessage =
+                                'Vui lòng nhập số khung và số máy';
+                        } else if (!imei.frameNumber) {
+                            imei.isValidMessage = 'Vui lòng nhập số khung';
+                        } else if (!imei.engineNumber) {
+                            imei.isValidMessage = 'Vui lòng nhập số máy';
+                        }
+                    } else {
+                        imei.isValid = false;
+                        delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
+                    }
+                });
+            }
+        });
+
+        // Kiểm tra toàn bộ sản phẩm để đảm bảo không có lỗi trước khi submit
+        const isValidForm = this.stockInReceipt.inventoryStockInDetails.every(
+            (product) => product.productImeis.every((imei) => !imei.isValid)
+        );
+
+        if (isValidForm) {
+            console.log('Form is valid, proceeding with submission...');
+
+            console.log(this.stockInReceipt);
+        } else {
+            console.log('Form is invalid, please correct the errors.');
+        }
     }
 }

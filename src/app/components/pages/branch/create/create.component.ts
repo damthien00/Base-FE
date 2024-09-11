@@ -88,11 +88,20 @@ export class CreateComponent implements OnInit {
         });
     }
 
-    onDistrictChange(event: any) {
-        const districtId = event.value.id;
-        this.addressService.getWards(districtId).subscribe((data) => {
+    loadWards(districtID: number) {
+        this.addressService.getWards(districtID).subscribe((data) => {
             this.wards = data.data;
+            this.createBranchForm.patchValue({
+                wardID: null,
+            });
         });
+    }
+
+    onDistrictChange(event: any) {
+        const districtId = event.value?.id;
+        if (districtId) {
+            this.loadWards(districtId);
+        }
     }
 
     ngOnInit() {

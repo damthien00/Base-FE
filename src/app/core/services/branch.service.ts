@@ -26,6 +26,12 @@ export class BranchService {
             .pipe(catchError(this.handleError));
     }
 
+    updateBranch(data: any): Observable<any> {
+        return this.http
+            .put<any>(`${this.url}/api/branch/update`, data)
+            .pipe(catchError(this.handleError));
+    }
+
     private handleError(error: HttpErrorResponse): Observable<any> {
         console.error('An error occurred:', error);
         return throwError('Something bad happened; please try again later.');

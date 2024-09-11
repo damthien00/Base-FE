@@ -16,9 +16,19 @@
         <!-- Body -->
         <ng-template pTemplate="content">
             <div class="grid p-fluid">
+                <input
+                    pInputText
+                    id="name1"
+                    type="hidden"
+                    spellcheck="false"
+                    placeholder="Nhập tên chi nhánh"
+                    formControlName="id"
+                />
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="name1"
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="name1"
                             >Tên chi nhánh<span class="red-asterisk"
                                 >*</span
                             ></label
@@ -49,7 +59,9 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="phoneNumber"
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="phoneNumber"
                             >Số điện thoại<span class="red-asterisk"
                                 >*</span
                             ></label
@@ -91,7 +103,11 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="email">Email</label>
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="email"
+                            >Email</label
+                        >
                         <input
                             pInputText
                             id="email"
@@ -100,7 +116,6 @@
                             placeholder="Nhập email"
                             formControlName="email"
                         />
-
                         <div
                             *ngIf="
                                 updateBranchForm.get('email')?.invalid &&
@@ -119,7 +134,9 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="address"
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="address"
                             >Địa chỉ<span class="red-asterisk">*</span></label
                         >
                         <input
@@ -148,7 +165,9 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="address"
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="address"
                             >Khu vực<span class="red-asterisk">*</span></label
                         >
                         <p-dropdown
@@ -199,7 +218,9 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field mb-0">
-                        <label htmlFor="wardID"
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="wardID"
                             >Phường xã<span class="red-asterisk">*</span></label
                         >
                         <p-dropdown
@@ -247,7 +268,11 @@
                         <p-inputSwitch
                             formControlName="isActive"
                         ></p-inputSwitch>
-                        <label htmlFor="address">Hoạt động</label>
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="address"
+                            >Hoạt động</label
+                        >
                     </div>
                 </div>
             </div>

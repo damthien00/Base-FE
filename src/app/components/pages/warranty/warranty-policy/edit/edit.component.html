@@ -1,23 +1,34 @@
-<p-dialog
-    [(visible)]="displayModal"
-    modal="true"
-    [closable]="false"
-    [draggable]="false"
-    [resizable]="false"
-    [style]="{ width: '50vw' }"
->
-    <!-- Header -->
-    <ng-template pTemplate="header">
-        <h4>Thêm chính sách bảo hành</h4>
-    </ng-template>
+<p-toast />
+<form [formGroup]="updateWarrantyPolicyForm" (ngSubmit)="onSubmit()">
+    <p-dialog
+        [(visible)]="displayModal"
+        modal="true"
+        [closable]="false"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: '50vw' }"
+    >
+        <!-- Header -->
+        <ng-template pTemplate="header">
+            <h4>Sửa chính sách bảo hành</h4>
+        </ng-template>
 
-    <!-- Body -->
-    <ng-template pTemplate="content">
-        <form [formGroup]="editWarrantyPolicyForm" (ngSubmit)="onSubmit()">
+        <!-- Body -->
+        <ng-template pTemplate="content">
             <div class="grid p-fluid">
+                <input
+                    pInputText
+                    id="name1"
+                    type="hidden"
+                    spellcheck="false"
+                    placeholder="Nhập tên chính sách bảo hành"
+                    formControlName="id"
+                />
                 <div class="col-12 md:col-6">
                     <div class="field">
-                        <label htmlFor="name1"
+                        <label
+                            htmlFor="name1"
+                            style="font-weight: 600; color: #000"
                             >Tên chính sách bảo hành<span class="red-asterisk"
                                 >*</span
                             ></label
@@ -32,13 +43,14 @@
                         />
                         <div
                             *ngIf="
-                                editWarrantyPolicyForm.get('name')?.invalid &&
-                                (editWarrantyPolicyForm.get('name')?.dirty ||
-                                    editWarrantyPolicyForm.get('name')?.touched)
+                                updateWarrantyPolicyForm.get('name')?.invalid &&
+                                (updateWarrantyPolicyForm.get('name')?.dirty ||
+                                    updateWarrantyPolicyForm.get('name')
+                                        ?.touched)
                             "
                         >
                             <div
-                                *ngIf="editWarrantyPolicyForm.get('name')?.errors?.['required']"
+                                *ngIf="updateWarrantyPolicyForm.get('name')?.errors?.['required']"
                                 class="error-message"
                             >
                                 Vui lòng nhập tên chính sách bảo hành
@@ -48,38 +60,38 @@
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="field">
-                        <label htmlFor="name1"
+                        <label
+                            htmlFor="name1"
+                            style="font-weight: 600; color: #000"
                             >Kỳ hạn bảo hành<span class="red-asterisk"
                                 >*</span
                             ></label
                         >
                         <div class="flex">
                             <p-inputNumber
-                                inputId="warranty_period"
-                                [(ngModel)]="value2"
-                                formControlName="warranty_period"
+                                inputId="term"
+                                formControlName="term"
                             />
                             <p-dropdown
                                 [options]="this.optionsTime"
-                                [(ngModel)]="this.selectedTime"
                                 optionLabel="name"
-                                formControlName="typeTime"
+                                formControlName="termType"
                             >
                             </p-dropdown>
                         </div>
                         <div
                             *ngIf="
-                                editWarrantyPolicyForm.get('warranty_period')
+                                updateWarrantyPolicyForm.get('warranty_period')
                                     ?.invalid &&
-                                (editWarrantyPolicyForm.get('warranty_period')
+                                (updateWarrantyPolicyForm.get('warranty_period')
                                     ?.dirty ||
-                                    editWarrantyPolicyForm.get(
+                                    updateWarrantyPolicyForm.get(
                                         'warranty_period'
                                     )?.touched)
                             "
                         >
                             <div
-                                *ngIf="editWarrantyPolicyForm.get('warranty_period')?.errors?.['required']"
+                                *ngIf="updateWarrantyPolicyForm.get('warranty_period')?.errors?.['required']"
                                 class="error-message"
                             >
                                 Vui lòng nhập kì hạn bảo hành
@@ -87,34 +99,29 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="col-12 md:col-3">
-                    <div class="field">
-                        <label htmlFor="name1"></label>
-                    </div>
-                </div> -->
             </div>
-        </form>
-    </ng-template>
+        </ng-template>
 
-    <!-- Footer -->
-    <ng-template pTemplate="footer">
-        <div class="flex gap-2 justify-content-end">
-            <button
-                pButton
-                pRipple
-                type="button"
-                label="Hủy"
-                icon="pi pi-times"
-                (click)="displayModal = false"
-                class="p-button-danger"
-            ></button>
-            <button
-                type="submit"
-                pButton
-                label="Lưu"
-                icon="pi pi-check"
-                class="p-button-primary"
-            ></button>
-        </div>
-    </ng-template>
-</p-dialog>
+        <!-- Footer -->
+        <ng-template pTemplate="footer">
+            <div class="flex gap-2 justify-content-end">
+                <button
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Hủy"
+                    icon="pi pi-times"
+                    (click)="displayModal = false"
+                    class="p-button-danger"
+                ></button>
+                <button
+                    type="submit"
+                    pButton
+                    label="Lưu"
+                    icon="pi pi-check"
+                    class="p-button-primary"
+                ></button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</form>

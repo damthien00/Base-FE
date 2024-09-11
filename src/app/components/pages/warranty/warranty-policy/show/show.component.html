@@ -42,19 +42,19 @@
                     >
                         <ng-template pTemplate="header">
                             <tr>
-                                <th>STT</th>
+                                <th style="text-align: center">STT</th>
                                 <th>Tên chính sách</th>
                                 <th>Kỳ hạn bảo hành</th>
+                                <th>Thao tác</th>
                             </tr>
                         </ng-template>
-
                         <ng-template
                             pTemplate="body"
                             let-warrantyPolicy
                             let-i="rowIndex"
                         >
                             <tr>
-                                <td style="width: 5%; min-width: 10rem">
+                                <td style="width: 2%; text-align: center">
                                     <span class="p-column-title">STT</span>
                                     {{ i + 1 }}
                                 </td>
@@ -62,7 +62,9 @@
                                     <span class="p-column-title"
                                         >Tên chính sách</span
                                     >
-                                    {{ warrantyPolicy.name }}
+                                    <div class="truncate-2">
+                                        {{ warrantyPolicy.name }}
+                                    </div>
                                 </td>
                                 <td style="width: 14%; min-width: 10rem">
                                     <span class="p-column-title"
@@ -85,6 +87,14 @@
                                         >năm</span
                                     >
                                 </td>
+                                <td style="width: 5%; text-align: center">
+                                    <span
+                                        class="pi pi-pencil p-1"
+                                        (click)="openEditModal(warrantyPolicy)"
+                                        title="Sửa"
+                                    >
+                                    </span>
+                                </td>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -103,4 +113,5 @@
 <app-edit
     #editModal
     (warrantyPolictyUpdated)="onWarrantPolicyUpdated($event)"
+    (loadWarrantyPolicies)="loadWarrantyPolicies()"
 ></app-edit>
