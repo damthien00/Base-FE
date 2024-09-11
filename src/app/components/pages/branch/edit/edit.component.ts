@@ -13,6 +13,7 @@ import { DropdownFilterOptions } from 'primeng/dropdown';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { ValidationService } from 'src/app/core/utils/validation.utils';
 import { MessageService } from 'primeng/api';
+import { dE } from '@fullcalendar/core/internal-common';
 
 @Component({
     selector: 'app-edit',
@@ -42,9 +43,40 @@ export class EditComponent implements OnInit {
     filterValue: string | undefined = '';
     wards: any;
     selectedWard: any;
-
     branch: any;
 
+    showModalDialog(branch: any): void {
+        this.displayModal = true;
+        this.branch = branch;
+        this.initializeForm();
+    }
+
+    initializeForm() {
+        this.updateBranchForm = this.formBuilder.group({
+            id: [this.branch?.id, [Validators.required]],
+            name: [this.branch?.name, [Validators.required]],
+            phoneNumber: [
+                this.branch?.phoneNumber,
+                [Validators.required, Validators.pattern(/^\d{10}$/)],
+            ],
+            email: [
+                this.branch?.email,
+                [
+                    Validators.pattern(
+                        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+                    ),
+                ],
+            ],
+            address: [this.branch?.address, [Validators.required]],
+            isActive: [this.branch?.isActive == 1 ? true : false],
+            districtID: [this.branch?.districtID, [Validators.required]],
+            wardID: [this.branch?.wardID, [Validators.required]],
+        });
+        this.setDistrictAndWard();
+
+        // this.loadWards(this.branch.districtID);
+        // this.selectedOption.;
+    }
     // districts: any[] | undefined;
     constructor(
         private formBuilder: FormBuilder,
@@ -53,51 +85,27 @@ export class EditComponent implements OnInit {
         private branchService: BranchService,
         private messageService: MessageService
     ) {
+        console.log(this.branch);
         this.updateBranchForm = this.formBuilder.group({
-            name: [this.branch?.name, [Validators.required]],
+            id: [null, [Validators.required]],
+            name: [null, [Validators.required]],
             phoneNumber: [
-                this.branch?.phoneNumber,
+                null,
                 [Validators.required, Validators.pattern(/^\d{10}$/)],
             ],
             email: [
-                this.branch?.email,
+                null,
                 [
                     Validators.pattern(
                         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
                     ),
                 ],
             ],
-            address: [this.branch?.address, [Validators.required]],
+            address: [null, [Validators.required]],
+            isActive: [false],
             districtID: [null, [Validators.required]],
             wardID: [null, [Validators.required]],
-            isActive: [null],
         });
-    }
-
-    initializeForm() {
-        this.updateBranchForm = this.formBuilder.group({
-            name: [this.branch?.name, [Validators.required]],
-            phoneNumber: [
-                this.branch?.phoneNumber,
-                [Validators.required, Validators.pattern(/^\d{10}$/)],
-            ],
-            email: [
-                this.branch?.email,
-                [
-                    Validators.pattern(
-                        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-                    ),
-                ],
-            ],
-            address: [this.branch?.address, [Validators.required]],
-            districtID: [this.branch?.districtID, [Validators.required]],
-            wardID: [this.branch?.wardID, [Validators.required]],
-            isActive: [this.branch?.isActive == 1 ? true : false],
-        });
-
-        // this.loadWards(this.branch.districtID);
-        this.setDistrictAndWard();
-        // this.selectedOption.;
     }
 
     setDistrictAndWard() {
@@ -115,7 +123,8 @@ export class EditComponent implements OnInit {
                 (ward) => ward.id === this.branch.wardID
             );
             this.updateBranchForm.patchValue({
-                ...this.branch,
+                // ...this.branch,
+                // isActive: [true],
                 districtID: selectedDistrict,
                 wardID: selectedWard,
             });
@@ -163,13 +172,6 @@ export class EditComponent implements OnInit {
         });
     }
 
-    showModalDialog(branch: any): void {
-        this.displayModal = true;
-        this.branch = branch;
-        console.log(this.branch);
-        this.initializeForm();
-    }
-
     resetFunction(options: DropdownFilterOptions) {
         options.reset();
         this.filterValue = '';
@@ -181,8 +183,8 @@ export class EditComponent implements OnInit {
 
     onSubmit() {
         if (this.updateBranchForm.valid) {
-            console.log(this.updateBranchForm.value);
             const formData = {
+                id: this.updateBranchForm.value.id,
                 name: this.updateBranchForm.value.name,
                 phoneNumber: this.updateBranchForm.value.phoneNumber,
                 email: this.updateBranchForm.value.email,
@@ -195,14 +197,15 @@ export class EditComponent implements OnInit {
                 wardName: this.updateBranchForm.value.wardID.name,
                 isActive: this.updateBranchForm.value.isActive ? 1 : 0,
             };
-            this.branchService.createBranch(formData).subscribe(
+            console.log(formData);
+            this.branchService.updateBranch(formData).subscribe(
                 (response) => {
                     this.displayModal = false;
                     this.updateBranchForm.reset();
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Thành công',
-                        detail: 'Thêm chi nhánh thành công',
+                        detail: 'Sửa chi nhánh thành công',
                     });
                     this.loadBranchs.emit();
                 },

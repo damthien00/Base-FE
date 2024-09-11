@@ -114,22 +114,11 @@
                         </td>
                         <td style="width: 5%; text-align: center">
                             <span
-                                class="pi pi-eye p-1"
-                                (click)="viewDetails(branch)"
-                                title="Xem chi tiết"
-                            >
-                            </span>
-                            <span
                                 class="pi pi-pencil p-1"
                                 (click)="openEditModal(branch)"
                                 title="Sửa"
                             >
                             </span>
-                            <span
-                                class="pi pi-trash p-1"
-                                (click)="deleteBranch(branch)"
-                                title="Xóa"
-                            ></span>
                         </td>
                     </tr>
                 </ng-template>
@@ -143,4 +132,8 @@
     (branchCreated)="onBranchCreated($event)"
     (loadBranchs)="loadBranchs()"
 ></app-create>
-<app-edit #editModal (branchUpdated)="onBranchUpdated($event)"></app-edit>
+<app-edit
+    #editModal
+    (loadBranchs)="loadBranchs()"
+    (branchUpdated)="onBranchUpdated($event)"
+></app-edit>

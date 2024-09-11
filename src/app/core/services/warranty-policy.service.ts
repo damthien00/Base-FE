@@ -24,13 +24,19 @@ export class WarrantyPolicyService {
 
     getWarrantyPolicies(): Observable<any> {
         // const { pageSize, pageIndex, name } = optionsFilterBranch;
-        let url = `${this.url}/api/warranty-policy/paging`;
+        let url = `${this.url}/api/warranty-policy/paging?pageSize=100`;
         return this.http.get<any>(url);
     }
 
     createWarrantyPolicy(data: any): Observable<any> {
         return this.http
             .post<any>(`${this.url}/api/warranty-policy/create`, data)
+            .pipe(catchError(this.handleError));
+    }
+
+    updateWarrantyPolicy(data: any): Observable<any> {
+        return this.http
+            .put<any>(`${this.url}/api/warranty-policy/update`, data)
             .pipe(catchError(this.handleError));
     }
 

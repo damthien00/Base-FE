@@ -6549,3 +6549,14 @@
     font-size: 28px;
     font-weight: 500;
 }
+
+.truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* Số dòng tối đa */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    /* Để văn bản tự động xuống dòng */
+}

@@ -40,14 +40,13 @@ export class ShowComponent implements OnInit {
         this.createModal.showModalDialog();
     }
 
-    openEditModal(category: any): void {
-        // this.editModal.categoryId = category.id;
-        this.editModal.showModalDialog();
+    openEditModal(warrantyPolicy: any): void {
+        console.log(warrantyPolicy);
+        this.editModal.showModalDialog(warrantyPolicy);
     }
 
     loadWarrantyPolicies() {
         this.warrantyPolicyService.getWarrantyPolicies().subscribe((data) => {
-            console.log(data);
             this.warrantyPolicies = data.data.items;
         });
     }

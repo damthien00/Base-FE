@@ -52,7 +52,9 @@ export class CreateComponent implements OnInit {
             this.warrantyPolicyService.createWarrantyPolicy(formData).subscribe(
                 (response) => {
                     this.displayModal = false;
-                    this.createWarrantyPolicyForm.reset();
+                    this.createWarrantyPolicyForm.reset({
+                        termType: this.optionsTime[0], // Đặt giá trị mặc định cho termType là phần tử đầu tiên trong optionsTime
+                    });
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Thành công',
