@@ -17,23 +17,28 @@ import { CollectionService } from 'src/app/core/services/collection.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { Products, ProductVariant } from 'src/app/core/models/product';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { WarrantyPolicyService } from 'src/app/core/services/warranty-policy.service';
+import { environment } from 'src/environments/environment';
+import { el } from '@fullcalendar/core/internal-common';
+import { HttpClient } from '@angular/common/http';
 
 interface selected {
   id: number;
 }
 
 @Component({
-  selector: 'app-create-product',
-  templateUrl: './create-product.component.html',
-  styleUrl: './create-product.component.scss',
+  selector: 'app-update-product',
+  templateUrl: './update-product.component.html',
+  styleUrl: './update-product.component.scss',
   providers: [MessageService]
 })
-export class CreateProductComponent implements OnInit{
+
+export class UpdateProductComponent implements OnInit{
   @ViewChild('dataTable', { static: true }) dataTable!: Table;
   @ViewChild('videoInput') videoInput!: ElementRef;
   @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
+  imageUrl: string = environment.url;
   items: MenuItem[] | undefined;
   cols!: any[];
   selectedUnit: any = null;
@@ -101,8 +106,13 @@ export class CreateProductComponent implements OnInit{
   data: any[] = [{}];
   isWarrantyApplied: boolean = false;  // Trạng thái công tắc
   warrantyOptions: any[] = [];
-
-  units = [{ name: 'Kg' }, { name: 'Lít' }, { name: 'Cái' }];
+  productId!: number;
+  productById: any = {};
+  productImages: { id: number, link: string }[] = [];
+  showProperties1Section: boolean = false;
+  showProperties1Section2: boolean = false;
+  imageCache: { [index: number]: string } = {};
+  imagesToDelete: number[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -111,7 +121,9 @@ export class CreateProductComponent implements OnInit{
     private categoryService: CategoryService,
     private productService: ProductService,
     private warrantyService: WarrantyPolicyService,
+    private route: ActivatedRoute,
     private router: Router,
+    private http: HttpClient,
     private messageService: MessageService
   ) {
     this.productForm = this.fb.group({
@@ -204,10 +216,13 @@ export class CreateProductComponent implements OnInit{
     this.items = [
       { icon: 'pi pi-home', route: '/installation' },
       { label: 'Sản phẩm' },
-      { label: 'Thêm mới' }
+      { label: 'Cập nhật' }
     ];
     this.getAllBrands();
     this.getCategoriesAndChild();
+    this.setDefaultCategory();
+    this.CallSnaphot();
+    this.FillDataGetById();
 
     this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
       if (this.addVariants) {
@@ -227,6 +242,131 @@ export class CreateProductComponent implements OnInit{
         this.productForm.get('totalQuantity').setValue(null);
       }
     });
+  }
+
+  CallSnaphot(): void {
+    this.productId = +this.route.snapshot.paramMap.get('id')!;
+  }
+
+  FillDataGetById(): void {
+    this.productService.getProductbyId(this.productId).subscribe((response: any) => {
+      this.productById = response.data;
+      this.productImages = this.productById.productImages;
+
+      const organizedVariants = this.organizeVariantsByProperties(this.productById.productVariants);
+
+      this.productForm.patchValue({
+        id: this.productById.id,
+        name: this.productById.name,
+        code: this.productById.code,
+        sku: this.productById.sku,
+        mass: this.productById.mass,
+        description: this.productById.description,
+        brandId: this.productById.brandId,
+        warrantyPolicyId: this.productById.warrantyPolicyId,
+        collectionId: this.productById.collectionId,
+        categoryId: this.productById.categoryId,
+        barcode: this.productById.barcode,
+        linkVideo: this.productById.linkVideo || undefined,
+        base64_FileVideo1: this.productById.base64_FileVideo || null,
+        base64_FileVideo: this.productById.base64_FileVideo || null,
+        sellingPrice: this.productById.sellingPrice,
+        importPrice: this.productById.importPrice,
+        totalQuantity: this.productById.totalQuantity,
+        width: this.productById.width,
+        hight: this.productById.hight,
+        length: this.productById.length,
+        status: this.productById.status,
+        productType: this.productById.productType,
+        warning: this.productById.warning,
+        numberDay: this.productById.numberDay,
+        version: this.productById.version,
+        unitName: this.productById.unitName,
+        base64_FileIamges: this.productById.base64_FileIamges,
+        base64_FileIamge: this.productById.base64_FileIamge,
+        propeties1: this.productById.productVariants[0]?.propeties1 || '',
+        propeties2: this.productById.productVariants[0]?.propeties2 || '',
+        sku1: this.productById.productVariants[0]?.sku || '',
+        globalPrice: [''],
+        globalWare: ['']
+      });
+
+
+      this.setDefaultCategory();
+
+      if (this.productById.status === 1) {
+        this.productForm.get('status')?.setValue(true);
+      } else {
+        this.productForm.get('status')?.setValue(false);
+      }
+      
+
+      const prices: number[] = this.productById.productVariants.map((variant: any) => variant.price); // Lấy mảng giá tiền từ các biến thể sản phẩm
+      const quantities: number[] = this.productById.productVariants.map((variant: any) => variant.quantity); // Lấy mảng giá tiền từ các biến thể sản phẩm
+
+      const valueProperties1Array = this.productForm.get('valuePropeties1') as FormArray;
+      const valueProperties2Array = this.productForm.get('valuePropeties2') as FormArray;
+
+      organizedVariants.forEach((variantGroup: any) => {
+        variantGroup.variants.forEach((variant: any, variantIndex: number) => {
+          if (!valueProperties1Array.value.includes(variant.valuePropeties1)) {
+            this.valueProperties1Array.clear();
+            valueProperties1Array.push(this.fb.control(variant.valuePropeties1));
+          }
+          if (!valueProperties2Array.value.includes(variant.valuePropeties2)) {
+            this.valueProperties2Array.clear();
+            valueProperties2Array.push(this.fb.control(variant.valuePropeties2));
+          }
+          
+          this.buttonVariants = false;
+          this.buttonVariants2 = false;
+          this.showProperties1Section = true;
+          this.showProperties1Section2 = true;
+
+          const index = valueProperties1Array.length - 1;
+
+          this.productForm.addControl(`base64_FileImage${index}`, this.fb.control(''));
+          this.productForm.addControl(this.getPriceControlName(index, variantIndex), this.fb.control(variant.price, Validators.required));
+          this.productForm.addControl(this.getWareControlName(index, variantIndex), this.fb.control(variant.quantity, Validators.required));
+          this.productForm.addControl(this.getSkuControlName(index, variantIndex), this.fb.control(variant.sku, Validators.required));
+          this.productForm.addControl(this.getBarcodeControlName(index, variantIndex), this.fb.control(variant.barcode, Validators.required));
+        });
+      });
+    });
+    // this.loadCategoriesAndChild();
+  }
+
+  setDefaultCategory(): void {
+    const defaultCategoryId = this.productForm.get('categoryId')?.value;
+    if (defaultCategoryId) {
+      // Find and set the category
+      this.findCategory(defaultCategoryId, this.categorieandchild);
+    }
+  }
+
+  findCategory(id: number, nodes: TreeNode[]): void {
+    for (const node of nodes) {
+      if (node.data.id === id) {
+        this.selectedCategory = node;
+        break;
+      }
+      if (node.children) {
+        this.findCategory(id, node.children);
+      }
+    }
+  }
+  
+
+  organizeVariantsByProperties(variants: any[]): any[] {
+    const organizedVariants: any[] = [];
+    const uniqueProperties = [...new Set(variants.map(variant => variant.valuePropeties1))];
+
+    uniqueProperties.forEach(property => {
+      const filteredVariants = variants.filter(variant => variant.valuePropeties1 === property);
+      organizedVariants.push({ property, variants: filteredVariants });
+    });
+
+    return organizedVariants;
   }
 
   onInput1(event: Event) {
@@ -249,8 +389,21 @@ export class CreateProductComponent implements OnInit{
       this.showNameError15 = false;  // Ẩn thông báo lỗi khi người dùng nhập dữ liệu
     }
   }
-  
 
+  getLinkImage(index: number): string | null {
+    const propertyValue = this.productForm.get('valuePropeties1')!.value[index];
+
+    // Lưu trữ ảnh vào một đối tượng cache để tái sử dụng
+    if (!this.imageCache[index]) {
+      const variant = this.productById.productVariants.find((variant: any) => variant.valuePropeties1 === propertyValue);
+      if (variant && variant.linkImage) {
+        this.imageCache[index] = this.imageUrl + `/api/files/images/${variant.linkImage}`;
+      }
+    }
+
+    return this.imageCache[index] || null;
+  }
+  
   onWarrantySwitchChange(event: any) {
     this.isWarrantyApplied = event.checked;
 
@@ -384,10 +537,15 @@ export class CreateProductComponent implements OnInit{
   }
 
   getCategoriesAndChild() {
-    this.categoryService.getCategoriesAndChild().subscribe((response) => {
-      // Chuyển đổi dữ liệu API thành TreeNode
-      this.categorieandchild = response;
-    });
+    this.categoryService.getCategoriesAndChild().subscribe(
+      response => {
+        this.categorieandchild = response;
+        this.setDefaultCategory();
+      },
+      error => {
+        console.error('Error fetching categories:', error);
+      }
+    );
   }
 
   getAllSubcategoriesRecursive(parentCategory: TreeNode) {
@@ -478,18 +636,6 @@ export class CreateProductComponent implements OnInit{
         this.fb.control('', Validators.required)
       );
     }
-
-    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
-      if (this.addVariants) {
-        this.updatePriceControls(newSellingPrice);
-      }
-    });
-
-    this.productForm.get('totalQuantity')?.valueChanges.subscribe((newtotalQuantity) => {
-      if (this.addVariants) {
-        this.updateWareControls(newtotalQuantity);
-      }
-    });
   }
 
   addProperty2(): void {
@@ -706,17 +852,6 @@ export class CreateProductComponent implements OnInit{
     this.buttonVariants = false;
     this.productForm.get('price')?.setValue(null);
     this.productForm.get('totalQuantity')?.setValue(null);
-    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
-      if (this.addVariants) {
-        this.updatePriceControls(newSellingPrice);
-      }
-    });
-
-    this.productForm.get('totalQuantity')?.valueChanges.subscribe((newtotalQuantity) => {
-      if (this.addVariants) {
-        this.updateWareControls(newtotalQuantity);
-      }
-    });
     // this.productForm.get('price')?.setValue(0);
     // this.productForm.get('totalQuantity')?.setValue(0);
   }
@@ -742,6 +877,34 @@ export class CreateProductComponent implements OnInit{
 
   closeAddVariants2() {
     this.addVariants2 = false;
+    this.productForm.get('propeties2')?.reset();
+    this.productForm.get('valuePropeties2')?.reset();
+    this.productForm.get('globalPrice')?.reset();
+    this.productForm.get('globalWare')?.reset();
+    this.productForm.get('base64_FileImage')?.reset();
+    this.productForm.get('price')?.reset();
+    this.productForm.get('totalQuantity')?.reset();
+    this.valueProperties2Array.clear();
+    this.addProperty2();
+    this.buttonVariants2 = true;
+  }
+
+  closeshowProperties1() {
+    this.showProperties1Section = false;
+    this.productForm.get('propeties1')?.reset();
+    this.productForm.get('valuePropeties1')?.reset();
+    this.productForm.get('globalPrice')?.reset();
+    this.productForm.get('globalWare')?.reset();
+    this.productForm.get('base64_FileImage')?.reset();
+    this.productForm.get('price')?.reset();
+    this.productForm.get('totalQuantity')?.reset();
+    this.valueProperties1Array.clear();
+    this.addProperty1();
+    this.buttonVariants = true;
+  }
+
+  closeshowProperties2() {
+    this.showProperties1Section2 = false;
     this.productForm.get('propeties2')?.reset();
     this.productForm.get('valuePropeties2')?.reset();
     this.productForm.get('globalPrice')?.reset();
@@ -791,7 +954,19 @@ export class CreateProductComponent implements OnInit{
   }
 
   handleFileInput(event: any, index: number): void {
+    const maxFileSize = 3 * 1024 * 1024;
     const file = event.target.files[0];
+
+    if (file.size > maxFileSize) {
+      this.messages = [{
+        severity: 'warn',
+        summary: 'Ảnh > 3MB',
+        detail: 'Ảnh tải lên không được lớn hơn 3MB',
+        life: 3000,
+      }];
+      return;
+    }
+
     if (file) {
       this.readFileAsBase64(file).then((result) => {
         this.productForm.get(`base64_FileImage${index}`)!.setValue(result);
@@ -819,13 +994,29 @@ export class CreateProductComponent implements OnInit{
   removeImageVariant(index: number): void {
     this.productForm.get(`base64_FileImage${index}`)!.setValue(null);
     this.imageSelected[index] = false;
-    const fileInput = document.getElementById(
-      `fileInput${index}`
-    ) as HTMLInputElement;
+    const fileInput = document.getElementById(`fileInput${index}`) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
     }
   }
+
+  removeProductVariantImage(i: number): void {
+    // Lấy giá trị của valuePropeties1 tại vị trí i
+    const propertyValue = this.productForm.get('valuePropeties1')!.value[i];
+
+    // Tìm index của variant có giá trị valuePropeties1 tương ứng
+    const variantIndex = this.productById.productVariants.findIndex((variant: any) => variant.valuePropeties1 === propertyValue);
+
+    if (variantIndex !== -1) {
+      // Xóa linkImage trong biến thể sản phẩm
+      this.productById.productVariants[variantIndex].linkImage = null;
+      // Cập nhật lại cache ảnh nếu có
+      delete this.imageCache[i];
+    }
+
+    // Không cần thay đổi giá trị của valuePropeties1 trong form control
+  }
+  
 
   checkAndOnSubmit() {
     // Tạo một danh sách các promises để kiểm tra mã vạch
@@ -846,7 +1037,7 @@ export class CreateProductComponent implements OnInit{
     Promise.all(promises).then((results) => {
       // Nếu tất cả các kiểm tra đều trả về true (không có lỗi), gọi this.onSubmit()
       if (results.every(result => result === true)) {
-        this.onSubmit();
+        this.onSubmitUpdate();
       } else {
         console.log('Không thể submit vì có mã vạch bị trùng.');
       }
@@ -859,41 +1050,51 @@ export class CreateProductComponent implements OnInit{
   checkBarcodeAndCreateProduct(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const barcode = this.productForm.get('barcode')!.value;
+      const originalBarcode = this.productById.barcode;
       this.showNameError12 = false; // Reset lỗi trước khi kiểm tra
-    
-      this.productService.CheckBarcode(barcode).subscribe(
-        (response) => {
-          if (response.data) {
-            this.showNameError12 = true;
-            this.errorMessage = 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.';
-            this.messages = [
-              {
-                severity: 'error',
-                summary: 'Lỗi',
-                detail: 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.',
-                life: 3000,
-              },
-            ];
-            resolve(false); // Báo rằng có lỗi và không được submit
-          } else {
-            resolve(true); // Báo rằng không có lỗi
+
+      if (barcode === originalBarcode) {
+        // Mã vạch không thay đổi, trực tiếp cập nhật sản phẩm
+        resolve(true); 
+      } else {
+        this.productService.CheckBarcode(barcode).subscribe(
+          (response) => {
+            if (response.data) {
+              this.showNameError12 = true;
+              this.errorMessage = 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.';
+              this.messages = [
+                {
+                  severity: 'error',
+                  summary: 'Lỗi',
+                  detail: 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.',
+                  life: 3000,
+                },
+              ];
+              resolve(false); // Báo rằng có lỗi và không được submit
+            } else {
+              resolve(true); // Báo rằng không có lỗi
+            }
+          },
+          (error) => {
+            console.error('Lỗi khi kiểm tra mã vạch:', error);
+            reject(error); // Báo lỗi nếu không kiểm tra được
           }
-        },
-        (error) => {
-          console.error('Lỗi khi kiểm tra mã vạch:', error);
-          reject(error); // Báo lỗi nếu không kiểm tra được
-        }
-      );
+        );
+      }
+    
     });
   }
   
   checkBarcodeVariantAndCreateProduct(i: number, j: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const barcodeControlName = this.getBarcodeControlName(i, j);
-      const barcode = this.productForm.get(barcodeControlName)?.value;
+      const barcode = this.productById.productVariants[0]?.barcode;
       this.showNameError14 = false; // Reset lỗi trước khi kiểm tra
-      
-      if (barcode) {
+
+      if (barcodeControlName === barcode) {
+        // Mã vạch không thay đổi, trực tiếp cập nhật sản phẩm
+        resolve(true); 
+      } else {
         this.productService.CheckBarcodeVariant(barcode).subscribe(
           (response) => {
             if (response.data) {
@@ -917,21 +1118,21 @@ export class CreateProductComponent implements OnInit{
             reject(error); // Báo lỗi nếu không kiểm tra được
           }
         );
-      } else {
-        console.error('Không tìm thấy giá trị mã vạch.');
-        resolve(true); // Nếu không có mã vạch, tiếp tục quá trình mà không báo lỗi
       }
+      
     });
   }
-  
 
   checkSkuAndCreateProduct(i: number, j: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const skuControlName = this.getSkuControlName(i, j);
-      const sku = this.productForm.get(skuControlName)?.value;
+      const sku = this.productById.productVariants[0]?.sku;
       this.showNameError15 = false; // Reset lỗi trước khi kiểm tra
-      
-      if (sku) {
+
+      if (skuControlName === sku) {
+        // Mã vạch không thay đổi, trực tiếp cập nhật sản phẩm
+        resolve(true); 
+      } else {
         this.productService.CheckBarcodeSku(sku).subscribe(
           (response) => {
             if (response.data) {
@@ -955,14 +1156,52 @@ export class CreateProductComponent implements OnInit{
             reject(error); // Báo lỗi nếu không kiểm tra được
           }
         );
-      } else {
-        console.error('Không tìm thấy giá trị mã sku.');
-        resolve(true); // Nếu không có mã vạch, tiếp tục quá trình mà không báo lỗi
       }
     });
   }
 
-  onSubmit(): void {
+  deleteImage(id: number): void {
+    // Add ID to imagesToDelete array
+    this.imagesToDelete.push(id);
+    // Remove the image from productImages array for UI update
+    this.productImages = this.productImages.filter(image => image.id !== id);
+  }
+
+  deleteImagesFromServer(): void {
+    this.imagesToDelete.forEach(id => {
+      this.http.delete(this.imageUrl + `/api/product/delete-images/${id}`).subscribe(
+        () => {
+          console.log(`Ảnh ${id} đã xóa thành công`);
+        },
+        (error) => {
+          console.error(`Error deleting image ${id}:`, error);
+        }
+      );
+    });
+  }
+
+  uploadImages(productId: number): void {
+    const formData = new FormData();
+    this.base64_FileIamges.forEach(image => {
+      const base64_FileIamge = image.preview.split(',')[1];
+      const json_addImage = {
+        productId: productId,
+        base64_image: base64_FileIamge
+      }
+      this.http.post(this.imageUrl + `/api/products/add-images`, json_addImage).subscribe(
+        () => {
+          console.log('Images added successfully');
+        },
+        (error) => {
+          console.error('Error adding images:', error);
+        }
+      );
+    });
+    console.log(this.base64_FileIamges)
+    debugger
+  }
+
+  onSubmitUpdate(): void {
     if (this.isSubmitting) {
       return;
     }
@@ -976,80 +1215,30 @@ export class CreateProductComponent implements OnInit{
       hasError = true;
     }
 
-    if (
-      !productData.name ||
-      productData.name.trim().length < 6 ||
-      productData.name.trim().length > 100
-    ) {
+    if (!productData.name || productData.name.trim().length < 6 || productData.name.trim().length > 100) {
       this.showNameError10 = true;
       hasError = true;
     }
 
-    if (
-      !productData.name ||
-      (productData.name.length > 0 && productData.name.trim().length === 0)
-    ) {
+    if (!productData.name || productData.name.length > 0 && productData.name.trim().length === 0) {
       this.showNameError11 = true;
       hasError = true;
     }
-
 
     if (!productData.categoryId || productData.categoryId.length === 0) {
       this.showNameError4 = true;
       hasError = true;
     }
 
-    // if (this.addVariants) {
-    //   this.showNameError5 = false;
-    //   this.showNameError7 = false;
-    //   hasError = false;
-    // } else {
-    //   if (!productData.price || productData.price.length === 0) {
-    //     this.showNameError5 = true;
-    //     hasError = true;
-    //   }
-
-    //   if (!productData.price || productData.price <= 0) {
-    //     this.showNameError7 = true;
-    //     hasError = true;
-    //   }
-    // }
-
-    // if (!productData.importPrice || productData.importPrice.length === 0) {
-    //   this.showNameError9 = true;
-    //   hasError = true;
-    // }
-
-    // if (!productData.importPrice || productData.importPrice <= 0) {
-    //   this.showNameError9 = true;
-    //   hasError = true;
-    // }
-
-    // const price = this.productForm.get('price')?.value;
-    // if (price === '0' || price === 0) {
-    //   this.showNameError14 = true;
-    //   hasError = true;
-    // } else {
-
-    // }
-
-    // const importPrice = this.productForm.get('importPrice')?.value;
-    // if (importPrice === '0' || importPrice === 0) {
-    //   this.showNameError15 = true;
-    //   hasError = true;
-    // }
-
     if (hasError) {
-      this.messages = [
-        {
-          severity: 'error',
-          summary: 'Không thể lưu vì:',
-          detail: 'Sản phẩm đang có lỗi cần được chỉnh sửa',
-          life: 3000,
-        },
-      ];
+      this.messages = [{
+        severity: 'error',
+        summary: 'Không thể lưu vì:',
+        detail: 'Sản phẩm đang có lỗi cần được chỉnh sửa',
+        life: 5000
+      }];
       this.isSubmitting = false;
-      return;
+      return
     }
 
     const product: Products = {
@@ -1081,6 +1270,32 @@ export class CreateProductComponent implements OnInit{
       productType: productData.productType
     };
 
+    this.productById.name = productData.name;
+    this.productById.sku = productData.sku;
+    this.productById.description = productData.description;
+    this.productById.brandId = productData.brandId;
+    this.productById.warrantyPolicyId = productData.warrantyPolicyId;
+    this.productById.barcode = productData.barcode;
+    this.productById.collectionId = productData.collectionId;
+    this.productById.categoryId = this.selectedCategory?.data.id;
+    this.productById.sellingPrice = productData.sellingPrice;
+    this.productById.importPrice = productData.importPrice;
+    this.productById.base64_FileIamges = productData.base64_FileIamges;
+    this.productById.base64_FileVideo = productData.base64_FileVideo1 || null;
+    this.productById.base64_FileVideo = productData.base64_FileVideo || null;
+    // this.productById.linkVideo = productData.linkVideo || null;
+    this.productById.totalQuantity = productData.totalQuantity || 0;
+    this.productById.mass = productData.mass || 0;
+    this.productById.width = productData.width;
+    this.productById.hight = productData.hight;
+    this.productById.length = productData.length;
+    this.productById.status = productData.status ? 1 : 0;
+    this.productById.warning = productData.warning ? 1 : 0;
+    this.productById.numberDay = productData.numberDay;
+    this.productById.unitName = productData.unitName;
+    this.productById.productType = productData.productType;
+
+
     let hasVariants = false;
     for (let i = 0; i < productData.valuePropeties1.length; i++) {
       const value1 = productData.valuePropeties1[i];
@@ -1092,57 +1307,73 @@ export class CreateProductComponent implements OnInit{
         const quantity = productData[this.getWareControlName(i, j)] || null;
         const sku = productData[this.getSkuControlName(i, j)] || null;
         const barcode = productData[this.getBarcodeControlName(i, j)] || null;
-        // if (!prices && prices <= 1000) {
-        //   this.showNameError8 = true;
-        //   return
-        // }
+        hasVariants = true;
+        const variant: ProductVariant = {
+          productId: product.id,
+          sku: sku,
+          barcode: barcode || sku,
+          price: prices,
+          quantity: quantity,
+          propeties1: product.propeties1,
+          valuePropeties1: value1,
+          propeties2: product.propeties2,
+          valuePropeties2: value2,
+          isDeleted: 0,
+          base64_FileImage: base64_FileImage || null
+        };
+        product.productVariants.push(variant);
+      }
+    }
 
-        if (prices !== null) {
-          hasVariants = true;
-          const variant: ProductVariant = {
-            sku: sku,
-            barcode: barcode || sku,
-            price: prices,
-            quantity: quantity,
-            propeties1: product.propeties1,
-            valuePropeties1: value1,
-            propeties2: product.propeties2,
-            valuePropeties2: value2,
-            base64_FileImage: base64_FileImage,
-          };
-          product.productVariants.push(variant);
-        }
+    // Cập nhật thông tin biến thể sản phẩm trong originalProduct
+    for (let index = 0; index < product.productVariants.length; index++) {
+      const productById = this.productById.productVariants[index];
+      const newVariant = product.productVariants[index];
+      if (productById) {
+        productById.propeties1 = newVariant.propeties1;
+        productById.valuePropeties1 = newVariant.valuePropeties1;
+        productById.propeties2 = newVariant.propeties2;
+        productById.valuePropeties2 = newVariant.valuePropeties2;
+        productById.productId = newVariant.productId;
+        productById.base64_FileImage = newVariant.base64_FileImage;
+        productById.quantity = newVariant.quantity;
+        productById.price = newVariant.price;
+        productById.sku = newVariant.sku;
+        productById.barcode = newVariant.barcode || newVariant.sku;
+        productById.isDeleted = newVariant.isDeleted;
+      } else {
+        this.productById.productVariants.push(newVariant);
       }
     }
 
     if (!hasVariants) {
       product.productVariants = [];
     }
-    this.validationMessage = null;
-    this.productService.createProduct(product).subscribe(
+
+    this.productService.updateProductAndVariant(this.productById).subscribe(
       (response) => {
         // console.log(product)
-        this.validationMessage = null;
-        console.log('Sản phẩm đã được thêm thành công:', response);
-        this.messages = [
-          {
-            severity: 'success',
-            summary: 'Thành công',
-            detail: 'Sản phẩm đã được thêm thành công',
-            life: 1000,
-          },
-        ];
+        console.log('Sản phẩm đã được sửa thành công:', response);
+        this.deleteImagesFromServer();
+        this.uploadImages(this.productId);
+        this.messages = [{
+          severity: 'success',
+          summary: 'Thành công',
+          detail: 'Sản phẩm đã được sửa thành công',
+          life: 2000,
+        }];
         setTimeout(() => {
-          this.router.navigate(['/products/show-product']);
+          this.router.navigate(['admin/quanlysanpham/danhsachsanpham']);;
           this.isSubmitting = false;
-        }, 1000);
+        }, 2000)
+
+        // Xử lý phản hồi thành công
       },
       (error) => {
-        console.error('Lỗi khi thêm sản phẩm:', error);
+        console.error('Lỗi khi sửa sản phẩm:', error);
         this.isSubmitting = false;
         // Xử lý lỗi
       }
     );
   }
-
 }

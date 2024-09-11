@@ -3,7 +3,7 @@
         <div class="col-12">
             <p-toolbar styleClass="mb-2">
                 <div class>
-                    <h3>Thêm mới sản phẩm</h3>
+                    <h3>Cập nhật sản phẩm</h3>
                     <p-breadcrumb
                         [model]="items">
                     </p-breadcrumb>
@@ -69,22 +69,22 @@
                                         <label class="labelip">Danh mục sản phẩm <span
                                             class="red-asterisk">*</span></label>
                                             <p-treeSelect
-                                            containerStyleClass="w-full"
-                                            [options]="categorieandchild"
-                                            optionValue="selectedCategory"
-                                            formControlName="categoryId"
-                                            optionLabel="label"
-                                            [showClear]="true"
-                                            placeholder="Chọn danh mục sản phẩm"
-                                            [style]="{ width: '100%' }"
-                                            (onNodeSelect)="onNodeSelect($event)"
-                                            (onNodeUnselect)="onNodeUnselect($event)"
-                                            (onFocus)="onTreeSelectFocus()"
-                                          >
-                                            <ng-template let-node pTemplate="default">
-                                              <span>{{ node.label }}</span>
-                                            </ng-template>
-                                          </p-treeSelect>
+                                                containerStyleClass="w-full"
+                                                [options]="categorieandchild"
+                                                formControlName="categoryId"
+                                                optionLabel="label"
+                                                optionValue="data.id"
+                                                [showClear]="true"
+                                                placeholder="Chọn danh mục sản phẩm"
+                                                [style]="{ width: '100%' }"
+                                                [(ngModel)]="selectedCategory"
+                                                (onNodeSelect)="onNodeSelect($event)"
+                                                (onNodeUnselect)="onNodeUnselect($event)"
+                                                (onFocus)="onTreeSelectFocus()">
+                                                <ng-template let-node pTemplate="default">
+                                                <span>{{ node.label }}</span>
+                                                </ng-template>
+                                            </p-treeSelect>              
                                           <div
                                           *ngIf="
                                             (productForm.get('categoryId')?.invalid &&
@@ -247,7 +247,7 @@
                             </div>                     
                             <div class="col-lg-12">
                                 <div class="row">
-                                    <div class="col-lg-4" *ngIf="productForm.get('productType').value === 0">
+                                    <div class="col-lg-4"  *ngIf="productForm.get('productType').value === 0">
                                         <label class="labelip">Kho hàng</label>
                                             <input
                                                 type="text"
@@ -270,28 +270,29 @@
                             </div>                      
                             <div class="col-lg-12">
                                 <div class="product-content">
-                                  <label class="labelip">Ảnh sản phẩm</label>
+                                  <label class="labelip">Ảnh sản phẩm </label>
                                   <div class="image-container">
                                     <div
                                       style="margin-left: 15px"
+                                      *ngFor="let image of productImages; let i = index"
+                                      class="image-product">
+                                      <img [src]="imageUrl+ '/api/files/images/'  + image.link" width="100" height="50" />
+                                      <i style="margin-top: 10px;" class="pi pi-trash" (click)="deleteImage(image.id)"></i>
+                                    </div>
+                                    <div
+                                      style="margin-left: 15px"
                                       *ngFor="let image of base64_FileIamges; let i = index"
-                                      class="image-product"
-                                    >
+                                      class="image-product">
                                       <img [src]="image.preview" width="100" height="50" />
-                                      <i
-                                        style="margin-top: 10px"
-                                        class="pi pi-trash"
-                                        (click)="removeImage(i)"
-                                      ></i>
+                                      <i style="margin-top: 10px;" class="pi pi-trash" (click)="removeImage(i)"></i>
                                     </div>
                                     <div class="img-ch">
                                       <label for="fileInput" class="preview">
                                         <i class="pi pi-plus"></i>
                                         <span
-                                          >Tải ảnh {{ base64_FileIamges.length }}/{{
+                                          >Tải ảnh {{ productImages.length + base64_FileIamges.length}}/{{
                                             maxImages
-                                          }}</span
-                                        >
+                                          }}</span>
                                       </label>
                                       <input
                                         type="file"
@@ -299,15 +300,18 @@
                                         id="fileInput"
                                         (change)="onImageSelected($event)"
                                         accept="image/*"
-                                        [disabled]="base64_FileIamges.length >= maxImages"
+                                        [disabled]="productImages.length + base64_FileIamges.length >= maxImages"
                                         style="display: none"
                                         multiple
                                       />
                                     </div>
                                     <div class="flex-wrap">
-                                        <p>Định dạng JPG/PNG/JPEG</p>
-                                        <span>Dung lượng: 3MB</span>
-                                    </div>
+                                      <div class="flex">
+                                          <p>Định dạng JPG/PNG/JPEG </p>
+                                          <span>Dung lượng: 3MB</span>
+                                      </div>
+                                  </div>
+              
                                   </div>
                                 </div>
                                 <!-- <div *ngIf="showNameError" class="error-message">
@@ -352,8 +356,103 @@
                                   }"
                                   (click)="openAddVariants()"
                                 ></p-button>
-                              </div>                             
+                              </div>                         
                             </div>
+                        </div>
+                        <div class="card-body-1" *ngIf="showProperties1Section">
+                            <div class="col-lg-12 mt-3">
+                                <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeshowProperties1()"></i>
+                                <div class="col-lg-6 mt-3 mb-2">
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    pInputText
+                                    formControlName="propeties1"
+                                    [style]="{ height: '35px', width: '58%' }" (input)="updateProperties1Header()"/>
+                                </div>
+                                <div class="row">
+                                  <div>
+                                    <div formArrayName="valuePropeties1" class="input-container">
+                                      <div *ngFor="let control of valueProperties1Array.controls; let i = index" class="input-group">
+                                        <div class="image-container2">
+                                          <img class="imageupload" src="/assets/img/imageupload.png" (click)="!imageSelected[i] && fileInput.click()"
+                                            [style.display]="imageSelected[i] || getLinkImage(i) ? 'none' : 'inline'" />
+                                          <input type="file" #fileInput id="fileInput{{i}}" style="display: none" (change)="handleFileInput($event, i)" />
+                                          <img *ngIf="getLinkImage(i)" [src]="getLinkImage(i)" alt="Variant Image"
+                                            width="50" height="50">
+                                          <img *ngIf="getBase64Image(i)" [src]="'data:image/png;base64,' + getBase64Image(i)" alt="Image" width="50"
+                                            height="50">
+                                          <!-- <div class="image-overlay" *ngIf="getBase64Image(i)">
+                                            <div class="image-hover">
+                                              <img [src]="'data:image/png;base64,' + getBase64Image(i)" alt="Image" width="150" height="150">
+                                            </div>
+                                            <div class="icon-hover">
+                                              <i class="pi pi-trash" (click)="removeImageVariant(i)"></i>
+                                            </div>
+                                          </div> -->
+                                          <div class="image-main" *ngIf="getBase64Image(i)">
+                                            <div class="image-container1">
+                                              <div class="image-edit">
+                                                <img [src]="'data:image/png;base64,' + getBase64Image(i)" alt="Image" width="150" height="150">
+                                              </div>
+                                              <div class="image-actions">
+                                                <button class="action-button disabled-calendar">
+                                                  <i class="pi pi-bars"></i>
+                                                </button>
+                                                |
+                                                <button class="action-button">
+                                                  <i class="pi pi-trash" (click)="removeImageVariant(i)"></i>
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+          
+                                          <div class="image-main" *ngIf="getLinkImage(i)">
+                                            <div class="image-container1">
+                                              <div class="image-edit">
+                                                <img [src]="getBase64Image(i) ? 'data:image/png;base64,' + getBase64Image(i) : getLinkImage(i)" 
+                                                alt="Image" 
+                                                width="150" 
+                                                height="150">
+                                              </div>
+                                              <div class="image-actions">
+                                                <button class="action-button disabled-calendar">
+                                                  <i class="pi pi-bars"></i>
+                                                </button>
+                                                |
+                                                <button class="action-button">
+                                                  <i class="pi pi-trash" (click)="removeProductVariantImage(i)"></i>
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+          
+                                          <!-- <div class="image-overlay" *ngIf="getLinkImage(i)">
+                                            <div class="image-hover">
+                                              <img [src]="getBase64Image(i) ? 'data:image/png;base64,' + getBase64Image(i) : getLinkImage(i)" 
+                                              alt="Image" 
+                                              width="150" 
+                                              height="150">
+                                            </div>
+                                            <div class="icon-hover">
+                                              <i class="pi pi-trash" (click)="removeProductVariantImage(i)"></i>
+                                            </div>
+                                          </div> -->
+                                        </div>
+                                        <input type="text" class="form-control" pInputText [formControlName]="i" [style]="{
+                                          height: '35px',
+                                          width: '60%',
+                                          'margin-left': '5px'
+                                        }" required>
+                                        <i style="margin-left: 5px;" class="pi pi-trash" (click)="removeProperty1(i)"></i>
+                                      </div>
+                                      <button type="button" pButton icon="pi pi-plus" [style]="{
+                                        width: '13%'
+                                      }" (click)="addProperty1()" class="p-button-rounded p-button-secondary p-button-text">Thêm giá trị</button>
+                                    </div>                 
+                                  </div>
+                                </div>
+                              </div>
                         </div>                      
                         <div class="card-body-1" *ngIf="addVariants">
                             <div class="col-lg-12 mt-3">
@@ -429,6 +528,45 @@
                              
                             </div>
                         </div>
+                        <div class="card-body-1" *ngIf="showProperties1Section2">
+                            <div class="col-lg-12 mt-3">
+                              <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeshowProperties2()"></i>
+                              <div class="col-lg-6 mt-3">
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  pInputText
+                                  formControlName="propeties2"
+                                  [style]="{ height: '35px', width: '58%' }"
+                                  (input)="updateProperties2Header()"
+                                />
+                              </div>
+                              <div class="col-lg-12 mt-3">
+                                <div class="row">
+                                  <div>
+                                    <div formArrayName="valuePropeties2" class="input-container">
+                                      <div *ngFor="let control of valueProperties2Array.controls; let i = index" class="input-group">
+                                        <input type="text" class="form-control" pInputText [formControlName]="i" [style]="{
+                                          height: '35px',
+                                          width: '75%',
+                                          'margin-left': '5px'
+                                        }" required>
+
+                                        <i style="margin-left: 5px;" class="pi pi-trash" (click)="removeProperty2(i)"></i>
+                                        <!-- <input type="text" class="form-control" pInputText [formControlName]="i" name="valueProperties1{{ i }}" required
+                                          [style]="{
+                                            height: '35px',
+                                            width: '71%',
+                                            'margin-left': '5px'
+                                          }"/> -->
+                                      </div>
+                                      <button type="button" pButton icon="pi pi-plus" (click)="addProperty2()" class="p-button-rounded p-button-secondary p-button-text">Thêm giá trị</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
                         <div class="card-body-1" *ngIf="addVariants2">
                             <div class="col-lg-12 mt-3">
                                 <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeAddVariants2()"></i>
@@ -485,7 +623,7 @@
                                             <th style="width: 20%">SKU phân loại</th>
                                             <th style="width: 10%">Mã vạch/Mã Barcode</th>
                                             <th style="width: 10%">Giá bán</th>
-                                            <th  *ngIf="productForm.get('productType').value === 0">Tồn kho</th>
+                                            <th *ngIf="productForm.get('productType').value === 0">Tồn kho</th>
                                           </tr>
                                         </ng-template>
                                         <ng-template
@@ -503,20 +641,137 @@
                                                     alt="Image"
                                                     width="50"
                                                     height="50"
-                                                  />
-                                                  <ng-template #defaultImage>
-                                                    <img
-                                                      style="margin-top: 10px;"
-                                                      class="imageupload"
-                                                      src="/assets/img/imageupload.png"
-                                                      alt="Default Image"
-                                                      width="50"
-                                                      height="50"
                                                     />
-                                                  </ng-template>
-                                                  <div style="text-align: center; padding: 15px 20px;">
-                                                    {{ productForm.get('name').value }} - {{ row.value }} - {{ value2.value }}
-                                                  </div>
+                                                    <ng-template #defaultImage>
+                                                    <img
+                                                        style="margin-top: 10px;"
+                                                        class="imageupload"
+                                                        src="/assets/img/imageupload.png"
+                                                        alt="Default Image"
+                                                        width="50"
+                                                        height="50"
+                                                    />
+                                                    </ng-template>
+                                                    <div style="text-align: center; padding: 15px 20px;">
+                                                        {{ productForm.get('name').value }} - {{ row.value }} - {{ value2.value }}
+                                                    </div>
+                                                </div>  
+                                            </td>
+                                            <td>
+                                                <input
+                                                  class="form-control"
+                                                  type="text"
+                                                  [formControlName]="getSkuControlName(i, j)"
+                                                  [style]="{ height: '35px', width: '200px' }"
+                                                  (input)="onInput3($event)"
+                                                />
+                                                <div *ngIf="showNameError15" class="error-message">
+                                                  {{ errorMessage3 }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                              <input
+                                                class="form-control"
+                                                type="text"
+                                                [formControlName]="getBarcodeControlName(i, j)"
+                                                (keypress)="onKeyPress($event)"
+                                                (input)="onInput2($event)"
+                                                [style]="{ height: '35px', width: '200px' }"
+                                              />
+                                              <div *ngIf="showNameError14" class="error-message">
+                                                {{ errorMessage2 }}
+                                              </div>
+                                              
+                                            </td>
+                                            <td>
+                                              <input
+                                                class="form-control"
+                                                type="text"
+                                                [formControlName]="getPriceControlName(i, j)"
+                                                (keypress)="onKeyPress($event)"
+                                                [style]="{ height: '35px', width: '200px' }"
+                                              />
+                                              <div
+                                                *ngIf="getPriceControlError(i, j)"
+                                                class="text-danger"
+                                              >
+                                                {{ getPriceControlError(i, j) }}
+                                              </div>
+                                            </td>
+                                            <td  *ngIf="productForm.get('productType').value === 0">
+                                              <input
+                                                class="form-control"
+                                                type="text"
+                                                [formControlName]="getWareControlName(i, j)"
+                                                (keypress)="onKeyPress($event)"
+                                                [style]="{ height: '35px', width: '200px' }"
+                                              />
+                                            </td>
+                                          </tr>
+                                        </ng-template>
+                                      </p-table>
+                                    </div>
+                                  </div>
+                                </div>                
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;" class="card-body-1" *ngIf="showProperties1Section">
+                            <div class="col-lg-12 mt-2">
+                                <label class="labelip" 
+                                  >Danh sách phân loại hàng</label
+                                >
+                                <div class="col-lg-12 mt-5">
+                                  <!-- <div *ngIf="showNameError8" class="error-message">
+                                      Tất cả giá của biến thể >= 0
+                                    </div> -->
+                                  <div>
+                                    <div class="table-products">
+                                      <p-table
+                                        [value]="valueProperties1Array.controls"
+                                        [rows]="10"
+                                      >
+                                        <ng-template pTemplate="header">
+                                          <tr>
+                                            <th style="width: 5%">STT</th>
+                                            <th style="width: 30%">Tên phân loại</th>
+                                            <th style="width: 20%">SKU phân loại</th>
+                                            <th style="width: 10%">Mã vạch/Mã Barcode</th>
+                                            <th style="width: 10%">Giá bán</th>
+                                            <th  *ngIf="productForm.get('productType').value === 0">Tồn kho</th>
+                                          </tr>
+                                        </ng-template>
+                                        <ng-template
+                                          pTemplate="body"
+                                          let-row
+                                          let-i="rowIndex"
+                                        >                       
+                                          <tr *ngFor="let value2 of valueProperties2Array.controls; let j = index">
+                                            <td>1</td>
+                                            <td>
+                                                <div style="display: flex;">
+                                                    <div *ngIf="!getLinkImage(i) && getBase64Image(i)">
+                                                        <img
+                                                        *ngIf="getBase64Image(i); else defaultImage"
+                                                        [src]="'data:image/png;base64,' + getBase64Image(i)"
+                                                        alt="Image"
+                                                        width="50"
+                                                        height="50"
+                                                        />
+                                                        <ng-template #defaultImage>
+                                                        <img
+                                                            style="margin-top: 10px;"
+                                                            class="imageupload"
+                                                            src="/assets/img/imageupload.png"
+                                                            alt="Default Image"
+                                                            width="50"
+                                                            height="50"
+                                                        />
+                                                        </ng-template>
+                                                    </div>
+                                                    <img *ngIf="getLinkImage(i)" [src]="getLinkImage(i)" alt="Variant Image" width="50" height="50">
+                                                    <div style="text-align: center; padding: 15px 20px;">
+                                                        {{ productForm.get('name').value }} - {{ row.value }} - {{ value2.value }}
+                                                    </div>
                                                 </div>  
                                             </td>
                                             <td>
@@ -575,24 +830,6 @@
                                     </div>
                                   </div>
                                 </div>
-              
-                                <!-- <div
-                                  class="showNameErrorAll"
-                                  *ngIf="
-                                    showNameError ||
-                                    showNameError2 ||
-                                    showNameError3 ||
-                                    showNameError4 ||
-                                    showNameError5 ||
-                                    showNameError6
-                                  "
-                                >
-                                  <p-messages
-                                    [(value)]="showNameErrorAll"
-                                    [enableService]="false"
-                                    [closable]="false"
-                                  ></p-messages>
-                                </div> -->
                             </div>
                         </div>
                     </div>

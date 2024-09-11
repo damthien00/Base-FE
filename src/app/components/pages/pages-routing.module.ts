@@ -78,6 +78,13 @@ import { RouterModule } from '@angular/router';
                     ),
             },
             {
+                path: 'products/update-product/:id',
+                loadChildren: () =>
+                    import('./products/update-product/update-product.module').then(
+                        (m) => m.UpdateProductModule
+                    ),
+            },
+            {
                 path: 'product-category/show',
                 loadChildren: () =>
                     import(
