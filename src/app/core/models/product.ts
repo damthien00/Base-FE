@@ -9,6 +9,7 @@ export interface Products {
     mass?: number | null;
     categoryId?: number;
     brandId?: number;
+    warrantyPolicyId?: number;
     collectionId?: number;
     barcode?: string;
     sku?: string;

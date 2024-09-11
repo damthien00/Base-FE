@@ -140,6 +140,14 @@ export class ProductService {
         );
     }
 
+    CheckBarcodeVariant(barCodeVr: string): Observable<{ data: boolean; [key: string]: any }> {
+      return this.http.get<{ data: boolean; [key: string]: any }>(`${this.url}/api/productvariants/checkbarcodevariant?barCodeVr=${barCodeVr}`);
+    }
+
+    CheckBarcodeSku(sku: string): Observable<{ data: boolean; [key: string]: any }> {
+      return this.http.get<{ data: boolean; [key: string]: any }>(`${this.url}/api/productvariants/checksku?sku=${sku}`);
+    }
+  
     checkBarcodeUpdate(barcode: string, productId: number) {
         const url = `${this.url}/api/product/checkbarcode?barCode=${barcode}&id=${productId}`;
         return this.http.get<any>(url);
