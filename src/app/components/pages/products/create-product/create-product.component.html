@@ -245,9 +245,9 @@
                                     </div>             
                                 </div>
                             </div>                     
-                            <div class="col-lg-12">
+                            <div class="col-lg-12"  *ngIf="productForm.get('productType').value === 0">
                                 <div class="row">
-                                    <div class="col-lg-4" *ngIf="productForm.get('productType').value === 0">
+                                    <div class="col-lg-4">
                                         <label class="labelip">Kho hàng</label>
                                             <input
                                                 type="text"
@@ -316,7 +316,7 @@
                             </div>
                             <div class="col-lg-12 mt-5">
                               <div style="display: flex">
-                                <p-inputSwitch formControlName="warrantySwitch" (onChange)="onWarrantySwitchChange($event)"></p-inputSwitch>
+                                <p-inputSwitch formControlName="warning" (onChange)="onWarrantySwitchChange($event)"></p-inputSwitch>
                                 <label style="padding: 3px 10px" class="labelip">Áp dụng bảo hành</label>
                               </div>
                             
@@ -324,10 +324,11 @@
                               <p-dropdown 
                                 *ngIf="isWarrantyApplied" 
                                 [options]="warrantyOptions" 
-                                optionLabel="name" 
+                                optionLabel="shortenedName" 
                                 formControlName="warrantyPolicyId"
                                 [style]="{ height: '40px', width: '30%' }"
                                 optionValue="id"
+                                [showClear]="true"
                                 placeholder="Chọn chính sách bảo hành">
                               </p-dropdown>
                             </div>         
@@ -527,9 +528,9 @@
                                                   [style]="{ height: '35px', width: '200px' }"
                                                   (input)="onInput3($event)"
                                                 />
-                                                <div *ngIf="showNameError15" class="error-message">
+                                                <!-- <div *ngIf="showNameError15" class="error-message">
                                                   {{ errorMessage3 }}
-                                                </div>
+                                                </div> -->
                                             </td>
                                             <td>
                                               <input
@@ -540,9 +541,9 @@
                                                 (input)="onInput2($event)"
                                                 [style]="{ height: '35px', width: '200px' }"
                                               />
-                                              <div *ngIf="showNameError14" class="error-message">
+                                              <!-- <div *ngIf="showNameError14" class="error-message">
                                                 {{ errorMessage2 }}
-                                              </div>
+                                              </div> -->
                                               
                                             </td>
                                             <td>
@@ -576,23 +577,7 @@
                                   </div>
                                 </div>
               
-                                <!-- <div
-                                  class="showNameErrorAll"
-                                  *ngIf="
-                                    showNameError ||
-                                    showNameError2 ||
-                                    showNameError3 ||
-                                    showNameError4 ||
-                                    showNameError5 ||
-                                    showNameError6
-                                  "
-                                >
-                                  <p-messages
-                                    [(value)]="showNameErrorAll"
-                                    [enableService]="false"
-                                    [closable]="false"
-                                  ></p-messages>
-                                </div> -->
+                               
                             </div>
                         </div>
                     </div>

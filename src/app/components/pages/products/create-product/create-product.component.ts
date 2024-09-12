@@ -261,8 +261,20 @@ export class CreateProductComponent implements OnInit{
 
   loadWarrantyPolicies() {
     this.warrantyService.getWarrantyPolicies().subscribe((response: any) => {
-      this.warrantyOptions = response.data.items;
+      this.warrantyOptions = response.data.items.map((option: any) => {
+        return {
+          ...option,
+          shortenedName: this.shortenName(option.name, 30) // Giới hạn độ dài tên
+        };
+      });
     });
+  }
+
+  shortenName(name: string, maxLength: number): string {
+    if (name.length > maxLength) {
+      return name.slice(0, maxLength) + '...'; // Cắt ngắn và thêm ...
+    }
+    return name;
   }
 
   updatePriceControls(newPrice: string) {
@@ -848,7 +860,15 @@ export class CreateProductComponent implements OnInit{
       if (results.every(result => result === true)) {
         this.onSubmit();
       } else {
-        console.log('Không thể submit vì có mã vạch bị trùng.');
+        // console.log('Không thể submit vì có mã vạch bị trùng.');
+        this.messages = [
+          {
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Mã đã tồn tại. Vui lòng kiểm tra lại.',
+            life: 3000,
+          },
+        ];
       }
     }).catch((error) => {
       console.error('Lỗi trong quá trình kiểm tra mã vạch:', error);
@@ -866,14 +886,7 @@ export class CreateProductComponent implements OnInit{
           if (response.data) {
             this.showNameError12 = true;
             this.errorMessage = 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.';
-            this.messages = [
-              {
-                severity: 'error',
-                summary: 'Lỗi',
-                detail: 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.',
-                life: 3000,
-              },
-            ];
+
             resolve(false); // Báo rằng có lỗi và không được submit
           } else {
             resolve(true); // Báo rằng không có lỗi
@@ -897,16 +910,16 @@ export class CreateProductComponent implements OnInit{
         this.productService.CheckBarcodeVariant(barcode).subscribe(
           (response) => {
             if (response.data) {
-              this.showNameError14 = true;
-              this.errorMessage2 = 'Mã vạch đã tồn tại.';
-              // this.messages = [
-              //   {
-              //     severity: 'error',
-              //     summary: 'Lỗi',
-              //     detail: 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.',
-              //     life: 3000,
-              //   },
-              // ];
+              // this.showNameError14 = true;
+              // this.errorMessage2 = 'Mã vạch đã tồn tại.';
+              // // this.messages = [
+              // //   {
+              // //     severity: 'error',
+              // //     summary: 'Lỗi',
+              // //     detail: 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.',
+              // //     life: 3000,
+              // //   },
+              // // ];
               resolve(false); // Báo rằng có lỗi
             } else {
               resolve(true); // Báo rằng không có lỗi
@@ -935,8 +948,8 @@ export class CreateProductComponent implements OnInit{
         this.productService.CheckBarcodeSku(sku).subscribe(
           (response) => {
             if (response.data) {
-              this.showNameError15 = true;
-              this.errorMessage3 = 'Mã sku đã tồn tại.';
+              // this.showNameError15 = true;
+              // this.errorMessage3 = 'Mã sku đã tồn tại.';
               // this.messages = [
               //   {
               //     severity: 'error',
@@ -1088,8 +1101,8 @@ export class CreateProductComponent implements OnInit{
 
       for (let j = 0; j < productData.valuePropeties2.length; j++) {
         const value2 = productData.valuePropeties2[j] || null;
-        const prices = productData[this.getPriceControlName(i, j)] || null;
-        const quantity = productData[this.getWareControlName(i, j)] || null;
+        const prices = productData[this.getPriceControlName(i, j)] || 0;
+        const quantity = productData[this.getWareControlName(i, j)] || 0;
         const sku = productData[this.getSkuControlName(i, j)] || null;
         const barcode = productData[this.getBarcodeControlName(i, j)] || null;
         // if (!prices && prices <= 1000) {
@@ -1102,8 +1115,8 @@ export class CreateProductComponent implements OnInit{
           const variant: ProductVariant = {
             sku: sku,
             barcode: barcode || sku,
-            price: prices,
-            quantity: quantity,
+            price: prices || 0,
+            quantity: quantity || 0,
             propeties1: product.propeties1,
             valuePropeties1: value1,
             propeties2: product.propeties2,

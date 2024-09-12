@@ -5,6 +5,7 @@ export interface Products {
     content: string;
     sellingPrice?: number | null;
     importPrice?: number | null;
+    price?: number | null;
     totalQuantity?: number | null;
     mass?: number | null;
     categoryId?: number;

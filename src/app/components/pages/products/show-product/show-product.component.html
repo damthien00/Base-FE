@@ -152,7 +152,7 @@
                 <td class="n-image-product">
                   <img [src]="imageUrl+ '/api/files/images/'  + (product.productImages[0] ? product.productImages[0].link : 'no-image.png')" />
                 </td>
-                <td>{{ product.name }}</td>
+                <td>{{ product.name }} - {{ product.sku }}</td>
                 <!-- <td>
                   <p
                     style="margin: 15px 0; height: 23px"
@@ -311,7 +311,7 @@
                   </div>
                 </td>
                 <td>{{ product.brandName }}</td>
-                <td></td>
+                <td>{{product.createdAt | date: 'dd/MM/yyyy'}}</td>
                 <td class="actions">
                   <!-- [routerLink]="['/admin/quanlysanpham/themsanpham']" -->
                   <a
