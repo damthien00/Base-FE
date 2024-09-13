@@ -21,7 +21,7 @@
         <div class="card">
             <p-table
                 #dt
-                [value]=""
+                [value]="stockInList"
                 responsiveLayout="scroll"
                 [rows]="10"
                 [paginator]="true"
@@ -90,48 +90,43 @@
                         <th>Thao tác</th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-category>
+                <ng-template pTemplate="body" let-stockInItem>
                     <tr>
                         <td style="width: 5%; min-width: 10rem">
-                            <span class="p-column-title">Id</span>
-                            {{ category.id }}
+                            <span class="p-column-title">Code</span>
+                            {{ stockInItem.code }}
                         </td>
-                        <td style="width: 23%; min-width: 10rem">
-                            <span class="p-column-title">Name</span>
-                            {{ category.name }}
+                        <td style="width: 15%; min-width: 10rem">
+                            <span class="p-column-title">CreateName</span>
+                            <!-- {{ stockInItem.name }} -->
                         </td>
                         <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">ParentName</span>
-                            {{ category.parentName }}
+                            <span class="p-column-title"
+                                >ImportStockInDate</span
+                            >
+                            <!-- {{ stockInItem.parentName }} -->
                         </td>
                         <td style="width: 14%; min-width: 8rem">
-                            <span class="p-column-title">Level</span>
-                            {{ category.level }}
+                            <span class="p-column-title">TotalPoduct</span>
+                            {{ stockInItem.subQuantity }}
                         </td>
                         <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">CreateName</span>
-                            <!-- {{ product.category }} -->
+                            <span class="p-column-title">TotalPrice</span>
+                            {{ stockInItem.total }}
                         </td>
                         <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Status</span>
-                            {{ category.status }}
+                            <span class="p-column-title">Note</span>
+                            {{ stockInItem.note }}
                         </td>
 
-                        <td>
+                        <td style="width: 4%; min-width: 10rem">
                             <div class="flex">
                                 <button
                                     pButton
                                     pRipple
                                     icon="pi pi-pencil"
                                     class="p-button-rounded p-button-success mr-2"
-                                    (click)="editProduct(product)"
-                                ></button>
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-trash"
-                                    class="p-button-rounded p-button-warning"
-                                    (click)="deleteProduct(product)"
+                                    (click)="showStockInDetail(stockInItem)"
                                 ></button>
                             </div>
                         </td>
@@ -141,3 +136,236 @@
         </div>
     </div>
 </div>
+
+<p-dialog
+    [(visible)]="displayStockInDetailModal"
+    modal="true"
+    [closable]="false"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '60vw' }"
+>
+    <!-- Header -->
+    <ng-template pTemplate="header">
+        <div class="flex justify-content-between" style="width: 100%">
+            <h4>Chi tiết phiếu nhập kho</h4>
+            <span class="close" (click)="displayStockInDetailModal = false">
+                <i class="pi pi-times"></i>
+            </span>
+        </div>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="content">
+        <div class="grid">
+            <div class="col-8">
+                <div class="card p-0" style="height: 280px">
+                    <p-table
+                        #dt
+                        [value]="stockInItemDetail"
+                        responsiveLayout="scroll"
+                        [rowHover]="true"
+                        dataKey="id"
+                    >
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>#</th>
+                                <th>Ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th style="text-align: center">Giá nhập</th>
+                                <th style="text-align: center">ĐVT</th>
+                                <th style="text-align: center">Số lượng</th>
+                                <th style="text-align: center">Thành tiền</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-data let-i="rowIndex">
+                            <tr>
+                                <td style="width: 3%">
+                                    {{ i + 1 }}
+                                </td>
+                                <td style="width: 8%">
+                                    <img
+                                        [src]="imageUrl + data.productImage"
+                                        alt="Product Image"
+                                        style="
+                                            width: 50px;
+                                            height: 50px;
+                                            border-radius: 4px;
+                                        "
+                                    />
+                                </td>
+                                <td style="width: 15.5%">
+                                    {{ data.productName }}
+                                </td>
+                                <td style="width: 12.5%; text-align: center">
+                                    {{ data.price }}
+                                </td>
+                                <td style="width: 9%; text-align: center">
+                                    {{ data.unit }}
+                                </td>
+                                <td style="width: 13.5%; text-align: center">
+                                    {{ data.quantity }}
+                                </td>
+                                <td style="width: 13.5%; text-align: center">
+                                    {{ data.totail }}
+                                </td>
+                            </tr>
+                            <tr
+                                *ngIf="
+                                    data &&
+                                    data.inventoryStockDetailProductImeies
+                                "
+                            >
+                                <td colspan="8" class="p-3 border-none">
+                                    <div class="flex flex-column">
+                                        <label for="" class="mb-2"
+                                            >Số khung/ số máy</label
+                                        >
+                                        <div
+                                            class="variant-item"
+                                            *ngFor="
+                                                let variant of data.inventoryStockDetailProductImeies;
+                                                let i = index
+                                            "
+                                        >
+                                            <span class="variant-item-label"
+                                                >{{ variant.frameNumber }}/{{
+                                                    variant.engineNumber
+                                                }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div class="col-4">
+                <div
+                    class="card"
+                    style="min-height: 280px; background-color: #efeeee"
+                >
+                    <div class="grid p-fluid">
+                        <div class="col-12 md:col-12">
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Tổng số sản phẩm
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                >
+                                    19
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Tổng tiền hàng
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                >
+                                    19
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Giảm giá
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                >
+                                    19
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Cần trả nhà cung cấp
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                >
+                                    19
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Tiền trả nhà cung cấp
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                >
+                                    19
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div
+                    class="card"
+                    style="height: auto; background-color: #efeeee"
+                >
+                    <div class="grid p-fluid">
+                        <div class="col-12 md:col-6">
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Mã hóa đơn
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    19
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Nhà cung cấp
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    19
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Địa chỉ
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    19
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Thời gian tạo
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    19
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Người tạo
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    19
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

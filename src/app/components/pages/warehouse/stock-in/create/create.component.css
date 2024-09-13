@@ -1,5 +1,5 @@
 .box-search{
-    display:relative;
+    width: 100%;
 }
 
 .product__list{
@@ -10,7 +10,31 @@
     box-shadow: 0 0 5px 0 #ccc;
     width: 100%;
     padding: 7px;
+    height: 400px;
     z-index: 999;
+    overflow-y: auto;
+}
+
+/* Thanh cuộn */
+.product__list::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* Track của thanh cuộn */
+.product__list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+/* Thanh cuộn */
+.product__list::-webkit-scrollbar-thumb {
+    background: #cecdcd;
+    border-radius: 4px;
+}
+
+/* Thanh cuộn khi hover */
+.product__list::-webkit-scrollbar-thumb:hover {
+    background: #adacac;
 }
 
 .product__item{
@@ -161,4 +185,8 @@
 
 .variant-item-close:hover {
     background-color:#3e219c;
+}
+
+.product__item-left{
+    margin-right: 10px;
 }
