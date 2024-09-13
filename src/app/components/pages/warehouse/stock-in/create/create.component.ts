@@ -13,6 +13,7 @@ import { NodeService } from 'src/app/core/services/node.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 export interface WarehouseReceipt {
     id?: number;
@@ -59,7 +60,8 @@ export class CreateComponent implements OnInit {
         private nodeService: NodeService,
         private productService: ProductService,
         public functionService: FunctionService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private router: Router
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
     }
@@ -143,6 +145,14 @@ export class CreateComponent implements OnInit {
             // subtotal: '',
             note: '',
             inventoryStockInDetails: [],
+            createdAt: new Date().toLocaleString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+            }),
 
             totalPrice: 0, // Tổng số tiền phải trả cho tất cả các sản phẩm/dịch vụ
             totalDiscountAmount: 0, // Tổng số tiền giảm giá đã được áp dụng
@@ -497,6 +507,10 @@ export class CreateComponent implements OnInit {
                         summary: 'Thành công',
                         detail: 'Thêm phiếu kho thành công',
                     });
+
+                    setTimeout(() => {
+                        this.router.navigate(['/warehouse/stock-in']);
+                    }, 1000); // Thời gian trễ 2 giây
                 },
                 (error) => {
                     // Xử lý khi lỗi

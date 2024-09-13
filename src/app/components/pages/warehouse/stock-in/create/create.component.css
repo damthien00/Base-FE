@@ -48,6 +48,14 @@
     background-color: rgb(42, 41, 134, 0.1);
 }
 
+.product__item svg{
+    transition: 0.5s linear;
+}
+
+.product__item:hover svg {
+    color: #fff !important;
+}
+
 .product__item-left{
     flex: 1;
 }
