@@ -91,6 +91,7 @@ export class UpdateProductComponent implements OnInit {
   showNameError13 = false;
   showNameError14 = false;
   showNameError15 = false;
+  showWarrantyError = false;
   errorMessage = '';
   errorMessage2 = '';
   errorMessage3 = '';
@@ -197,18 +198,6 @@ export class UpdateProductComponent implements OnInit {
     this.setDefaultCategory();
     this.CallSnaphot();
     this.FillDataGetById();
-    
-    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
-      if (this.addVariants) {
-        this.updatePriceControls(newSellingPrice);
-      }
-    });
-
-    // this.productForm.get('totalQuantity')?.valueChanges.subscribe((newtotalQuantity) => {
-    //   if (this.addVariants) {
-    //     this.updateWareControls(newtotalQuantity);
-    //   }
-    // });
 
     this.productForm.get('productType').valueChanges.subscribe((value) => {
       if (value === 1) {
@@ -216,6 +205,18 @@ export class UpdateProductComponent implements OnInit {
         this.productForm.get('totalQuantity').setValue(null);
       }
     });
+
+    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
+      if (this.addVariants) {
+        this.updatePriceControls(newSellingPrice);
+      }
+    });
+  
+    this.productForm.get('totalQuantity')?.valueChanges.subscribe((newTotalQuantity) => {
+      if (this.addVariants) {
+        this.updateWareControls(newTotalQuantity);
+      }
+    }); 
   }
 
 
@@ -269,10 +270,18 @@ export class UpdateProductComponent implements OnInit {
 
       this.setDefaultCategory();
 
+      this.disableSerialOption();
+
       if (this.productById.status === 1) {
         this.productForm.get('status')?.setValue(true);
       } else {
         this.productForm.get('status')?.setValue(false);
+      }
+
+      if (this.productById.productType === 1 && this.productById.totalQuantity > 0) {
+        this.productForm.get('productType')?.disable();
+      } else {
+        this.productForm.get('productType')?.enable();
       }
 
       this.FillWarrantySwitchChange();
@@ -283,7 +292,7 @@ export class UpdateProductComponent implements OnInit {
       const valueProperties1Array = this.productForm.get('valuePropeties1') as FormArray;
       const valueProperties2Array = this.productForm.get('valuePropeties2') as FormArray;
 
-      
+
       organizedVariants.forEach((variantGroup: any) => {
         variantGroup.variants.forEach((variant: any, variantIndex: number) => {
           if (!valueProperties1Array.value.includes(variant.valuePropeties1)) {
@@ -293,10 +302,10 @@ export class UpdateProductComponent implements OnInit {
             valueProperties2Array.push(this.fb.control(variant.valuePropeties2));
           }
 
-          this.buttonVariants = false;
-          this.buttonVariants2 = false;
           this.showProperties1Section = true;
           this.showProperties1Section2 = true;
+          this.buttonVariants = false;
+          this.buttonVariants2 = false;
 
           const index = valueProperties1Array.length - 1;
 
@@ -309,6 +318,19 @@ export class UpdateProductComponent implements OnInit {
       });
     });
     // this.loadCategoriesAndChild();
+  }
+
+  disableSerialOption(): void {
+    const totalQuantity = this.productForm.get('totalQuantity')?.value;
+    const wareQuantities = this.productById.productVariants.map((variant: any) => variant.quantity);
+
+    const isDisabled = totalQuantity > 0 || wareQuantities.some((q: number) => q > 0);
+
+    if (isDisabled) {
+      this.productForm.get('productType')?.disable();
+    } else {
+      this.productForm.get('productType')?.enable();
+    }
   }
 
   setDefaultCategory(): void {
@@ -401,6 +423,8 @@ export class UpdateProductComponent implements OnInit {
 
     if (this.isWarrantyApplied) {
       this.loadWarrantyPolicies();
+    } else {
+      this.productForm.get('warrantyPolicyId')?.reset();
     }
   }
 
@@ -602,6 +626,26 @@ export class UpdateProductComponent implements OnInit {
     this.isTreeSelectFocused = true;
   }
 
+  onKeyPressQuantity(event: KeyboardEvent) {
+    const inputChar = event.key;
+    if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
+      event.preventDefault();
+    }
+    if (inputChar === 'Enter') {
+      this.updateWareControls(this.productForm.get('totalQuantity')?.value);
+    }
+  }
+  
+  onKeyPressPrice(event: KeyboardEvent) {
+    const inputChar = event.key;
+    if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
+      event.preventDefault();
+    }
+    if (inputChar === 'Enter') {
+      this.updatePriceControls(this.productForm.get('sellingPrice')?.value);
+    }
+  }
+
   addProperty1(): void {
     this.valueProperties1Array.push(this.fb.control(''));
     // Thêm ô input price cho giá trị mới của valueProperties1
@@ -621,6 +665,18 @@ export class UpdateProductComponent implements OnInit {
       this.productForm.addControl(this.getPriceControlName(index, j), this.fb.control('', Validators.required));
       this.productForm.addControl(this.getWareControlName(index, j), this.fb.control('', Validators.required));
     }
+
+    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
+      if (this.addVariants) {
+        this.updatePriceControls(newSellingPrice);
+      }
+    });
+  
+    this.productForm.get('totalQuantity')?.valueChanges.subscribe((newTotalQuantity) => {
+      if (this.addVariants) {
+        this.updateWareControls(newTotalQuantity);
+      }
+    }); 
   }
 
   addProperty2(): void {
@@ -1072,10 +1128,10 @@ export class UpdateProductComponent implements OnInit {
       hasError = true;
     }
 
-    if (!productData.name || productData.name.trim().length < 6 || productData.name.trim().length > 100) {
-      this.showNameError10 = true;
-      hasError = true;
-    }
+    // if (!productData.name || productData.name.trim().length < 6 || productData.name.trim().length > 100) {
+    //   this.showNameError10 = true;
+    //   hasError = true;
+    // }
 
     if (!productData.name || productData.name.length > 0 && productData.name.trim().length === 0) {
       this.showNameError11 = true;
@@ -1084,6 +1140,11 @@ export class UpdateProductComponent implements OnInit {
 
     if (!productData.categoryId || productData.categoryId.length === 0) {
       this.showNameError4 = true;
+      hasError = true;
+    }
+
+    if (this.isWarrantyApplied && !productData.warrantyPolicyId) {
+      this.showWarrantyError = true;
       hasError = true;
     }
 

@@ -152,7 +152,11 @@
                 <td class="n-image-product">
                   <img [src]="imageUrl+ '/api/files/images/'  + (product.productImages[0] ? product.productImages[0].link : 'no-image.png')" />
                 </td>
-                <td>{{ product.name }} - {{ product.sku }}</td>
+                <td>
+                  <span>{{ product.name }}</span>
+                  <p style="color: blue; font-weight: 600;">{{ product.sku }}</p>
+                  
+                </td>
                 <!-- <td>
                   <p
                     style="margin: 15px 0; height: 23px"
@@ -170,7 +174,7 @@
                   </p>
                 </td> -->
                 <td>
-                  <p
+                  <div
                     style="margin: 15px 0; height: 23px"
                     *ngFor="
                       let variant of this.showAllVariants.get(product.id) === 0 ||
@@ -179,8 +183,13 @@
                         : product.productVariants.slice(0, 3)
                     "
                   >
-                    {{ variant.valuePropeties1 }} , {{ variant.valuePropeties2 }}
-                  </p>
+
+                  
+                    <span>{{ variant.valuePropeties1 }} , {{ variant.valuePropeties2 }}</span>
+                    <p style="color: blue; font-weight: 600; line-height: 15px;">{{ variant.sku }}</p>
+               
+                    
+                  </div>
                 </td>
                 <td class="price-product">
                   <p
@@ -220,14 +229,14 @@
                   >
                     {{
                       variant.quantity >= 1000
-                        ? (variant.quantity / 1000)
+                        ? variant.quantity
                         : variant.quantity
                     }}
                   </p>
                   <p *ngIf="product.productVariants.length === 0">
                     {{
                       product.totalQuantity >= 1000
-                        ? (product.totalQuantity / 1000)
+                        ? product.totalQuantity
                         : product.totalQuantity
                     }}
                   </p>

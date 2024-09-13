@@ -135,7 +135,6 @@
                                                 (productForm.get('name')?.dirty ||
                                                   productForm.get('name')?.touched)) ||
                                               showNameError2 ||
-                                              showNameError10 ||
                                               showNameError11
                                             "
                                           >
@@ -151,12 +150,7 @@
                                             >
                                               Tên không được chứa toàn ký tự trắng
                                             </div>
-                                            <div
-                                              *ngIf="productForm.get('name')?.errors?.['invalidLength']"
-                                              class="error-message"
-                                            >
-                                              Tên phải từ 6 đến 100 ký tự
-                                            </div>
+                                            
                                           </div> 
                                     </div>
                                     <div class="col-lg-4">
@@ -227,7 +221,7 @@
                                         formControlName="sellingPrice"
                                         placeholder="Nhập giá bán"
                                         maxlength="100"
-                                        (keypress)="onKeyPress($event)"
+                                        (keypress)="onKeyPressPrice($event)"
                                         /> 
                                     </div>
                                     <div class="col-lg-4">
@@ -257,7 +251,7 @@
                                                 formControlName="totalQuantity"
                                                 placeholder="Nhập kho hàng"
                                                 maxlength="100"
-                                                (keypress)="onKeyPress($event)"
+                                                (keypress)="onKeyPressQuantity($event)"
                                             /> 
                                     </div>      
                                 </div>
@@ -331,6 +325,9 @@
                                 [showClear]="true"
                                 placeholder="Chọn chính sách bảo hành">
                               </p-dropdown>
+                              <div *ngIf="showWarrantyError" class="error-message">
+                                Hãy chọn chính sách bảo hành
+                              </div>
                             </div>         
                         </div>
                     </div>
@@ -526,11 +523,11 @@
                                                   type="text"
                                                   [formControlName]="getSkuControlName(i, j)"
                                                   [style]="{ height: '35px', width: '200px' }"
-                                                  (input)="onInput3($event)"
+                                                  (input)="onInput3($event); onSkuInput($event, i, j)"
                                                 />
-                                                <!-- <div *ngIf="showNameError15" class="error-message">
-                                                  {{ errorMessage3 }}
-                                                </div> -->
+                                                <div *ngIf="duplicateSkuError" class="text-danger">
+                                                  {{ errorMessageSku }}
+                                                </div>
                                             </td>
                                             <td>
                                               <input
@@ -538,12 +535,12 @@
                                                 type="text"
                                                 [formControlName]="getBarcodeControlName(i, j)"
                                                 (keypress)="onKeyPress($event)"
-                                                (input)="onInput2($event)"
+                                                (input)="onInput2($event); onBarcodeInput($event, i, j)"
                                                 [style]="{ height: '35px', width: '200px' }"
                                               />
-                                              <!-- <div *ngIf="showNameError14" class="error-message">
-                                                {{ errorMessage2 }}
-                                              </div> -->
+                                              <div *ngIf="duplicateBarcodeError" class="text-danger">
+                                                {{ errorMessageCheck }}
+                                              </div>
                                               
                                             </td>
                                             <td>
