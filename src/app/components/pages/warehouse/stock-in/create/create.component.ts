@@ -8,10 +8,11 @@ import {
     ViewChild,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { NodeService } from 'src/app/core/services/node.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
+import { environment } from 'src/environments/environment';
 
 export interface WarehouseReceipt {
     id?: number;
@@ -30,8 +31,10 @@ export interface WarehouseReceipt {
     selector: 'app-create',
     templateUrl: './create.component.html',
     styleUrls: ['./create.component.css'],
+    providers: [MessageService],
 })
 export class CreateComponent implements OnInit {
+    imageUrl: string = environment.imageUrl;
     @ViewChild('searchInput') searchInput!: ElementRef;
     items: MenuItem[] | undefined;
     datas: any;
@@ -42,7 +45,7 @@ export class CreateComponent implements OnInit {
     stockInReceipt: any;
     filteredDatas: any;
     showProducts = false;
-
+    isValidForm: boolean = true;
     temporaryDiscountRate: number = 0;
     temporaryDiscountUnit: string = 'VND';
 
@@ -50,10 +53,13 @@ export class CreateComponent implements OnInit {
     optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
     frameNumber: any;
     engineNumber: any;
+
+    onBarcode: boolean = false;
     constructor(
         private nodeService: NodeService,
         private productService: ProductService,
-        public functionService: FunctionService
+        public functionService: FunctionService,
+        private messageService: MessageService
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
     }
@@ -149,26 +155,70 @@ export class CreateComponent implements OnInit {
         };
     }
 
-    onProductSearch(event: Event): void {
+    // onProductSearch(event: Event): void {
+    //     const input = event.target as HTMLInputElement;
+    //     const searchTerm = input.value.toLowerCase();
+
+    //     // Lọc dữ liệu dựa trên từ khóa tìm kiếm
+
+    //     this.optionsFillerProduct.KeyWord = searchTerm;
+    //     this.loadProducts();
+    // }
+
+    async onProductSearch(event: Event) {
         const input = event.target as HTMLInputElement;
         const searchTerm = input.value.toLowerCase();
-
-        // Lọc dữ liệu dựa trên từ khóa tìm kiếm
-        this.filteredDatas = this.datas.filter(
-            (item: any) =>
-                item.productName.toLowerCase().includes(searchTerm) ||
-                item.serialNumbers.some((serial: any) =>
-                    serial.toLowerCase().includes(searchTerm)
-                )
-        );
+        if (this.onBarcode) {
+            this.optionsFillerProduct.pageIndex = 1;
+            this.optionsFillerProduct.pageSize = 1;
+            this.optionsFillerProduct.productName = '';
+            this.optionsFillerProduct.Barcode = searchTerm.toLowerCase();
+            try {
+                const response =
+                    await this.productService.SearchProductVariants(
+                        this.optionsFillerProduct
+                    );
+                if (response.data.length > 0) {
+                    this.addToCart(response.data[0]);
+                } else {
+                    // Hiển thị thông báo sản phẩm không tồn tại
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: '',
+                        detail: 'Sản phẩm không tồn tại',
+                    });
+                }
+            } finally {
+            }
+        } else {
+            this.optionsFillerProduct.pageIndex = 1;
+            this.optionsFillerProduct.pageSize = 10;
+            this.optionsFillerProduct.KeyWord = searchTerm.toLowerCase();
+            this.optionsFillerProduct.Barcode = null;
+            try {
+                // const response =
+                //     await this.productService.SearchProductVariants(
+                //         this.optionsFillerProduct
+                //     );
+                // this.filteredDatas = response.data;
+                this.loadProducts();
+            } finally {
+            }
+        }
     }
 
     showProductList(): void {
-        this.showProducts = true;
-        this.loadProducts();
+        if (this.onBarcode) {
+            this.showProducts = false;
+        } else {
+            this.showProducts = true;
+            this.loadProducts();
+        }
     }
 
     async loadProducts() {
+        this.optionsFillerProduct.pageIndex = 1;
+        this.optionsFillerProduct.pageSize = 10;
         let response = await this.productService.FilterProduct(
             this.optionsFillerProduct
         );
@@ -187,10 +237,6 @@ export class CreateComponent implements OnInit {
 
     onProductListClick(event: MouseEvent): void {
         this.showProducts = true; // Prevent the click event from hiding the product list
-    }
-
-    onToggleActiveBarcode() {
-        this.activeBarcode = !this.activeBarcode;
     }
 
     onNodeSelect(event: any) {
@@ -234,7 +280,8 @@ export class CreateComponent implements OnInit {
         // });
     }
 
-    addToCart(item: any, event: Event): void {
+    addToCart(item: any): void {
+        console.log(item);
         // Kiểm tra xem sản phẩm đã có trong inventoryStockInDetails hay chưa
         const existingDetail = this.stockInReceipt.inventoryStockInDetails.find(
             (detail) => detail.productId === item.id
@@ -249,11 +296,13 @@ export class CreateComponent implements OnInit {
             // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
             const newDetail = {
                 productId: item.id,
-                productImage: item.productImage,
-                productName: item.productName,
+                productImage: item.productImages[0]?.link,
+                productName: item.name,
+                productType: item.productType,
                 quantity: 0,
-                price: item.price,
-                unit: item.unit,
+                productCode: item.code,
+                price: item.sellingPrice,
+                unit: item.unitName,
                 total: 0,
                 frameNumber: '',
                 engineNumber: '',
@@ -270,6 +319,7 @@ export class CreateComponent implements OnInit {
 
     updateTotal(data: any) {
         data.total = data.price * data.quantity;
+        this.checkValidity();
         this.updatePaymentInfo();
     }
 
@@ -294,6 +344,8 @@ export class CreateComponent implements OnInit {
         this.stockInReceipt.moneyReturn =
             this.stockInReceipt.customerPayment -
             this.stockInReceipt.totalAmountPaid;
+
+        this.checkValidity();
     }
 
     calculateDiscount(totalPrice: number): number {
@@ -321,6 +373,8 @@ export class CreateComponent implements OnInit {
     }
 
     calculateTotalDiscount(): number {
+        this.stockInReceipt.discountRate = this.temporaryDiscountRate;
+        this.stockInReceipt.discountUnit = this.temporaryDiscountUnit;
         // Giả định bạn muốn tính toán giảm giá dựa trên tỷ lệ hoặc giá trị
         if (this.stockInReceipt.discountUnit === '%') {
             return (
@@ -334,17 +388,14 @@ export class CreateComponent implements OnInit {
     }
 
     saveDiscount() {
-        console.log();
-
-        this.stockInReceipt.discountRate = this.temporaryDiscountRate;
-        this.stockInReceipt.discountUnit = this.temporaryDiscountUnit;
         this.stockInReceipt.totalDiscountAmount = this.calculateTotalDiscount();
+        console.log(this.stockInReceipt.totalDiscountAmount);
+        console.log(this.stockInReceipt);
         this.updatePaymentInfo();
         this.displayDiscountModal = false;
     }
 
     onEnterTest(product: any) {
-        console.log(product);
         const imeiItem = {
             frameNumber: product.frameNumber,
             engineNumber: product.engineNumber,
@@ -362,11 +413,10 @@ export class CreateComponent implements OnInit {
         // Xóa giá trị trong form sau khi đẩy vào mảng
         product.frameNumber = '';
         product.engineNumber = '';
+        this.checkValidity();
     }
 
     removeImeiItem(product: any, index: number) {
-        console.log(product);
-        console.log(index);
         product.productImeis.splice(index, 1);
         product.quantity = product.productImeis.length;
         product.total = product.quantity * product.price;
@@ -374,7 +424,124 @@ export class CreateComponent implements OnInit {
     }
 
     onSubmit() {
+        console.log(this.stockInReceipt);
         this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
+            if (product.quantity == 0) {
+                product.isValid = true;
+                product.isValidMessage = 'Số lượng > 0';
+            } else {
+                product.isValid = false;
+                delete product.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
+            }
+
+            if (product.productImeis) {
+                product.productImeis.forEach((imei) => {
+                    if (!imei.frameNumber || !imei.engineNumber) {
+                        imei.isValid = true;
+                        if (!imei.frameNumber && !imei.engineNumber) {
+                            imei.isValidMessage =
+                                'Vui lòng nhập số khung và số máy';
+                        } else if (!imei.frameNumber) {
+                            imei.isValidMessage = 'Vui lòng nhập số khung';
+                        } else if (!imei.engineNumber) {
+                            imei.isValidMessage = 'Vui lòng nhập số máy';
+                        }
+                    } else {
+                        imei.isValid = false;
+                        delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
+                    }
+                });
+            }
+        });
+        this.checkValidity();
+        if (this.isValidForm) {
+            const products = this.stockInReceipt.inventoryStockInDetails.map(
+                (product) => {
+                    const productImeis =
+                        product.productImeis?.map((imei) => ({
+                            ...imei,
+                            type: 1,
+                        })) || [];
+                    return {
+                        productId: product.productId,
+                        productName: product.productName,
+                        productCode: product.productCode,
+                        productImage: product.productImage,
+                        unit: product.unit,
+                        price: product.price,
+                        quantity: product.quantity,
+                        totail: product.total,
+                        code: 'string',
+                        inventoryStockDetailProductImeis: productImeis,
+                    };
+                }
+            );
+
+            const formData = {
+                supplierId: 1,
+                supplierName: '',
+                subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
+                totalDiscount: this.stockInReceipt.totalDiscountAmount,
+                branchId: 6,
+                branchName: 'string',
+                total: this.stockInReceipt.customerPayment,
+                version: 0,
+                code: 'string',
+                note: this.stockInReceipt.note,
+                inventoryStockInDetails: products,
+            };
+            this.productService.createStockIn(formData).subscribe(
+                (response) => {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Thành công',
+                        detail: 'Thêm phiếu kho thành công',
+                    });
+                },
+                (error) => {
+                    // Xử lý khi lỗi
+                    console.error('Error creating inventoryStockIn:', error);
+                }
+            );
+        } else {
+            console.log('Form is invalid, please correct the errors.');
+        }
+    }
+
+    checkValidity() {
+        if (this.stockInReceipt.inventoryStockInDetails.length == 0) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Chú ý',
+                detail: 'Phiếu nhập chưa có sản phẩm',
+            });
+            this.isValidForm = false;
+            return;
+        }
+
+        // Kiểm tra giá trị thanh toán và tổng giảm giá
+        if (
+            this.stockInReceipt.customerPayment ===
+            this.stockInReceipt.totalAmountPaid
+        ) {
+            this.stockInReceipt.isValidMoney = false;
+            delete this.stockInReceipt.isMessageValidMoney;
+        } else {
+            this.stockInReceipt.isValidMoney = true;
+            this.stockInReceipt.isMessageValidMoney =
+                'Bằng tiền cần trả nhà cung cấp';
+        }
+
+        // Kiểm tra các sản phẩm và IMEI
+        this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
+            if (product.quantity === 0) {
+                product.isValid = true;
+                product.isValidMessage = 'Số lượng > 0';
+            } else {
+                product.isValid = false;
+                delete product.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
+            }
+
             if (product.productImeis) {
                 product.productImeis.forEach((imei) => {
                     if (!imei.frameNumber || !imei.engineNumber) {
@@ -395,17 +562,47 @@ export class CreateComponent implements OnInit {
             }
         });
 
-        // Kiểm tra toàn bộ sản phẩm để đảm bảo không có lỗi trước khi submit
-        const isValidForm = this.stockInReceipt.inventoryStockInDetails.every(
-            (product) => product.productImeis.every((imei) => !imei.isValid)
-        );
+        // Kiểm tra tính hợp lệ của form
+        this.isValidForm =
+            this.stockInReceipt.inventoryStockInDetails?.every((product) => {
+                // Kiểm tra số lượng sản phẩm
+                if (product.quantity === 0) {
+                    return false;
+                }
 
-        if (isValidForm) {
-            console.log('Form is valid, proceeding with submission...');
+                // Kiểm tra IMEI nếu có
+                if (product.productImeis) {
+                    return product.productImeis.every((imei) => !imei.isValid);
+                }
 
-            console.log(this.stockInReceipt);
+                // Kiểm tra tính hợp lệ của sản phẩm
+                return !product.isValid;
+            }) && !this.stockInReceipt.isValidMoney;
+
+        if (this.isValidForm) {
+            console.log('Form is valid and ready to submit.');
         } else {
-            console.log('Form is invalid, please correct the errors.');
+            console.log('Form is not valid. Please check the errors.');
         }
     }
+
+    onBarcodeClick() {
+        this.activeBarcode = !this.activeBarcode;
+        if (this.onBarcode) {
+            this.messageService.add({
+                severity: 'success',
+                summary: '',
+                detail: 'Chuyển sang chế độ thường',
+            });
+        } else {
+            this.messageService.add({
+                severity: 'success',
+                summary: '',
+                detail: 'Chuyển sang chế độ barcode',
+            });
+        }
+        this.onBarcode = !this.onBarcode;
+    }
+
+    // onToggleActiveBarcode() {}
 }

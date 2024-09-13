@@ -1972,7 +1972,7 @@
     padding: 0.75rem 1.25rem;
     font-size: 1rem;
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-    border-radius: 4px;
+    border-radius: 4px !important;
   }
   .p-button:not(:disabled):hover {
     background: #434463;
@@ -6559,4 +6559,9 @@
     text-overflow: ellipsis;
     white-space: normal;
     /* Để văn bản tự động xuống dòng */
+}
+
+ol{
+    padding-left: 0 !important;
+    margin-bottom: 0 !important;
 }

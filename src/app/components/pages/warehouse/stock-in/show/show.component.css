@@ -1,0 +1,14 @@
+.close{
+    padding: 5px;
+    border-radius:50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content:center;
+    align-items:center;
+    transition: 0.1s ease-in;
+}
+
+.close:hover {
+    background-color: #e6e4e4;
+}

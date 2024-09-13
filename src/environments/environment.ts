@@ -6,7 +6,17 @@ const url = 'http://103.153.69.217:5059';
 export const environment = {
     production: false,
     url: `${url}`,
+    imageUrl: `${url}/api/files/images/`,
 };
+
+// const url = 'http://103.153.69.217:5055';
+// const urlPro = 'http://103.153.69.217:5057';
+// export const environment = {
+//     production: false,
+//     url: `${url}`,
+//     imageUrlPro: `${urlPro}/api/files/images/`,
+//     urlPro: `${urlPro}`,
+// };
 
 /*
  * For easier debugging in development mode, you can import the following file
