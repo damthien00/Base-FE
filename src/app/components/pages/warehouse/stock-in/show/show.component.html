@@ -41,32 +41,35 @@
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Tìm kiếm mã chuyển hàng:</label
+                                >Tìm kiếm mã nhập kho:</label
                             >
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search"></i>
                                 <input
                                     pInputText
                                     type="text"
+                                    [(ngModel)]="
+                                        this.optionsFilterStockIn.KeyWord
+                                    "
                                     placeholder="Tìm theo mã nhập kho"
                                     style="width: 350px"
                                     class="sm:"
                                 />
-                                <!-- [(ngModel)]="
-                                        this.optionsFillerProduct.KeyWord
-                                    " -->
                             </span>
                         </div>
                         <div class="flex flex-column">
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Ngày tạo:</label
+                                >Ngày nhập kho:</label
                             >
                             <p-calendar
+                                placeholder="Từ ngày - Đến ngày"
+                                [(ngModel)]="deadlineRange"
+                                selectionMode="range"
                                 [showIcon]="true"
-                                placeholder="Chọn khoảng thời gian"
-                                inputId="icon"
+                                (onBlur)="blurDateRange()"
+                                [dateFormat]="this.formatdate"
                             ></p-calendar>
                         </div>
                         <button
@@ -104,6 +107,11 @@
                             <span class="p-column-title"
                                 >ImportStockInDate</span
                             >
+                            {{
+                                stockInItem.createdAt
+                                    | date : "dd/MM/yyyy HH:mm:ss"
+                            }}
+
                             <!-- {{ stockInItem.parentName }} -->
                         </td>
                         <td style="width: 14%; min-width: 8rem">
@@ -112,11 +120,16 @@
                         </td>
                         <td style="width: 14%; min-width: 10rem">
                             <span class="p-column-title">TotalPrice</span>
-                            {{ stockInItem.total }}
+                            {{
+                                stockInItem.total
+                                    | currency : "VND" : "symbol" : "1.0-0"
+                            }}
                         </td>
                         <td style="width: 14%; min-width: 10rem">
                             <span class="p-column-title">Note</span>
-                            {{ stockInItem.note }}
+                            <span class="truncate-2">
+                                {{ stockInItem.note }}
+                            </span>
                         </td>
 
                         <td style="width: 4%; min-width: 10rem">
@@ -162,7 +175,7 @@
                 <div class="card p-0" style="height: 280px">
                     <p-table
                         #dt
-                        [value]="stockInItemDetail"
+                        [value]="stockInItemDetail.inventoryStockInDetails"
                         responsiveLayout="scroll"
                         [rowHover]="true"
                         dataKey="id"
@@ -256,7 +269,9 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
                                 >
-                                    19
+                                    <span>{{
+                                        stockInItemDetail.subQuantity
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="field grid">
@@ -266,7 +281,13 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
                                 >
-                                    19
+                                    <span>{{
+                                        stockInItemDetail.total
+                                            | currency
+                                                : "VND"
+                                                : "symbol"
+                                                : "1.0-0"
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="field grid">
@@ -276,7 +297,13 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
                                 >
-                                    19
+                                    <span>{{
+                                        stockInItemDetail.totalDiscount
+                                            | currency
+                                                : "VND"
+                                                : "symbol"
+                                                : "1.0-0"
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="field grid">
@@ -286,7 +313,14 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
                                 >
-                                    19
+                                    <span>{{
+                                        stockInItemDetail.total -
+                                            stockInItemDetail.totalDiscount
+                                            | currency
+                                                : "VND"
+                                                : "symbol"
+                                                : "1.0-0"
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="field grid">
@@ -296,7 +330,14 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
                                 >
-                                    19
+                                    <span>{{
+                                        stockInItemDetail.total -
+                                            stockInItemDetail.totalDiscount
+                                            | currency
+                                                : "VND"
+                                                : "symbol"
+                                                : "1.0-0"
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -317,7 +358,7 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
                                 >
-                                    19
+                                    <span>{{ stockInItemDetail.code }}</span>
                                 </div>
                             </div>
                             <div class="field grid">
@@ -327,7 +368,7 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
                                 >
-                                    19
+                                    Đang trống
                                 </div>
                             </div>
                             <div class="field grid">
@@ -337,7 +378,7 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
                                 >
-                                    19
+                                    Đang trống
                                 </div>
                             </div>
                         </div>
@@ -349,7 +390,10 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
                                 >
-                                    19
+                                    <span>{{
+                                        stockInItemDetail.createdAt
+                                            | date : "dd/MM/yyyy HH:mm:ss"
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="field grid">
@@ -359,7 +403,7 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
                                 >
-                                    19
+                                    Đang trống
                                 </div>
                             </div>
                         </div>
