@@ -3,6 +3,7 @@ export class OptionsFilterStockIn {
     pageIndex: number | null = 1;
     CreatedById: number | null;
     StartDate: Date | null = null;
+    KeyWord: string | null = null;
     EndDate: Date | null = null;
     TrackingNumber: string | null;
 }

@@ -496,7 +496,7 @@ export class CreateComponent implements OnInit {
                 branchName: 'string',
                 total: this.stockInReceipt.customerPayment,
                 version: 0,
-                code: 'string',
+                // code: 'string',
                 note: this.stockInReceipt.note,
                 inventoryStockInDetails: products,
             };
