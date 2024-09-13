@@ -28,7 +28,7 @@
                               <label style="padding-left: 10px;" for="sanphamthuong">Sản phẩm thường</label>
                             </div>
                             <div style="margin-left: 100px;" class="processing-checkbox">
-                              <input type="radio" id="sanphamserial" formControlName="productType" [value]="1" />
+                              <input type="radio" id="sanphamserial" formControlName="productType" [value]="1" [disabled]="productForm.get('productType')?.disabled" />
                               <label style="padding-left: 10px;" for="sanphamserial">Sản phẩm Serial/iMei</label>
                             </div>
                         </div>
@@ -135,7 +135,6 @@
                                                 (productForm.get('name')?.dirty ||
                                                   productForm.get('name')?.touched)) ||
                                               showNameError2 ||
-                                              showNameError10 ||
                                               showNameError11
                                             "
                                           >
@@ -150,12 +149,6 @@
                                               class="error-message"
                                             >
                                               Tên không được chứa toàn ký tự trắng
-                                            </div>
-                                            <div
-                                              *ngIf="productForm.get('name')?.errors?.['invalidLength']"
-                                              class="error-message"
-                                            >
-                                              Tên phải từ 6 đến 100 ký tự
                                             </div>
                                           </div> 
                                     </div>
@@ -217,7 +210,7 @@
                                                 maxlength="100"
                                             /> 
                                     </div>
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-4" *ngIf="productById.productVariants.length === 0">
                                         <label class="labelip">Giá bán </label>
                                         <input
                                         type="text"
@@ -227,7 +220,7 @@
                                         formControlName="sellingPrice"
                                         placeholder="Nhập giá bán"
                                         maxlength="100"
-                                        (keypress)="onKeyPress($event)"
+                                        (keypress)="onKeyPressPrice($event)"
                                         /> 
                                     </div>
                                     <div class="col-lg-4">
@@ -247,7 +240,7 @@
                             </div>                     
                             <div class="col-lg-12">
                                 <div class="row">
-                                    <div class="col-lg-4"  *ngIf="productForm.get('productType').value === 0">
+                                    <div class="col-lg-4"  *ngIf="productForm.get('productType').value === 0 && productById.productVariants.length === 0">
                                         <label class="labelip">Kho hàng</label>
                                             <input
                                                 type="text"
@@ -257,7 +250,7 @@
                                                 formControlName="totalQuantity"
                                                 placeholder="Nhập kho hàng"
                                                 maxlength="100"
-                                                (keypress)="onKeyPress($event)"
+                                                (keypress)="onKeyPressQuantity($event)"
                                             /> 
                                     </div>      
                                 </div>
@@ -335,6 +328,9 @@
                                 [showClear]="true"
                                 placeholder="Chọn chính sách bảo hành">
                               </p-dropdown>
+                              <div *ngIf="showWarrantyError" class="error-message">
+                                Hãy chọn chính sách bảo hành
+                              </div>
                             </div>         
                         </div>
                     </div>
@@ -561,7 +557,9 @@
                                             'margin-left': '5px'
                                           }"/> -->
                                       </div>
-                                      <button type="button" pButton icon="pi pi-plus" (click)="addProperty2()" class="p-button-rounded p-button-secondary p-button-text">Thêm giá trị</button>
+                                      <button type="button" pButton icon="pi pi-plus" [style]="{
+                                        width: '13%'
+                                    }" (click)="addProperty2()" class="p-button-rounded p-button-secondary p-button-text">Thêm giá trị</button>
                                     </div>
                                   </div>
                                 </div>

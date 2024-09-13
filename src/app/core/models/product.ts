@@ -56,7 +56,7 @@ export interface ProductVariant {
     valuePropeties2?: string;
     base64_FileImage?: string;
     linkImage?: string;
-    isDeleted?: number
+    isDeleted?: number;
 }
 
 export interface ProductImage {

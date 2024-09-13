@@ -30,7 +30,7 @@ interface selected {
   styleUrl: './create-product.component.scss',
   providers: [MessageService]
 })
-export class CreateProductComponent implements OnInit{
+export class CreateProductComponent implements OnInit {
   @ViewChild('dataTable', { static: true }) dataTable!: Table;
   @ViewChild('videoInput') videoInput!: ElementRef;
   @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
@@ -59,6 +59,7 @@ export class CreateProductComponent implements OnInit{
   formattedPrice: string | null = null;
   formattedPriceSale: string | null = null;
   isSerialProduct: boolean = false;
+  isSubmittingCheck: boolean = false;
 
   productForm!: FormGroup;
   selectedCategory: TreeNode | null = null;
@@ -85,6 +86,7 @@ export class CreateProductComponent implements OnInit{
   showNameError13 = false;
   showNameError14 = false;
   showNameError15 = false;
+  showWarrantyError = false;
   errorMessage = '';
   errorMessage2 = '';
   errorMessage3 = '';
@@ -101,6 +103,12 @@ export class CreateProductComponent implements OnInit{
   data: any[] = [{}];
   isWarrantyApplied: boolean = false;  // Trạng thái công tắc
   warrantyOptions: any[] = [];
+  barcodes: string[] = []; // To store the list of all entered barcodes
+  duplicateBarcodeError: boolean = false; // To track if there are duplicate barcodes
+  errorMessageCheck: string = 'Trùng mã Barcode'; // Error message for duplicates
+  skus: string[] = []; // To store the list of all entered barcodes
+  duplicateSkuError: boolean = false; // To track if there are duplicate barcodes
+  errorMessageSku: string = 'Trùng mã Sku'; // Error message for duplicates
 
   units = [{ name: 'Kg' }, { name: 'Lít' }, { name: 'Cái' }];
 
@@ -165,8 +173,8 @@ export class CreateProductComponent implements OnInit{
       unitName: [null]
     });
 
-     // Thêm ô input price cho mỗi hàng của valueProperties1
-     for (let i = 0; i < this.valueProperties1Array.length; i++) {
+    // Thêm ô input price cho mỗi hàng của valueProperties1
+    for (let i = 0; i < this.valueProperties1Array.length; i++) {
       this.productForm.addControl(
         `price${i}`,
         this.fb.control(0, [Validators.required, Validators.min(0)])
@@ -209,18 +217,6 @@ export class CreateProductComponent implements OnInit{
     this.getAllBrands();
     this.getCategoriesAndChild();
 
-    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
-      if (this.addVariants) {
-        this.updatePriceControls(newSellingPrice);
-      }
-    });
-
-    this.productForm.get('totalQuantity')?.valueChanges.subscribe((newtotalQuantity) => {
-      if (this.addVariants) {
-        this.updateWareControls(newtotalQuantity);
-      }
-    });
-
     this.productForm.get('productType').valueChanges.subscribe((value) => {
       if (value === 1) {
         // Nếu chọn sản phẩm Serial/iMei thì đặt totalQuantity về null
@@ -249,13 +245,15 @@ export class CreateProductComponent implements OnInit{
       this.showNameError15 = false;  // Ẩn thông báo lỗi khi người dùng nhập dữ liệu
     }
   }
-  
+
 
   onWarrantySwitchChange(event: any) {
     this.isWarrantyApplied = event.checked;
 
     if (this.isWarrantyApplied) {
       this.loadWarrantyPolicies();
+    } else {
+      this.productForm.get('warrantyPolicyId')?.reset();
     }
   }
 
@@ -286,7 +284,7 @@ export class CreateProductComponent implements OnInit{
       this.valueProperties2Array.controls.forEach((subControl, j) => {
         const priceControlName = this.getPriceControlName(i, j);
         const priceControl = this.productForm.get(priceControlName);
-  
+
         if (priceControl) {
           priceControl.setValue(newPrice);
         }
@@ -325,21 +323,21 @@ export class CreateProductComponent implements OnInit{
     return null;
   }
 
-  updateWareControls(newWare: string) {
+  updateWareControls(newTotalQuantity: string): void {
     if (!this.addVariants) {
       return;
     }
 
-    this.valueProperties1Array.controls.forEach((control, i) => {
-      this.valueProperties2Array.controls.forEach((subControl, j) => {
+    for (let i = 0; i < this.valueProperties1Array.length; i++) {
+      for (let j = 0; j < this.valueProperties2Array.length; j++) {
         const wareControlName = this.getWareControlName(i, j);
         const wareControl = this.productForm.get(wareControlName);
-  
+
         if (wareControl) {
-          wareControl.setValue(newWare);
+          wareControl.setValue(newTotalQuantity);  // Update the WareControl with the new totalQuantity
         }
-      });
-    });
+      }
+    }
   }
 
   toggleDescriptionEditor() {
@@ -351,22 +349,42 @@ export class CreateProductComponent implements OnInit{
       event.preventDefault();
     }
   }
-  
+
   onKeyPress(event: KeyboardEvent) {
     const inputChar = event.key;
     if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
       event.preventDefault();
     }
   }
-  
+
+  onKeyPressQuantity(event: KeyboardEvent) {
+    const inputChar = event.key;
+    if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
+      event.preventDefault();
+    }
+    if (inputChar === 'Enter') {
+      this.updateWareControls(this.productForm.get('totalQuantity')?.value);
+    }
+  }
+
+  onKeyPressPrice(event: KeyboardEvent) {
+    const inputChar = event.key;
+    if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
+      event.preventDefault();
+    }
+    if (inputChar === 'Enter') {
+      this.updatePriceControls(this.productForm.get('sellingPrice')?.value);
+    }
+  }
+
   isNumberOrDecimalKey(inputChar: string, inputElement: EventTarget): boolean {
     const input = (inputElement as HTMLInputElement).value;
-  
+
     // Allow digits and one decimal point, but prevent more than one decimal point
     if (inputChar === '.' && input.includes('.')) {
       return false;
     }
-  
+
     // Allow digits and decimal point
     return /^[0-9.]$/.test(inputChar);
   }
@@ -447,7 +465,7 @@ export class CreateProductComponent implements OnInit{
     }
     unselectedNode.children = null;
   }
-  
+
   onTreeSelectFocus() {
     this.isTreeSelectFocused = true;
   }
@@ -456,6 +474,14 @@ export class CreateProductComponent implements OnInit{
     this.valueProperties1Array.push(this.fb.control(''));
     // Thêm ô input price cho giá trị mới của valueProperties1
     const index = this.valueProperties1Array.length - 1;
+    this.productForm.addControl(
+      `sku${index}`,
+      this.fb.control('', Validators.required)
+    );
+    this.productForm.addControl(
+      `barcode${index}`,
+      this.fb.control('', Validators.required)
+    );
     this.productForm.addControl(
       `price${index}`,
       this.fb.control('', Validators.required)
@@ -489,19 +515,19 @@ export class CreateProductComponent implements OnInit{
         this.getBarcodeControlName(index, j),
         this.fb.control('', Validators.required)
       );
+
+      this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
+        if (this.addVariants) {
+          this.updatePriceControls(newSellingPrice);
+        }
+      });
+
+      this.productForm.get('totalQuantity')?.valueChanges.subscribe((newTotalQuantity) => {
+        if (this.addVariants) {
+          this.updateWareControls(newTotalQuantity);
+        }
+      });
     }
-
-    this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
-      if (this.addVariants) {
-        this.updatePriceControls(newSellingPrice);
-      }
-    });
-
-    this.productForm.get('totalQuantity')?.valueChanges.subscribe((newtotalQuantity) => {
-      if (this.addVariants) {
-        this.updateWareControls(newtotalQuantity);
-      }
-    });
   }
 
   addProperty2(): void {
@@ -530,30 +556,42 @@ export class CreateProductComponent implements OnInit{
   removeProperty1(index: number): void {
     this.valueProperties1Array.removeAt(index);
     this.imageSelected[index] = false;
+    this.productForm.removeControl(`sku${index}`);
+    this.productForm.removeControl(`barcode${index}`);
     this.productForm.removeControl(`price${index}`);
     this.productForm.removeControl(`quantity${index}`);
     for (let j = 0; j < this.valueProperties2Array.length; j++) {
+      this.productForm.removeControl(this.getSkuControlName(index, j));
+      this.productForm.removeControl(this.getBarcodeControlName(index, j));
       this.productForm.removeControl(this.getPriceControlName(index, j));
       this.productForm.removeControl(this.getWareControlName(index, j));
     }
     for (let i = index; i < this.valueProperties1Array.length; i++) {
+      const skuControl = this.productForm.get(`sku${i + 1}`);
+      const barcodeControl = this.productForm.get(`barcode${i + 1}`);
       const priceControl = this.productForm.get(`price${i + 1}`);
       const wareControl = this.productForm.get(`quantity${i + 1}`);
+      this.productForm.removeControl(`sku${i + 1}`);
+      this.productForm.addControl(`sku${i}`, skuControl);
+      this.productForm.removeControl(`barcode${i + 1}`);
+      this.productForm.addControl(`barcode${i}`, barcodeControl);
       this.productForm.removeControl(`price${i + 1}`);
       this.productForm.addControl(`price${i}`, priceControl);
       this.productForm.removeControl(`quantity${i + 1}`);
       this.productForm.addControl(`quantity${i}`, wareControl);
       for (let j = 0; j < this.valueProperties2Array.length; j++) {
-        const control1 = this.productForm.get(
-          this.getPriceControlName(i + 1, j)
-        );
-        const control2 = this.productForm.get(
-          this.getWareControlName(i + 1, j)
-        );
+        const control1 = this.productForm.get(this.getSkuControlName(i + 1, j));
+        const control2 = this.productForm.get(this.getBarcodeControlName(i + 1, j));
+        const control3 = this.productForm.get(this.getPriceControlName(i + 1, j));
+        const control4 = this.productForm.get(this.getWareControlName(i + 1, j));
+        this.productForm.removeControl(this.getSkuControlName(i + 1, j));
+        this.productForm.addControl(this.getSkuControlName(i, j), control1);
+        this.productForm.removeControl(this.getBarcodeControlName(i + 1, j));
+        this.productForm.addControl(this.getBarcodeControlName(i, j), control2);
         this.productForm.removeControl(this.getPriceControlName(i + 1, j));
-        this.productForm.addControl(this.getPriceControlName(i, j), control1);
+        this.productForm.addControl(this.getPriceControlName(i, j), control3);
         this.productForm.removeControl(this.getWareControlName(i + 1, j));
-        this.productForm.addControl(this.getWareControlName(i, j), control2);
+        this.productForm.addControl(this.getWareControlName(i, j), control4);
       }
     }
   }
@@ -562,22 +600,26 @@ export class CreateProductComponent implements OnInit{
     this.valueProperties2Array.removeAt(index);
     // Xóa ô input price của từng valueProperties1
     for (let i = 0; i < this.valueProperties1Array.length; i++) {
+      this.productForm.removeControl(this.getSkuControlName(i, index));
+      this.productForm.removeControl(this.getBarcodeControlName(i, index));
       this.productForm.removeControl(this.getPriceControlName(i, index));
       this.productForm.removeControl(this.getWareControlName(i, index));
     }
     // Sau khi xóa, cập nhật lại các key của input price
     for (let i = 0; i < this.valueProperties1Array.length; i++) {
       for (let j = index; j < this.valueProperties2Array.length; j++) {
-        const control1 = this.productForm.get(
-          this.getPriceControlName(i, j + 1)
-        );
-        const control2 = this.productForm.get(
-          this.getWareControlName(i, j + 1)
-        );
-        this.productForm.removeControl(this.getPriceControlName(i, j + 1));
-        this.productForm.addControl(this.getPriceControlName(i, j), control1);
-        this.productForm.removeControl(this.getWareControlName(i, j + 1));
-        this.productForm.addControl(this.getWareControlName(i, j), control2);
+        const control1 = this.productForm.get(this.getSkuControlName(i + 1, j));
+        const control2 = this.productForm.get(this.getBarcodeControlName(i + 1, j));
+        const control3 = this.productForm.get(this.getPriceControlName(i + 1, j));
+        const control4 = this.productForm.get(this.getWareControlName(i + 1, j));
+        this.productForm.removeControl(this.getSkuControlName(i + 1, j));
+        this.productForm.addControl(this.getSkuControlName(i, j), control1);
+        this.productForm.removeControl(this.getBarcodeControlName(i + 1, j));
+        this.productForm.addControl(this.getBarcodeControlName(i, j), control2);
+        this.productForm.removeControl(this.getPriceControlName(i + 1, j));
+        this.productForm.addControl(this.getPriceControlName(i, j), control3);
+        this.productForm.removeControl(this.getWareControlName(i + 1, j));
+        this.productForm.addControl(this.getWareControlName(i, j), control4);
       }
     }
   }
@@ -694,11 +736,11 @@ export class CreateProductComponent implements OnInit{
   getBarcodeControlName(i: number, j: number): string {
     return `barcode${i}-${j}`;
   }
-  
+
   getSkuControlName(i: number, j: number): string {
     return `sku${i}-${j}`;
   }
-  
+
   applyGlobalPrice(): void {
     // Lấy giá trị của globalPrice từ biểu mẫu
     const globalPrice = this.productForm.get('globalPrice')!.value;
@@ -716,8 +758,6 @@ export class CreateProductComponent implements OnInit{
   openAddVariants() {
     this.addVariants = true;
     this.buttonVariants = false;
-    this.productForm.get('price')?.setValue(null);
-    this.productForm.get('totalQuantity')?.setValue(null);
     this.productForm.get('sellingPrice')?.valueChanges.subscribe((newSellingPrice) => {
       if (this.addVariants) {
         this.updatePriceControls(newSellingPrice);
@@ -745,8 +785,6 @@ export class CreateProductComponent implements OnInit{
     this.productForm.get('globalPrice')?.reset();
     this.productForm.get('globalWare')?.reset();
     this.productForm.get('base64_FileImage')?.reset();
-    this.productForm.get('price')?.reset();
-    this.productForm.get('totalQuantity')?.reset();
     this.valueProperties1Array.clear();
     this.addProperty1();
     this.buttonVariants = true;
@@ -759,8 +797,6 @@ export class CreateProductComponent implements OnInit{
     this.productForm.get('globalPrice')?.reset();
     this.productForm.get('globalWare')?.reset();
     this.productForm.get('base64_FileImage')?.reset();
-    this.productForm.get('price')?.reset();
-    this.productForm.get('totalQuantity')?.reset();
     this.valueProperties2Array.clear();
     this.addProperty2();
     this.buttonVariants2 = true;
@@ -770,7 +806,6 @@ export class CreateProductComponent implements OnInit{
     const control = this.productForm.get(`base64_FileImage${index}`);
     return control ? control.value : null;
   }
-
 
   getPriceControlError(i: number, j: number) {
     const control = this.productForm.get(this.getPriceControlName(i, j));
@@ -784,7 +819,7 @@ export class CreateProductComponent implements OnInit{
     }
     return '';
   }
-  
+
   onImageVariant(event: any, index: number): void {
     const file: File = event.target.files[0];
     if (file) {
@@ -840,12 +875,18 @@ export class CreateProductComponent implements OnInit{
   }
 
   checkAndOnSubmit() {
+    if (this.isSubmittingCheck) {
+      return; // Nếu đang gửi dữ liệu, không làm gì cả
+    }
+
+    this.isSubmittingCheck = true; // Đặt cờ khi bắt đầu gửi dữ liệu
+
     // Tạo một danh sách các promises để kiểm tra mã vạch
     const promises: Promise<boolean>[] = [];
-  
+
     // Thêm kiểm tra mã vạch sản phẩm vào danh sách
     promises.push(this.checkBarcodeAndCreateProduct());
-  
+
     // Thêm kiểm tra mã vạch biến thể vào danh sách
     for (let i = 0; i < this.valueProperties1Array.length; i++) {
       for (let j = 0; j < this.valueProperties2Array.length; j++) {
@@ -853,7 +894,7 @@ export class CreateProductComponent implements OnInit{
         promises.push(this.checkSkuAndCreateProduct(i, j));
       }
     }
-  
+
     // Đợi tất cả kiểm tra hoàn thành
     Promise.all(promises).then((results) => {
       // Nếu tất cả các kiểm tra đều trả về true (không có lỗi), gọi this.onSubmit()
@@ -865,22 +906,24 @@ export class CreateProductComponent implements OnInit{
           {
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Mã đã tồn tại. Vui lòng kiểm tra lại.',
-            life: 3000,
+            detail: 'Mã barcode hoặc mã sku của biến thể đã tồn tại. Vui lòng kiểm tra lại.',
+            life: 4000,
           },
         ];
+        return
       }
     }).catch((error) => {
       console.error('Lỗi trong quá trình kiểm tra mã vạch:', error);
+    }).finally(() => {
+      this.isSubmittingCheck = false; // Đặt lại cờ khi hoàn tất gửi dữ liệu
     });
   }
-  
 
   checkBarcodeAndCreateProduct(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const barcode = this.productForm.get('barcode')!.value;
       this.showNameError12 = false; // Reset lỗi trước khi kiểm tra
-    
+
       this.productService.CheckBarcode(barcode).subscribe(
         (response) => {
           if (response.data) {
@@ -899,27 +942,19 @@ export class CreateProductComponent implements OnInit{
       );
     });
   }
-  
+
   checkBarcodeVariantAndCreateProduct(i: number, j: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const barcodeControlName = this.getBarcodeControlName(i, j);
       const barcode = this.productForm.get(barcodeControlName)?.value;
       this.showNameError14 = false; // Reset lỗi trước khi kiểm tra
-      
+
       if (barcode) {
         this.productService.CheckBarcodeVariant(barcode).subscribe(
           (response) => {
             if (response.data) {
               // this.showNameError14 = true;
               // this.errorMessage2 = 'Mã vạch đã tồn tại.';
-              // // this.messages = [
-              // //   {
-              // //     severity: 'error',
-              // //     summary: 'Lỗi',
-              // //     detail: 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.',
-              // //     life: 3000,
-              // //   },
-              // // ];
               resolve(false); // Báo rằng có lỗi
             } else {
               resolve(true); // Báo rằng không có lỗi
@@ -936,28 +971,19 @@ export class CreateProductComponent implements OnInit{
       }
     });
   }
-  
 
   checkSkuAndCreateProduct(i: number, j: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const skuControlName = this.getSkuControlName(i, j);
       const sku = this.productForm.get(skuControlName)?.value;
       this.showNameError15 = false; // Reset lỗi trước khi kiểm tra
-      
+
       if (sku) {
         this.productService.CheckBarcodeSku(sku).subscribe(
           (response) => {
             if (response.data) {
               // this.showNameError15 = true;
               // this.errorMessage3 = 'Mã sku đã tồn tại.';
-              // this.messages = [
-              //   {
-              //     severity: 'error',
-              //     summary: 'Lỗi',
-              //     detail: 'Mã vạch đã tồn tại. Vui lòng kiểm tra lại.',
-              //     life: 3000,
-              //   },
-              // ];
               resolve(false); // Báo rằng có lỗi
             } else {
               resolve(true); // Báo rằng không có lỗi
@@ -975,6 +1001,54 @@ export class CreateProductComponent implements OnInit{
     });
   }
 
+  onBarcodeInput(event: Event, i: number, j: number): void {
+    const inputElement = event.target as HTMLInputElement;
+    const barcode = inputElement.value;
+
+    // Update the barcode value in the array based on its control name
+    const controlName = this.getBarcodeControlName(i, j);
+    this.barcodes[i * 10 + j] = barcode; // Assuming there are max 10 variants
+
+    // Check for duplicates
+    this.checkForDuplicateBarcodes();
+  }
+
+  checkForDuplicateBarcodes(): void {
+    const uniqueBarcodes = new Set(this.barcodes);
+    this.duplicateBarcodeError = uniqueBarcodes.size !== this.barcodes.length;
+  }
+  
+  getBarcodeControlError(): string | null {
+    if (this.duplicateBarcodeError) {
+      return this.errorMessageCheck;
+    }
+    return null;
+  }
+
+  onSkuInput(event: Event, i: number, j: number): void {
+    const inputElement = event.target as HTMLInputElement;
+    const sku = inputElement.value;
+  
+    // Update the barcode value in the array based on its control name
+    const controlName = this.getSkuControlName(i, j);
+    this.skus[i * 10 + j] = sku; // Assuming there are max 10 variants
+  
+    // Check for duplicates
+    this.checkForDuplicateSku();
+  }
+
+  checkForDuplicateSku(): void {
+    const uniqueSku = new Set(this.skus);
+    this.duplicateSkuError = uniqueSku.size !== this.skus.length;
+  }
+  
+  getSkuControlError(): string | null {
+    if (this.duplicateSkuError) {
+      return this.errorMessageSku;
+    }
+    return null;
+  }
+
   onSubmit(): void {
     if (this.isSubmitting) {
       return;
@@ -989,13 +1063,28 @@ export class CreateProductComponent implements OnInit{
       hasError = true;
     }
 
-    if (
-      !productData.name ||
-      productData.name.trim().length < 6 ||
-      productData.name.trim().length > 100
-    ) {
-      this.showNameError10 = true;
-      hasError = true;
+    if (this.duplicateBarcodeError) {
+      this.messages = [
+        {
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Có mã Barcode của biến thể bị trùng! Vui lòng nhập lại.',
+          life: 4000,
+        },
+      ];
+      return; // Prevent form submission
+    }
+
+    if (this.duplicateSkuError) {
+      this.messages = [
+        {
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Có mã SKU của biến thể bị trùng! Vui lòng nhập lại.',
+          life: 4000,
+        },
+      ];
+      return; // Prevent form submission
     }
 
     if (
@@ -1012,45 +1101,11 @@ export class CreateProductComponent implements OnInit{
       hasError = true;
     }
 
-    // if (this.addVariants) {
-    //   this.showNameError5 = false;
-    //   this.showNameError7 = false;
-    //   hasError = false;
-    // } else {
-    //   if (!productData.price || productData.price.length === 0) {
-    //     this.showNameError5 = true;
-    //     hasError = true;
-    //   }
+    if (this.isWarrantyApplied && !productData.warrantyPolicyId) {
+      this.showWarrantyError = true;
+      hasError = true;
+    }
 
-    //   if (!productData.price || productData.price <= 0) {
-    //     this.showNameError7 = true;
-    //     hasError = true;
-    //   }
-    // }
-
-    // if (!productData.importPrice || productData.importPrice.length === 0) {
-    //   this.showNameError9 = true;
-    //   hasError = true;
-    // }
-
-    // if (!productData.importPrice || productData.importPrice <= 0) {
-    //   this.showNameError9 = true;
-    //   hasError = true;
-    // }
-
-    // const price = this.productForm.get('price')?.value;
-    // if (price === '0' || price === 0) {
-    //   this.showNameError14 = true;
-    //   hasError = true;
-    // } else {
-
-    // }
-
-    // const importPrice = this.productForm.get('importPrice')?.value;
-    // if (importPrice === '0' || importPrice === 0) {
-    //   this.showNameError15 = true;
-    //   hasError = true;
-    // }
 
     if (hasError) {
       this.messages = [
@@ -1094,7 +1149,7 @@ export class CreateProductComponent implements OnInit{
       productType: productData.productType
     };
 
-    let hasVariants = false;
+    // let hasVariants = false;
     for (let i = 0; i < productData.valuePropeties1.length; i++) {
       const value1 = productData.valuePropeties1[i];
       const base64_FileImage = productData[`base64_FileImage${i}`];
@@ -1105,13 +1160,8 @@ export class CreateProductComponent implements OnInit{
         const quantity = productData[this.getWareControlName(i, j)] || 0;
         const sku = productData[this.getSkuControlName(i, j)] || null;
         const barcode = productData[this.getBarcodeControlName(i, j)] || null;
-        // if (!prices && prices <= 1000) {
-        //   this.showNameError8 = true;
-        //   return
-        // }
 
-        if (prices !== null) {
-          hasVariants = true;
+        if (value1) {
           const variant: ProductVariant = {
             sku: sku,
             barcode: barcode || sku,
@@ -1125,12 +1175,16 @@ export class CreateProductComponent implements OnInit{
           };
           product.productVariants.push(variant);
         }
+        // if (prices !== null && quantity !== null) {
+        //   // hasVariants = true;
+        // }
       }
     }
 
-    if (!hasVariants) {
+    if (product.productVariants.length === 0) {
       product.productVariants = [];
     }
+
     this.validationMessage = null;
     this.productService.createProduct(product).subscribe(
       (response) => {
