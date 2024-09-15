@@ -489,14 +489,14 @@ export class CreateComponent implements OnInit {
 
             const formData = {
                 supplierId: 1,
-                supplierName: '',
+                supplierName: 'string',
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
                 branchId: 6,
                 branchName: 'string',
                 total: this.stockInReceipt.customerPayment,
                 version: 0,
-                // code: 'string',
+                code: 'string',
                 note: this.stockInReceipt.note,
                 inventoryStockInDetails: products,
             };

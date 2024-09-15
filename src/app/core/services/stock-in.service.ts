@@ -30,6 +30,7 @@ export class StockInService {
             pageIndex,
             CreatedById,
             StartDate,
+            Code,
             EndDate,
             TrackingNumber,
         } = optionsFilterStockIn;
@@ -49,6 +50,10 @@ export class StockInService {
             url += `&StartDate=${StartDate.toISOString()}`;
         }
 
+        if (Code !== null && Code !== undefined) {
+            url += `&Code=${Code}`;
+        }
+
         // Thêm tham số EndDate nếu có
         if (EndDate !== null && EndDate !== undefined) {
             url += `&EndDate=${EndDate.toISOString()}`;
@@ -59,6 +64,14 @@ export class StockInService {
             url += `&TrackingNumber=${encodeURIComponent(TrackingNumber)}`;
         }
 
+        return this.http.get<any>(url);
+    }
+
+    getStockInById(id: any): Observable<any> {
+        // Khởi tạo URL với các tham số cơ bản
+        let url = `${this.url}/api/inventory-stock-in/get-by-id?id=${id}`;
+
+        // Gửi yêu cầu GET tới URL đã khởi tạo
         return this.http.get<any>(url);
     }
 }

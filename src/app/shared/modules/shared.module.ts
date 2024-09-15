@@ -15,6 +15,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DialogModule } from 'primeng/dialog';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { PaginatorModule } from 'primeng/paginator';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { CalendarModule } from 'primeng/calendar';
 import { SplitButtonModule } from 'primeng/splitbutton';
@@ -42,7 +43,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
         ToolbarModule,
         RatingModule,
         InputTextModule,
-
+        PaginatorModule,
         InputTextareaModule,
         DropdownModule,
         RadioButtonModule,
@@ -61,6 +62,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
         InputSwitchModule,
         TableModule,
         FileUploadModule,
+        PaginatorModule,
         RippleModule,
         CalendarModule,
         ToastModule,

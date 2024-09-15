@@ -298,9 +298,25 @@
                                         <span
                                             style="
                                                 position: absolute;
+                                                top: 35px;
+                                            "
+                                            *ngIf="
+                                                data.isValid &&
+                                                data.productType === 1
+                                            "
+                                            class="error-message"
+                                            >{{ data.isValidMessage }}</span
+                                        >
+
+                                        <span
+                                            style="
+                                                position: absolute;
                                                 top: 44px;
                                             "
-                                            *ngIf="data.isValid"
+                                            *ngIf="
+                                                data.isValid &&
+                                                data.productType != 1
+                                            "
                                             class="error-message"
                                             >{{ data.isValidMessage }}</span
                                         >

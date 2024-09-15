@@ -3,6 +3,7 @@ import { OptionsFilterStockIn } from './../../../../../core/DTOs/stock-in/option
 import { StockInService } from './../../../../../core/services/stock-in.service';
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-show',
@@ -10,14 +11,21 @@ import { MenuItem } from 'primeng/api';
     styleUrls: ['./show.component.css'],
 })
 export class ShowComponent implements OnInit {
+    imageUrl: string = environment.imageUrl;
     items: MenuItem[] | undefined;
-    stockInList: any;
+    stockInList: any[];
     optionsFilterStockIn: OptionsFilterStockIn = new OptionsFilterStockIn();
     displayStockInDetailModal: boolean = false;
 
     stockInItemDetail: any;
+    code: any;
     deadlineRange: Date[] = [];
     formatdate: string = 'dd/mm/yy';
+
+    pageSize: number = 10;
+    pageNumber: number = 1;
+    totalRecordsCount: any;
+
     constructor(private stockInService: StockInService) {}
 
     ngOnInit() {
@@ -27,25 +35,33 @@ export class ShowComponent implements OnInit {
         ];
         this.loadStockIn();
 
-        this.deadlineRange = [
-            this.optionsFilterStockIn.StartDate ?? new Date(),
-            this.optionsFilterStockIn.EndDate ?? new Date(),
-        ];
+        // this.deadlineRange = [
+        //     this.optionsFilterStockIn.StartDate ?? new Date(),
+        //     this.optionsFilterStockIn.EndDate ?? new Date(),
+        // ];
     }
 
     loadStockIn() {
         console.log(this.optionsFilterStockIn);
+
+        this.optionsFilterStockIn.pageIndex = this.pageNumber;
+        this.optionsFilterStockIn.pageSize = this.pageSize;
         this.stockInService
             .getStockInLists(this.optionsFilterStockIn)
             .subscribe((response) => {
-                this.stockInList = response.data.items; // In ra dữ liệu để kiểm tra
+                this.totalRecordsCount = response.data.totalRecords;
+                this.stockInList = response.data.items;
+                console.log(this.totalRecordsCount);
             });
     }
 
     showStockInDetail(stockIn: any) {
         console.log(stockIn);
+
+        this.stockInService.getStockInById(stockIn.id).subscribe((response) => {
+            this.stockInItemDetail = response.data;
+        });
         this.displayStockInDetailModal = true;
-        this.stockInItemDetail = stockIn;
     }
 
     blurDateRange($event: Event) {
@@ -64,6 +80,7 @@ export class ShowComponent implements OnInit {
             this.optionsFilterStockIn.EndDate = undefined;
         }
     }
+
     EvenFilter() {
         if (this.deadlineRange) {
             this.optionsFilterStockIn.StartDate = this.deadlineRange[0] || null;
@@ -72,6 +89,31 @@ export class ShowComponent implements OnInit {
             this.optionsFilterStockIn.StartDate = null;
             this.optionsFilterStockIn.EndDate = null;
         }
+        this.optionsFilterStockIn.Code = this.code;
         this.loadStockIn();
+    }
+
+    //Paganation
+    onPageChange(event: any): void {
+        console.log(event);
+
+        this.pageSize = event.rows;
+        this.pageNumber = event.page + 1;
+        this.loadStockIn();
+    }
+
+    goToPreviousPage(): void {
+        if (this.pageNumber > 1) {
+            this.pageNumber--;
+            this.loadStockIn();
+        }
+    }
+
+    goToNextPage(): void {
+        const lastPage = Math.ceil(this.totalRecordsCount / this.pageSize);
+        if (this.pageNumber < lastPage) {
+            this.pageNumber++;
+            this.loadStockIn();
+        }
     }
 }

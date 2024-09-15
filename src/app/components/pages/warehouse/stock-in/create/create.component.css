@@ -10,7 +10,7 @@
     box-shadow: 0 0 5px 0 #ccc;
     width: 100%;
     padding: 7px;
-    height: 400px;
+    max-height: 400px;
     z-index: 999;
     overflow-y: auto;
 }
