@@ -85,12 +85,15 @@
                         <th>Số sản phẩm</th>
                         <th>Tổng tiền</th>
                         <th>Ghi chú</th>
-                        <th>Thao tác</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-stockInItem>
                     <tr>
-                        <td style="width: 5%; min-width: 10rem">
+                        <td
+                            style="width: 5%; min-width: 10rem"
+                            class="code"
+                            (click)="showStockInDetail(stockInItem)"
+                        >
                             <span class="p-column-title">Code</span>
                             {{ stockInItem.code }}
                         </td>
@@ -125,18 +128,6 @@
                             <span class="truncate-2">
                                 {{ stockInItem.note }}
                             </span>
-                        </td>
-
-                        <td style="width: 4%; min-width: 10rem">
-                            <div class="flex">
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-pencil"
-                                    class="p-button-rounded p-button-success mr-2"
-                                    (click)="showStockInDetail(stockInItem)"
-                                ></button>
-                            </div>
                         </td>
                     </tr>
                 </ng-template>
@@ -182,6 +173,7 @@
                         #dt
                         [value]="stockInItemDetail?.inventoryStockInDetails"
                         responsiveLayout="scroll"
+                        scrollHeight="280px"
                         [rowHover]="true"
                         dataKey="id"
                     >
@@ -206,6 +198,9 @@
                                     <img
                                         *ngIf="data.productImage"
                                         [src]="imageUrl + data.productImage"
+                                        height="50"
+                                        width="50"
+                                        style="border-radius: 4px"
                                         alt="Product Image"
                                     />
 
@@ -236,7 +231,13 @@
                                     {{ data.productName }}
                                 </td>
                                 <td style="width: 12.5%; text-align: center">
-                                    {{ data.price }}
+                                    {{
+                                        data.price
+                                            | currency
+                                                : "VND"
+                                                : "symbol"
+                                                : "1.0-0"
+                                    }}
                                 </td>
                                 <td style="width: 9%; text-align: center">
                                     {{ data.unit }}
@@ -245,32 +246,49 @@
                                     {{ data.quantity }}
                                 </td>
                                 <td style="width: 13.5%; text-align: center">
-                                    {{ data.totail }}
+                                    {{
+                                        data.totail
+                                            | currency
+                                                : "VND"
+                                                : "symbol"
+                                                : "1.0-0"
+                                    }}
                                 </td>
                             </tr>
                             <tr
                                 *ngIf="
                                     data &&
-                                    data.inventoryStockDetailProductImeies
+                                    data.inventoryStockDetailProductImeis &&
+                                    data.inventoryStockDetailProductImeis
+                                        .length > 0
                                 "
                             >
                                 <td colspan="8" class="p-3 border-none">
                                     <div class="flex flex-column">
                                         <label for="" class="mb-2"
-                                            >Số khung/ số máy</label
-                                        >
+                                            >Số khung/ số máy:
+                                        </label>
                                         <div
-                                            class="variant-item"
-                                            *ngFor="
-                                                let variant of data.inventoryStockDetailProductImeies;
-                                                let i = index
+                                            style="
+                                                display: flex;
+                                                flex-wrap: wrap;
                                             "
                                         >
-                                            <span class="variant-item-label"
-                                                >{{ variant.frameNumber }}/{{
-                                                    variant.engineNumber
-                                                }}
-                                            </span>
+                                            <div
+                                                class="variant-item"
+                                                *ngFor="
+                                                    let variant of data.inventoryStockDetailProductImeis;
+                                                    let i = index
+                                                "
+                                            >
+                                                <span
+                                                    class="variant-item-label"
+                                                >
+                                                    {{ variant.frameNumber }}/{{
+                                                        variant.engineNumber
+                                                    }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

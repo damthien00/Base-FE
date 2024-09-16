@@ -184,11 +184,11 @@ export class CreateComponent implements OnInit {
             this.optionsFillerProduct.productName = '';
             this.optionsFillerProduct.Barcode = searchTerm.toLowerCase();
             try {
-                const response =
-                    await this.productService.SearchProductVariants(
-                        this.optionsFillerProduct
-                    );
+                const response = await this.productService.FilterProduct(
+                    this.optionsFillerProduct
+                );
                 if (response.data.length > 0) {
+                    console.log(response.data);
                     this.addToCart(response.data[0]);
                 } else {
                     // Hiển thị thông báo sản phẩm không tồn tại
@@ -304,16 +304,17 @@ export class CreateComponent implements OnInit {
                 existingDetail.quantity * existingDetail.price;
         } else {
             // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
+
             const newDetail = {
                 productId: item.id,
                 productImage: item.productImages[0]?.link,
                 productName: item.name,
                 productType: item.productType,
-                quantity: 0,
+                quantity: item.productType === 1 ? 0 : 1,
                 productCode: item.code,
                 price: item.sellingPrice,
                 unit: item.unitName,
-                total: 0,
+                total: item.productType === 1 ? 0 : item.sellingPrice * 1,
                 frameNumber: '',
                 engineNumber: '',
             };
@@ -617,6 +618,5 @@ export class CreateComponent implements OnInit {
         }
         this.onBarcode = !this.onBarcode;
     }
-
     // onToggleActiveBarcode() {}
 }
