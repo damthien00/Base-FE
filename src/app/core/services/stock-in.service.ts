@@ -74,4 +74,22 @@ export class StockInService {
         // Gửi yêu cầu GET tới URL đã khởi tạo
         return this.http.get<any>(url);
     }
+
+    checkExistEngineAndFrame(
+        frameNumber: any,
+        engineNumber: any
+    ): Observable<any> {
+        console.log('work');
+        // Khởi tạo URL
+        let url = `${this.url}/api/inventory-stock-in/check-exist-emei`;
+
+        // Dữ liệu để gửi trong body của yêu cầu POST
+        let body = {
+            frameNumber: frameNumber,
+            engineNumber: engineNumber,
+        };
+
+        // Gửi yêu cầu POST với URL và body đã khởi tạo
+        return this.http.post<any>(url, body);
+    }
 }

@@ -1,3 +1,4 @@
+import { StockInService } from './../../../../../core/services/stock-in.service';
 import { FunctionService } from 'src/app/core/utils/function.utils';
 import { NumberFormatPipe } from 'src/app/shared/pipes/numberFormat.pipe';
 import {
@@ -59,6 +60,7 @@ export class CreateComponent implements OnInit {
     constructor(
         private nodeService: NodeService,
         private productService: ProductService,
+        private stockInService: StockInService,
         public functionService: FunctionService,
         private messageService: MessageService,
         private router: Router
@@ -569,9 +571,36 @@ export class CreateComponent implements OnInit {
                         } else if (!imei.engineNumber) {
                             imei.isValidMessage = 'Vui lòng nhập số máy';
                         }
+                        console.log(imei.frameNumber, imei.engineNumber);
                     } else {
-                        imei.isValid = false;
+                        // if (!imei.isValid) {
+                        this.stockInService
+                            .checkExistEngineAndFrame(
+                                imei.frameNumber,
+                                imei.engineNumber
+                            )
+                            .subscribe(
+                                (exists) => {
+                                    console.log(exists);
+                                    if (exists.data) {
+                                        imei.isValid = true;
+                                        imei.isValidMessage =
+                                            'Số khung hoặc số máy đã tồn tại';
+                                    } else {
+                                        imei.isValid = false;
+                                        delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
+                                    }
+                                },
+                                (error) => {
+                                    console.error(
+                                        'Error checking engine and frame number:',
+                                        error
+                                    );
+                                }
+                            );
+                        // imei.isValid = false;
                         delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
+                        // }
                     }
                 });
             }

@@ -12,14 +12,14 @@ import { AppLayoutComponent } from './layout/app.layout.component';
                     component: AppLayoutComponent,
                     children: [
                         {
-                            path: '',
+                            path: 'dashboard',
                             loadChildren: () =>
                                 import(
                                     'src/app/components/dashboard/dashboard.module'
                                 ).then((m) => m.DashboardModule),
                         },
                         {
-                            path: '',
+                            path: 'pages',
                             loadChildren: () =>
                                 import('./components/pages/pages.module').then(
                                     (m) => m.PagesModule

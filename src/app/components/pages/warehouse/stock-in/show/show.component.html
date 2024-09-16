@@ -14,7 +14,7 @@
                     pRipple
                     icon="pi pi-plus"
                     label="Nhập kho"
-                    [routerLink]="['/warehouse/stock-in/create']"
+                    [routerLink]="['/pages/warehouse/stock-in/create']"
                 ></button>
             </ng-template>
         </p-toolbar>
@@ -37,7 +37,7 @@
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Tìm kiếm mã nhập kho:</label
+                                >Tìm kiếm theo người tạo:</label
                             >
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search"></i>
@@ -45,7 +45,7 @@
                                     pInputText
                                     type="text"
                                     [(ngModel)]="code"
-                                    placeholder="Tìm theo mã nhập kho"
+                                    placeholder="Tìm theo người tạo"
                                     style="width: 350px"
                                     class="sm:"
                                 />
@@ -152,7 +152,7 @@
     [closable]="false"
     [draggable]="false"
     [resizable]="false"
-    [style]="{ width: '60vw' }"
+    [style]="{ width: '70vw' }"
 >
     <!-- Header -->
     <ng-template pTemplate="header">

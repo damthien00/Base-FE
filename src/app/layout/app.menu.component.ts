@@ -19,10 +19,31 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Tổng quan',
                         icon: 'pi pi-fw pi-chart-line',
-                        routerLink: ['/'],
+                        routerLink: ['/dashboard'],
                     },
                 ],
             },
+            // {
+            //     label: '',
+            //     icon: 'pi pi-fw pi-user',
+            //     items: [
+            //         {
+            //             label: 'Login',
+            //             icon: 'pi pi-fw pi-sign-in',
+            //             routerLink: ['/auth/login'],
+            //         },
+            //         {
+            //             label: 'Error',
+            //             icon: 'pi pi-fw pi-times-circle',
+            //             routerLink: ['/auth/error'],
+            //         },
+            //         {
+            //             label: 'Access Denied',
+            //             icon: 'pi pi-fw pi-lock',
+            //             routerLink: ['/auth/access'],
+            //         },
+            //     ],
+            // },
             {
                 label: '',
                 items: [
@@ -33,17 +54,17 @@ export class AppMenuComponent implements OnInit {
                             {
                                 label: 'Sản phẩm',
                                 icon: 'pi pi-fw pi-box',
-                                routerLink: ['/products/show-product'],
+                                routerLink: ['/pages/products/show-product'],
                             },
                             {
                                 label: 'Danh mục sản phẩm',
                                 icon: 'pi pi-fw pi-tags',
-                                routerLink: ['/product-category/show'],
+                                routerLink: ['/pages/product-category/show'],
                             },
                             {
                                 label: 'Thương hiệu',
                                 icon: 'pi pi-fw pi-tags',
-                                routerLink: ['/brand/show-brand'],
+                                routerLink: ['/pages/brand/show-brand'],
                             },
                         ],
                     },
@@ -59,12 +80,12 @@ export class AppMenuComponent implements OnInit {
                             {
                                 label: 'Nhập kho',
                                 icon: 'pi pi-fw pi-box',
-                                routerLink: ['warehouse/stock-in'],
+                                routerLink: ['/pages/warehouse/stock-in'],
                             },
                             {
                                 label: 'Chuyển hàng',
                                 icon: 'pi pi-fw pi-truck',
-                                routerLink: ['/stock-transfer'],
+                                routerLink: ['/pages/stock-transfer'],
                             },
                         ],
                     },
@@ -80,17 +101,21 @@ export class AppMenuComponent implements OnInit {
                             {
                                 label: 'Phiếu bảo hành',
                                 icon: 'pi pi-fw pi-file',
-                                routerLink: ['/warranty/warranty-certificate'],
+                                routerLink: [
+                                    '/pages/warranty/warranty-certificate',
+                                ],
                             },
                             {
                                 label: 'Yêu cầu bảo hành',
                                 icon: 'pi pi-fw pi-inbox',
-                                routerLink: ['/warranty/warranty-request'],
+                                routerLink: [
+                                    '/pages/warranty/warranty-request',
+                                ],
                             },
                             {
                                 label: 'Chính sách bảo hành',
                                 icon: 'pi pi-fw pi-file',
-                                routerLink: ['/warranty/warranty-policy'],
+                                routerLink: ['/pages/warranty/warranty-policy'],
                             },
                         ],
                     },
@@ -102,30 +127,30 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Chi nhánh',
                         icon: 'pi pi-fw pi-map-marker',
-                        routerLink: ['/branch'],
+                        routerLink: ['/pages/branch'],
                     },
                 ],
             },
-            {
-                label: '',
-                items: [
-                    {
-                        label: 'Bán tại quầy',
-                        icon: 'pi pi-fw pi-shopping-cart',
-                        items: [
-                            {
-                                label: 'Bán hàng',
-                                icon: 'pi pi-fw pi-shopping-cart',
-                                routerLink: ['/landing'],
-                            },
-                            {
-                                label: 'Hóa đơn',
-                                icon: 'pi pi-fw pi-file',
-                            },
-                        ],
-                    },
-                ],
-            },
+            // {
+            //     label: '',
+            //     items: [
+            //         {
+            //             label: 'Bán tại quầy',
+            //             icon: 'pi pi-fw pi-shopping-cart',
+            //             items: [
+            //                 {
+            //                     label: 'Bán hàng',
+            //                     icon: 'pi pi-fw pi-shopping-cart',
+            //                     routerLink: ['/pages/landing'],
+            //                 },
+            //                 {
+            //                     label: 'Hóa đơn',
+            //                     icon: 'pi pi-fw pi-file',
+            //                 },
+            //             ],
+            //         },
+            //     ],
+            // },
         ];
     }
 }
