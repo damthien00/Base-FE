@@ -42,8 +42,6 @@ export class ShowComponent implements OnInit {
     }
 
     loadStockIn() {
-        console.log(this.optionsFilterStockIn);
-
         this.optionsFilterStockIn.pageIndex = this.pageNumber;
         this.optionsFilterStockIn.pageSize = this.pageSize;
         this.stockInService
@@ -89,6 +87,7 @@ export class ShowComponent implements OnInit {
             this.optionsFilterStockIn.StartDate = null;
             this.optionsFilterStockIn.EndDate = null;
         }
+        this.pageNumber = 1;
         this.optionsFilterStockIn.Code = this.code;
         this.loadStockIn();
     }
