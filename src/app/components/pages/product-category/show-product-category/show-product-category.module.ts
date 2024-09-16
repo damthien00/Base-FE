@@ -6,6 +6,7 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
+import { PaginatorModule } from 'primeng/paginator';
 
 @NgModule({
     imports: [
@@ -18,7 +19,8 @@ import { ToastModule } from 'primeng/toast';
         TreeSelectModule,
         InputSwitchModule,
         MessagesModule,
-        ToastModule
+        ToastModule,
+        PaginatorModule
     ],
     declarations: [ShowProductCategoryComponent],
 })

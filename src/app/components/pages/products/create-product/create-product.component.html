@@ -222,6 +222,7 @@
                                         placeholder="Nhập giá bán"
                                         maxlength="100"
                                         (keypress)="onKeyPressPrice($event)"
+                                        (blur)="formatCurrencySell()"
                                         /> 
                                     </div>
                                     <div class="col-lg-4">
@@ -235,6 +236,7 @@
                                             placeholder="Nhập giá nhập"
                                             maxlength="100"
                                             (keypress)="onKeyPress($event)"
+                                            (blur)="formatCurrencyIm()"
                                             /> 
                                     </div>             
                                 </div>

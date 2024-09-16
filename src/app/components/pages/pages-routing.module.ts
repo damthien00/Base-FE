@@ -91,6 +91,13 @@ import { RouterModule } from '@angular/router';
                         './product-category/show-product-category/show-product-category.module'
                     ).then((m) => m.ShowProductCategoryModule),
             },
+            {
+                path: 'brand/show-brand',
+                loadChildren: () =>
+                    import(
+                        './brand/brand.module'
+                    ).then((m) => m.BrandModule),
+            },
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],
