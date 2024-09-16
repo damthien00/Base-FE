@@ -40,6 +40,11 @@ export class AppMenuComponent implements OnInit {
                                 icon: 'pi pi-fw pi-tags',
                                 routerLink: ['/product-category/show'],
                             },
+                            {
+                                label: 'Thương hiệu',
+                                icon: 'pi pi-fw pi-tags',
+                                routerLink: ['/brand/show-brand'],
+                            },
                         ],
                     },
                 ],

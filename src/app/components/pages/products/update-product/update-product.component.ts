@@ -278,7 +278,7 @@ export class UpdateProductComponent implements OnInit {
         this.productForm.get('status')?.setValue(false);
       }
 
-      if (this.productById.productType === 1 && this.productById.totalQuantity > 0) {
+      if (this.productById.productType === 1) {
         this.productForm.get('productType')?.disable();
       } else {
         this.productForm.get('productType')?.enable();
@@ -339,6 +339,24 @@ export class UpdateProductComponent implements OnInit {
       // Find and set the category
       this.findCategory(defaultCategoryId, this.categorieandchild);
     }
+  }
+
+  formatCurrencySell() {
+    const sellprice = this.productForm.get('sellingPrice')?.value;
+    const formattedSellPrice = new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(sellprice);
+    this.productForm.patchValue({ sellingPrice: formattedSellPrice });
+  }
+
+  formatCurrencyIm() {
+    const imprice = this.productForm.get('importPrice')?.value;
+    const formattedImPrice = new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(imprice);
+    this.productForm.patchValue({ importPrice: formattedImPrice });
   }
 
   findCategory(id: number, nodes: TreeNode[]): void {
@@ -1197,8 +1215,8 @@ export class UpdateProductComponent implements OnInit {
     this.productById.barcode = productData.barcode;
     this.productById.collectionId = productData.collectionId;
     this.productById.categoryId = this.selectedCategory?.data.id;
-    this.productById.sellingPrice = productData.sellingPrice;
-    this.productById.importPrice = productData.importPrice;
+    this.productById.sellingPrice = productData.sellingPrice || 0;
+    this.productById.importPrice = productData.importPrice || 0;
     this.productById.base64_FileIamges = productData.base64_FileIamges;
     this.productById.base64_FileVideo = productData.base64_FileVideo1 || null;
     this.productById.base64_FileVideo = productData.base64_FileVideo || null;

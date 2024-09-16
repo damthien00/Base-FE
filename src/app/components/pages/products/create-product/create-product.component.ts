@@ -377,6 +377,24 @@ export class CreateProductComponent implements OnInit {
     }
   }
 
+  formatCurrencySell() {
+    const sellprice = this.productForm.get('sellingPrice')?.value;
+    const formattedSellPrice = new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(sellprice);
+    this.productForm.patchValue({ sellingPrice: formattedSellPrice });
+  }
+
+  formatCurrencyIm() {
+    const imprice = this.productForm.get('importPrice')?.value;
+    const formattedImPrice = new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(imprice);
+    this.productForm.patchValue({ importPrice: formattedImPrice });
+  }
+
   isNumberOrDecimalKey(inputChar: string, inputElement: EventTarget): boolean {
     const input = (inputElement as HTMLInputElement).value;
 
