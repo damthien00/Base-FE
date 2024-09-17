@@ -1152,14 +1152,17 @@ export class CreateProductComponent implements OnInit {
     const filledBarcodes = this.barcodes.filter(barcode => barcode); // Only consider non-empty barcodes
     const uniqueBarcodes = new Set(filledBarcodes);
     this.duplicateBarcodeError = uniqueBarcodes.size !== filledBarcodes.length;
-  } 
-  
-  getBarcodeControlError(): string | null {
     if (this.duplicateBarcodeError) {
-      return this.errorMessageCheck;
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã vạch biến thể không được trùng nhau',
+          life: 3000,
+        },
+      ];
     }
-    return null;
-  }
+  } 
 
   checkDuplicateBarcode(newBarcode: string): boolean {
     const existingBarcode = this.productForm.get('barcode')?.value;
@@ -1179,9 +1182,14 @@ export class CreateProductComponent implements OnInit {
 
     // Check for duplicates
     if (this.checkDuplicateBarcode(newBarcode)) {
-      this.duplicateBarcode = true;
-    } else {
-      this.duplicateBarcode = false;
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã vạch trùng với mã vạch sản phẩm',
+          life: 3000,
+        },
+      ];
     }
   }
 
@@ -1190,10 +1198,15 @@ export class CreateProductComponent implements OnInit {
     const newSKU = input.value;
 
     // Check for duplicates
-    if (this.checkDuplicateBarcode(newSKU)) {
-      this.duplicateSKU = true;
-    } else {
-      this.duplicateSKU = false;
+    if (this.checkDuplicateSKU(newSKU)) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã sku trùng với mã sku sản phẩm',
+          life: 3000,
+        },
+      ];
     }
   }
 
@@ -1220,14 +1233,19 @@ export class CreateProductComponent implements OnInit {
     const filledSku = this.skus.filter(sku => sku); // Only consider non-empty barcodes
     const uniqueSku = new Set(filledSku);
     this.duplicateSkuError = uniqueSku.size !== filledSku.length;
-  }
-  
-  getSkuControlError(): string | null {
     if (this.duplicateSkuError) {
-      return this.errorMessageSku;
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã sku biến thể không được trùng nhau',
+          life: 3000,
+        },
+      ];
     }
-    return null;
+    
   }
+
 
   onSubmit(): void {
     if (this.isSubmitting) {
@@ -1246,33 +1264,81 @@ export class CreateProductComponent implements OnInit {
     if (this.duplicateBarcodeError) {
       this.messages = [
         {
-          severity: 'error',
+          severity: 'warn',
           summary: 'Lỗi',
           detail: 'Có mã Barcode của biến thể bị trùng! Vui lòng nhập lại.',
-          life: 4000,
+          life: 3000,
         },
       ];
+      this.isSubmitting = false;
       return; // Prevent form submission
     }
 
     if (this.duplicateSkuError) {
       this.messages = [
         {
-          severity: 'error',
+          severity: 'warn',
           summary: 'Lỗi',
           detail: 'Có mã SKU của biến thể bị trùng! Vui lòng nhập lại.',
-          life: 4000,
+          life: 3000,
         },
       ];
+      this.isSubmitting = false;
       return; // Prevent form submission
     }
 
-    if (this.duplicateBarcode) {
-      hasError = true;
+    if (this.duplicateBarcodeError || this.duplicateSkuError) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: 'Lỗi',
+          detail: 'Mã Barcode và Sku của biến thể bị trùng! Vui lòng nhập lại.',
+          life: 3000,
+        },
+      ];
+      this.isSubmitting = false;
+      return; // Prevent form submission
+    }
+
+     if (this.duplicateBarcode) {
+      // Display warning message and prevent form submission
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã vạch biến thể không được trùng với mã vạch sản phẩm',
+          life: 3000,
+        },
+      ];
+      this.isSubmitting = false;
+      return; // Prevent further execution of onSubmit
     }
 
     if (this.duplicateSKU) {
-      hasError = true;
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã sku biến thể không được trùng với mã sku sản phẩm',
+          life: 3000,
+        },
+      ];
+      this.isSubmitting = false;
+      return
+    }
+
+    if (this.duplicateBarcode || this.duplicateSKU) {
+      // Display warning message and prevent form submission
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã vạch và Sku của biến thể không được trùng với mã vạch và Sku sản phẩm',
+          life: 3000,
+        },
+      ];
+      this.isSubmitting = false;
+      return; // Prevent further execution of onSubmit
     }
 
     if (

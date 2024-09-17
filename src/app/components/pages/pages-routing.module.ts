@@ -98,6 +98,13 @@ import { RouterModule } from '@angular/router';
                         './brand/brand.module'
                     ).then((m) => m.BrandModule),
             },
+            {
+                path: 'user/show-user',
+                loadChildren: () =>
+                    import(
+                        './user/user.module'
+                    ).then((m) => m.UserModule),
+            },
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],

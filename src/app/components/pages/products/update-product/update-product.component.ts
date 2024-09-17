@@ -122,6 +122,16 @@ export class UpdateProductComponent implements OnInit {
   showProperties1Section2: boolean = false;
   imageCache: { [index: number]: string } = {};
   imagesToDelete: number[] = [];
+  barcodes: string[] = []; // To store the list of all entered barcodes
+  duplicateBarcodeError: boolean = false; // To track if there are duplicate barcodes
+  errorMessageCheck: string = 'Trùng mã Barcode'; // Error message for duplicates
+  skus: string[] = []; // To store the list of all entered barcodes
+  duplicateSkuError: boolean = false; // To track if there are duplicate barcodes
+  errorMessageSku: string = 'Trùng mã Sku'; // Error message for duplicates
+  duplicateBarcode: boolean = false; // To track if there are duplicate barcodes
+  errorMessageBarcode: string = 'Mã vạch trùng với mã vạch sản phẩm';
+  duplicateSKU: boolean = false; // To track if there are duplicate barcodes
+  errorMessageSKU: string = 'Mã sku trùng với mã sku sản phẩm';
 
   constructor(
     private fb: FormBuilder,
@@ -340,13 +350,13 @@ export class UpdateProductComponent implements OnInit {
       const isProductTypeZero2 = this.productById.productType === 1;
       const hasVariantWithQuantity = this.productById.productVariants.some((variant: any) => variant.quantity > 0);
   
-      if (isProductTypeZero && hasStockData || hasVariantWithQuantity) {
+      if (isProductTypeZero || hasStockData || hasVariantWithQuantity) {
         this.productForm.get('productType')?.disable();
       } else {
         this.productForm.get('productType')?.enable();
       }
 
-      if (isProductTypeZero2 && hasStockData) {
+      if (isProductTypeZero2 || hasStockData) {
         this.productForm.get('productType')?.disable();
       } else {
         this.productForm.get('productType')?.enable();
@@ -1340,6 +1350,123 @@ export class UpdateProductComponent implements OnInit {
     }
   }
 
+  onBarcodeInput(event: Event, i: number, j: number): void {
+    const inputElement = event.target as HTMLInputElement;
+    const barcode = inputElement.value;
+  
+    // Update the barcode value in the array based on its control name
+    const controlName = this.getBarcodeControlName(i, j);
+  
+    if (barcode.trim() === '') {
+      // If the input is empty, remove it from the barcodes array
+      this.barcodes[i * 10 + j] = null; // Assuming there are max 10 variants
+    } else {
+      // Otherwise, update the barcode
+      this.barcodes[i * 10 + j] = barcode;
+    }
+  
+    // Check for duplicates
+    this.checkForDuplicateBarcodes();
+  }
+  
+  checkForDuplicateBarcodes(): void {
+    const filledBarcodes = this.barcodes.filter(barcode => barcode); // Only consider non-empty barcodes
+    const uniqueBarcodes = new Set(filledBarcodes);
+    this.duplicateBarcodeError = uniqueBarcodes.size !== filledBarcodes.length;
+    if (this.duplicateBarcodeError) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã vạch biến thể không được trùng nhau',
+          life: 3000,
+        },
+      ];
+    }
+  } 
+
+  checkDuplicateBarcode(newBarcode: string): boolean {
+    const existingBarcode = this.productForm.get('barcode')?.value;
+    const barcodes = this.valueProperties2Array.controls.map((control: any) => control.value.barcode);
+    return existingBarcode === newBarcode || barcodes.includes(newBarcode);
+  }
+
+  checkDuplicateSKU(newSku: string): boolean {
+    const existingSku = this.productForm.get('sku')?.value;
+    const skus = this.valueProperties2Array.controls.map((control: any) => control.value.sku);
+    return existingSku === newSku || skus.includes(newSku);
+  }
+
+  onBarcodeInput2(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newBarcode = input.value;
+
+    // Check for duplicates
+    if (this.checkDuplicateBarcode(newBarcode)) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã vạch trùng với mã vạch sản phẩm',
+          life: 3000,
+        },
+      ];
+    }
+  }
+
+  onSKUInput2(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newSKU = input.value;
+
+    // Check for duplicates
+    if (this.checkDuplicateBarcode(newSKU)) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã sku trùng với mã sku sản phẩm',
+          life: 3000,
+        },
+      ];
+    }
+  }
+
+  onSkuInput(event: Event, i: number, j: number): void {
+    const inputElement = event.target as HTMLInputElement;
+    const sku = inputElement.value;
+  
+    // Update the barcode value in the array based on its control name
+    const controlName = this.getSkuControlName(i, j);
+  
+    if (sku.trim() === '') {
+      // If the input is empty, remove it from the barcodes array
+      this.skus[i * 10 + j] = null; // Assuming there are max 10 variants
+    } else {
+      // Otherwise, update the barcode
+      this.skus[i * 10 + j] = sku;
+    }
+  
+    // Check for duplicates
+    this.checkForDuplicateSku();
+  }
+
+  checkForDuplicateSku(): void {
+    const filledSku = this.skus.filter(sku => sku); // Only consider non-empty barcodes
+    const uniqueSku = new Set(filledSku);
+    this.duplicateSkuError = uniqueSku.size !== filledSku.length;
+    if (this.duplicateSkuError) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã sku biến thể không được trùng nhau',
+          life: 3000,
+        },
+      ];
+    }
+  }
+  
+
   onSubmitUpdate(): void {
     if (this.isSubmitting) {
       return;
@@ -1354,6 +1481,58 @@ export class UpdateProductComponent implements OnInit {
       hasError = true;
     }
 
+    if (this.duplicateBarcodeError) {
+      this.messages = [
+        {
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Có mã Barcode của biến thể bị trùng! Vui lòng nhập lại.',
+          life: 4000,
+        },
+      ];
+      this.isSubmitting = false;
+      return; // Prevent form submission
+    }
+
+    if (this.duplicateSkuError) {
+      this.messages = [
+        {
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Có mã SKU của biến thể bị trùng! Vui lòng nhập lại.',
+          life: 4000,
+        },
+      ];
+      this.isSubmitting = false;
+      return; // Prevent form submission
+    }
+
+    if (this.duplicateBarcode) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã vạch biến thể không được trùng với mã vạch sản phẩm',
+          life: 3000,
+        },
+      ];
+      this.isSubmitting = false;
+      return
+    }
+
+    if (this.duplicateSKU) {
+      this.messages = [
+        {
+          severity: 'warn',
+          summary: '',
+          detail: 'Mã sku biến thể không được trùng với mã sku sản phẩm',
+          life: 3000,
+        },
+      ];
+      this.isSubmitting = false;
+      return
+    }
+
     // if (!productData.name || productData.name.trim().length < 6 || productData.name.trim().length > 100) {
     //   this.showNameError10 = true;
     //   hasError = true;
@@ -1366,6 +1545,14 @@ export class UpdateProductComponent implements OnInit {
 
     if (!productData.categoryId || productData.categoryId.length === 0) {
       this.showNameError4 = true;
+      hasError = true;
+    }
+
+    if (this.duplicateBarcode) {
+      hasError = true;
+    }
+
+    if (this.duplicateSKU) {
       hasError = true;
     }
 

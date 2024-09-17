@@ -522,7 +522,7 @@
                                           let-i="rowIndex"
                                         >                       
                                           <tr *ngFor="let value2 of valueProperties2Array.controls; let j = index">
-                                            <td>1</td>
+                                            <td>{{i + 1}}</td>
                                             <td>
                                                 <div style="display: flex;">
                                                     <img
@@ -555,12 +555,9 @@
                                                   [style]="{ height: '35px', width: '200px' }"
                                                   (input)="onInput3($event); onSkuInput($event, i, j); onSKUInput2($event, i, j)"
                                                 />
-                                                <div *ngIf="duplicateSkuError" class="text-danger">
+                                                <!-- <div *ngIf="duplicateSkuError" class="text-danger">
                                                   {{ errorMessageSku }}
-                                                </div>
-                                                <div *ngIf="duplicateSKU" class="text-danger">
-                                                  {{ errorMessageSKU }}
-                                                </div>
+                                                </div>                             -->
                                             </td>
                                             <td>
                                               <input
@@ -571,12 +568,9 @@
                                                 (input)="onInput2($event); onBarcodeInput($event, i, j); onBarcodeInput2($event, i, j)"
                                                 [style]="{ height: '35px', width: '200px' }"
                                               />
-                                              <div *ngIf="duplicateBarcodeError" class="text-danger">
+                                              <!-- <div *ngIf="duplicateBarcodeError" class="text-danger">
                                                 {{ errorMessageCheck }}
-                                              </div>
-                                              <div *ngIf="duplicateBarcode" class="text-danger">
-                                                {{ errorMessageBarcode }}
-                                              </div>
+                                              </div> -->
                                             </td>
                                             <td *ngIf="!formattedPrices[i][j] || isEditMode3[i][j]">
                                               <input

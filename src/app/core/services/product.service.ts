@@ -188,6 +188,7 @@ export class ProductService {
     }
 
     getStockDetailsByProductCode(productCode: string): Observable<any> {
-        return this.http.get(`${this.url}/api/inventory-stock-in/getstockindetailsbyproductcode?productCode=${productCode}`);
+        const encodedProductCode = encodeURIComponent(productCode);
+        return this.http.get(`${this.url}/api/inventory-stock-in/getstockindetailsbyproductcode?productCode=${encodedProductCode}`);
       }
 }
