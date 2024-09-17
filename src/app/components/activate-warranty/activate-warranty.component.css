@@ -1,0 +1,47 @@
+.activate-warranty{
+    width: 390px;
+    margin: 0 auto;
+    background-color: #fff;
+}
+
+.banner img{
+    width: 100%;
+}
+
+.container{
+    padding: 12px;
+    background-color: #fff;
+    height: 100%;
+}
+
+.back{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+}
+
+i{
+    display:block;
+    font-size: 13px;
+}
+
+.title{
+    margin-top:10px
+}
+
+.title h1{
+    font-size: 15px;
+    color: #E24343;
+}
+
+.title p {
+    font-size: 14px;
+    font-weight: 500;
+    line-height:22px;
+    margin-top:10px
+}
+
+.form{
+    margin-top:10px
+}

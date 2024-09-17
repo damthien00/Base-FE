@@ -131,6 +131,17 @@ export class AppMenuComponent implements OnInit {
                     },
                 ],
             },
+
+            {
+                label: '',
+                items: [
+                    {
+                        label: 'Kích hoạt bảo hành',
+                        icon: 'pi pi-fw pi-map-marker',
+                        routerLink: ['/activate-warranty'],
+                    },
+                ],
+            },
             // {
             //     label: '',
             //     items: [

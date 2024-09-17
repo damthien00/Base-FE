@@ -41,6 +41,13 @@ import { AppLayoutComponent } from './layout/app.layout.component';
                             'src/app/components/landing/landing.module'
                         ).then((m) => m.LandingModule),
                 },
+                {
+                    path: 'activate-warranty',
+                    loadChildren: () =>
+                        import(
+                            'src/app/components/activate-warranty/activate-warranty.module'
+                        ).then((m) => m.ActivateWarrantyModule),
+                },
                 { path: 'notfound', component: NotfoundComponent },
                 { path: '**', redirectTo: '/notfound' },
             ],
