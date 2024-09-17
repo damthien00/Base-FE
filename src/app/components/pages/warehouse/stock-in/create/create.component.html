@@ -366,9 +366,7 @@
                                                     [(ngModel)]="
                                                         variant.frameNumber
                                                     "
-                                                    (ngModelChange)="
-                                                        checkValidity()
-                                                    "
+                                                    (blur)="checkValidity()"
                                                 />
                                             </span>
                                             <span class="variant-item-input">
@@ -380,9 +378,7 @@
                                                     [(ngModel)]="
                                                         variant.engineNumber
                                                     "
-                                                    (ngModelChange)="
-                                                        checkValidity()
-                                                    "
+                                                    (blur)="checkValidity()"
                                                     placeholder="Nhập số máy"
                                                 />
                                             </span>

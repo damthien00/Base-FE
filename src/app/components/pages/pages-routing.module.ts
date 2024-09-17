@@ -11,7 +11,6 @@ import { RouterModule } from '@angular/router';
                         (m) => m.EmptyDemoModule
                     ),
             },
-
             {
                 path: 'products/show-product',
                 loadChildren: () =>
@@ -73,16 +72,16 @@ import { RouterModule } from '@angular/router';
             {
                 path: 'products/create-product',
                 loadChildren: () =>
-                    import('./products/create-product/create-product.module').then(
-                        (m) => m.CreateProductModule
-                    ),
+                    import(
+                        './products/create-product/create-product.module'
+                    ).then((m) => m.CreateProductModule),
             },
             {
                 path: 'products/update-product/:id',
                 loadChildren: () =>
-                    import('./products/update-product/update-product.module').then(
-                        (m) => m.UpdateProductModule
-                    ),
+                    import(
+                        './products/update-product/update-product.module'
+                    ).then((m) => m.UpdateProductModule),
             },
             {
                 path: 'product-category/show',
@@ -94,9 +93,7 @@ import { RouterModule } from '@angular/router';
             {
                 path: 'brand/show-brand',
                 loadChildren: () =>
-                    import(
-                        './brand/brand.module'
-                    ).then((m) => m.BrandModule),
+                    import('./brand/brand.module').then((m) => m.BrandModule),
             },
             {
                 path: 'user/show-user',

@@ -1,37 +1,39 @@
 <div class="toast-container">
     <p-messages
-      [(value)]="messages"
-      [enableService]="false"
-      [closable]="false"
+        [(value)]="messages"
+        [enableService]="false"
+        [closable]="false"
     ></p-messages>
-  </div>
-  <main id="main" class="main show-product-component">
+</div>
+<main id="main" class="main show-product-component">
     <div class="pagetitle">
-      <div>
-        <h3>Quản lý sản phẩm</h3>
-        <nav>
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-            <li class="breadcrumb-item">Sản phẩm</li>
-            <li class="breadcrumb-item active">Danh sách sản phẩm</li>
-          </ol>
-        </nav>
-      </div>
-  
-      <div>
-        <button
-          pButton
-          pRipple
-          label="Thêm mới"
-          style="height: 40px; width: 130px; border-radius: 10px;"
-          [routerLink]="['/products/create-product']"
-        ></button>
-      </div>
+        <div>
+            <h3>Quản lý sản phẩm</h3>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="index.html">Admin</a>
+                    </li>
+                    <li class="breadcrumb-item">Sản phẩm</li>
+                    <li class="breadcrumb-item active">Danh sách sản phẩm</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div>
+            <button
+                pButton
+                pRipple
+                label="Thêm mới"
+                style="height: 40px; width: 130px; border-radius: 10px"
+                [routerLink]="['/pages/products/create-product']"
+            ></button>
+        </div>
     </div>
     <!-- End Page Title -->
-  
+
     <section class="section show-product-component k-list-table">
-      <!-- <div class="row title">
+        <!-- <div class="row title">
         <div class="col-lg-6 tilte_left">
           <h4>Danh sách sản phẩm</h4>
         </div>
@@ -45,81 +47,81 @@
           </div>
         </div>
       </div> -->
-      <div class="row filter">
-        <div class="col-lg-3 search">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input
-              [(ngModel)]="this.optionsFillerProduct.KeyWord"
-              class="form-control search"
-              type="text"
-              placeholder="Tìm kiếm theo tên/SKU sản phẩm"
-            />
-          </span>
+        <div class="row filter">
+            <div class="col-lg-3 search">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input
+                        [(ngModel)]="this.optionsFillerProduct.KeyWord"
+                        class="form-control search"
+                        type="text"
+                        placeholder="Tìm kiếm theo tên/SKU sản phẩm"
+                    />
+                </span>
+            </div>
+            <div class="col-lg-2 filter-categories">
+                <p-treeSelect
+                    containerStyleClass="w-full2"
+                    [options]="treeCategory"
+                    (onNodeSelect)="onNodeSelect()"
+                    (onClear)="onClear()"
+                    optionLabel="label"
+                    [showClear]="true"
+                    [(ngModel)]="selectedNodes"
+                    placeholder="Danh mục"
+                    [style]="{ width: '200px', height: '100%' }"
+                >
+                    <ng-template let-node pTemplate="default">
+                        <span>{{ node.name }}</span>
+                    </ng-template>
+                </p-treeSelect>
+            </div>
+            <div class="col-lg-3 filter-price" style="max-width: 220px">
+                <span>Giá</span>
+                <input
+                    [(ngModel)]="this.optionsFillerProduct.StartPrice"
+                    type="text"
+                    pKeyFilter="int"
+                    placeholder="Từ :"
+                    (blur)="checkStartPriceValue()"
+                    (keypress)="onKeyPress($event)"
+                />
+                <input
+                    [(ngModel)]="this.optionsFillerProduct.EndPrice"
+                    type="text"
+                    pKeyFilter="int"
+                    placeholder="Đến :"
+                    (blur)="checkEndPriceValue()"
+                    (keypress)="onKeyPress($event)"
+                />
+            </div>
+            <div class="col-lg-2 filter-status">
+                <p-dropdown
+                    [options]="this.optionsStatus"
+                    [(ngModel)]="this.statusFilter"
+                    optionLabel="name"
+                    [showClear]="true"
+                    placeholder="Trạng thái"
+                    [style]="{ height: '37px', width: '100%' }"
+                ></p-dropdown>
+            </div>
+            <div class="col-lg-1 filter-button">
+                <button (click)="EvenFilter()">Lọc</button>
+            </div>
         </div>
-        <div class="col-lg-2 filter-categories">
-          <p-treeSelect
-            containerStyleClass="w-full2"
-            [options]="treeCategory"
-            (onNodeSelect)="onNodeSelect()"
-            (onClear)="onClear()"
-            optionLabel="label"
-            [showClear]="true"
-            [(ngModel)]="selectedNodes"
-            placeholder="Danh mục"
-            [style]="{ width: '200px', height: '100%' }"
-          >
-            <ng-template let-node pTemplate="default">
-              <span>{{ node.name }}</span>
-            </ng-template>
-          </p-treeSelect>
-        </div>
-        <div class="col-lg-3 filter-price" style="max-width: 220px">
-          <span>Giá</span>
-          <input
-            [(ngModel)]="this.optionsFillerProduct.StartPrice"
-            type="text"
-            pKeyFilter="int"
-            placeholder="Từ :"
-            (blur)="checkStartPriceValue()"
-            (keypress)="onKeyPress($event)"
-          />
-          <input
-            [(ngModel)]="this.optionsFillerProduct.EndPrice"
-            type="text"
-            pKeyFilter="int"
-            placeholder="Đến :"
-            (blur)="checkEndPriceValue()"
-            (keypress)="onKeyPress($event)"
-          />
-        </div>
-        <div class="col-lg-2 filter-status">
-          <p-dropdown
-            [options]="this.optionsStatus"
-            [(ngModel)]="this.statusFilter"
-            optionLabel="name"
-            [showClear]="true"
-            placeholder="Trạng thái"
-            [style]="{ height: '37px', width: '100%' }"
-          ></p-dropdown>
-        </div>
-        <div class="col-lg-1 filter-button">
-          <button (click)="EvenFilter()">Lọc</button>
-        </div>
-      </div>
-      <div class="row section-main" style="margin-top: -26px">
-        <div class="row section-main-product card">
-          <p-table
-            [value]="products"
-            [rows]="5"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            [rowsPerPageOptions]="[10, 25, 50]"
-            styleClass="p-datatable-striped"
-          >
-            <ng-template pTemplate="header">
-              <tr style="height: 60px" class="n-title-head">
-                <!-- <th style="width: 5%; padding-left: 20px">
+        <div class="row section-main" style="margin-top: -26px">
+            <div class="row section-main-product card">
+                <p-table
+                    [value]="products"
+                    [rows]="5"
+                    [showCurrentPageReport]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [rowsPerPageOptions]="[10, 25, 50]"
+                    styleClass="p-datatable-striped"
+                >
+                    <ng-template pTemplate="header">
+                        <tr style="height: 60px" class="n-title-head">
+                            <!-- <th style="width: 5%; padding-left: 20px">
                   <p-checkbox
                     [(ngModel)]="checked"
                     [binary]="true"
@@ -149,15 +151,24 @@
                 <!-- <td style="padding-left: 20px">
                   <p-checkbox [binary]="true" inputId="binary"></p-checkbox>
                 </td> -->
-                <td class="n-image-product">
-                  <img [src]="imageUrl+ '/api/files/images/'  + (product.productImages[0] ? product.productImages[0].link : 'no-image.png')" />
-                </td>
-                <td>
-                  <span>{{ product.name }}</span>
-                  <p style="color: blue; font-weight: 600;">{{ product.sku }}</p>
-                  
-                </td>
-                <!-- <td>
+                            <td class="n-image-product">
+                                <img
+                                    [src]="
+                                        imageUrl +
+                                        '/api/files/images/' +
+                                        (product.productImages[0]
+                                            ? product.productImages[0].link
+                                            : 'no-image.png')
+                                    "
+                                />
+                            </td>
+                            <td>
+                                <span>{{ product.name }}</span>
+                                <p style="color: blue; font-weight: 600">
+                                    {{ product.sku }}
+                                </p>
+                            </td>
+                            <!-- <td>
                   <p
                     style="margin: 15px 0; height: 23px"
                     *ngFor="
@@ -173,75 +184,106 @@
                     {{ product.sku }}
                   </p>
                 </td> -->
-                <td>
-                  <div
-                    style="margin: 16px 0; height: 23px"
-                    *ngFor="
-                      let variant of this.showAllVariants.get(product.id) === 0 ||
-                      this.showAllVariants.get(product.id) === 2
-                        ? product.productVariants
-                        : product.productVariants.slice(0, 3)
-                    "
-                  >
-
-                  
-                    <span>{{ variant.valuePropeties1 }} , {{ variant.valuePropeties2 }}</span>
-                    <p style="color: blue; font-weight: 600; line-height: 15px;">{{ variant.sku }}</p>
-               
-                    
-                  </div>
-                </td>
-                <td class="price-product">
-                  <p
-                    style="margin: 15px 0; height: 23px"
-                    *ngFor="
-                      let variant of this.showAllVariants.get(product.id) === 0 ||
-                      this.showAllVariants.get(product.id) === 2
-                        ? product.productVariants
-                        : product.productVariants.slice(0, 3)
-                    "
-                  >
-                    {{
-                      variant?.price?.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND"
-                      })
-                    }}
-                  </p>
-                  <p *ngIf="product.productVariants.length === 0">
-                    {{
-                      product?.sellingPrice?.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND"
-                      })
-                    }}
-                  </p>
-                </td>
-                <td class="quantity-product">
-                  <p
-                    style="margin: 15px 0; height: 23px"
-                    *ngFor="
-                      let variant of this.showAllVariants.get(product.id) === 0 ||
-                      this.showAllVariants.get(product.id) === 2
-                        ? product.productVariants
-                        : product.productVariants.slice(0, 3)
-                    "
-                  >
-                    {{
-                      variant.quantity >= 1000
-                        ? variant.quantity
-                        : variant.quantity
-                    }}
-                  </p>
-                  <p *ngIf="product.productVariants.length === 0">
-                    {{
-                      product.totalQuantity >= 1000
-                        ? product.totalQuantity
-                        : product.totalQuantity
-                    }}
-                  </p>
-                </td>
-                <!-- <td class="sellcounts-product">
+                            <td>
+                                <div
+                                    style="margin: 16px 0; height: 23px"
+                                    *ngFor="
+                                        let variant of this.showAllVariants.get(
+                                            product.id
+                                        ) === 0 ||
+                                        this.showAllVariants.get(product.id) ===
+                                            2
+                                            ? product.productVariants
+                                            : product.productVariants.slice(
+                                                  0,
+                                                  3
+                                              )
+                                    "
+                                >
+                                    <span
+                                        >{{ variant.valuePropeties1 }} ,
+                                        {{ variant.valuePropeties2 }}</span
+                                    >
+                                    <p
+                                        style="
+                                            color: blue;
+                                            font-weight: 600;
+                                            line-height: 15px;
+                                        "
+                                    >
+                                        {{ variant.sku }}
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="price-product">
+                                <p
+                                    style="margin: 15px 0; height: 23px"
+                                    *ngFor="
+                                        let variant of this.showAllVariants.get(
+                                            product.id
+                                        ) === 0 ||
+                                        this.showAllVariants.get(product.id) ===
+                                            2
+                                            ? product.productVariants
+                                            : product.productVariants.slice(
+                                                  0,
+                                                  3
+                                              )
+                                    "
+                                >
+                                    {{
+                                        variant?.price?.toLocaleString(
+                                            "vi-VN",
+                                            {
+                                                style: "currency",
+                                                currency: "VND"
+                                            }
+                                        )
+                                    }}
+                                </p>
+                                <p *ngIf="product.productVariants.length === 0">
+                                    {{
+                                        product?.sellingPrice?.toLocaleString(
+                                            "vi-VN",
+                                            {
+                                                style: "currency",
+                                                currency: "VND"
+                                            }
+                                        )
+                                    }}
+                                </p>
+                            </td>
+                            <td class="quantity-product">
+                                <p
+                                    style="margin: 15px 0; height: 23px"
+                                    *ngFor="
+                                        let variant of this.showAllVariants.get(
+                                            product.id
+                                        ) === 0 ||
+                                        this.showAllVariants.get(product.id) ===
+                                            2
+                                            ? product.productVariants
+                                            : product.productVariants.slice(
+                                                  0,
+                                                  3
+                                              )
+                                    "
+                                >
+                                    {{
+                                        variant.quantity >= 1000
+                                            ? variant.quantity
+                                            : variant.quantity
+                                    }}
+                                </p>
+                                <p *ngIf="product.productVariants.length === 0">
+                                    {{
+                                        product.totalQuantity >= 1000
+                                            ? product.totalQuantity
+                                            : product.totalQuantity
+                                    }}
+                                </p>
+                            </td>
+                            <!-- <td class="sellcounts-product">
                   <p>
                     {{
                       product.productVariants.length === 0
@@ -250,206 +292,239 @@
                     }}
                   </p>
                 </td> -->
-                <td
-                  class="n-product-status"
-                  style="
-                    padding-left: 10px;
-                    border-bottom: none;
-                    border-left: none;
-                    border-right: none;
-                  "
-                >
-                  <div
-                    *ngFor="
-                      let variant of this.showAllVariants.get(product.id) === 0 ||
-                      this.showAllVariants.get(product.id) === 2
-                        ? product.productVariants
-                        : product.productVariants.slice(0, 3)
-                    "
-                    style="
-                      margin: 15px 0;
-                      width: 90%;
-                      height: 23px;
-                      border: 1px solid #d9d9d9;
-                      border-radius: 15px;
-                      text-align: center;
-                      background-color: red;
-                    "
-                    [style.background-color]="
-                      variant.quantity === 0
-                        ? '#E24343'
-                        : product.status === 1
-                        ? '#57f298'
-                        : '#DCDCDC'
-                    "
-                  >
-                    {{
-                      variant.quantity === 0
-                        ? "Hết hàng"
-                        : product.status === 1
-                        ? "Hoạt động"
-                        : "Ẩn"
-                    }}
-                  </div>
-                  <div
-                    *ngIf="product.productVariants.length === 0"
-                    style="
-                      margin: 15px 0;
-                      width: 90%;
-                      height: 23px;
-                      border: 1px solid #d9d9d9;
-                      border-radius: 15px;
-                      text-align: center;
-                      background-color: red;
-                    "
-                    [style.background-color]="
-                      product.totalQuantity === 0
-                        ? '#f23939'
-                        : product.status === 1
-                        ? '#57f298'
-                        : '#d9d9d9'
-                    "
-                  >
-                    {{
-                      product.totalQuantity === 0
-                        ? "Hết hàng"
-                        : product.status === 1
-                        ? "Hoạt động"
-                        : "Ẩn"
-                    }}
-                  </div>
-                </td>
-                <td>{{ product.brandName }}</td>
-                <td>{{product.createdAt | date: 'dd/MM/yyyy'}}</td>
-                <td class="actions">
-                  <!-- [routerLink]="['/admin/quanlysanpham/themsanpham']" -->
-                  <a
-                    [routerLink]="['/products/update-product', product.id]"
-                  >
-                    <p>Cập nhật</p>
-                  </a>
-                  <p
-                    style="margin: 5px 0; text-align: center; cursor: pointer"
-                    (click)="ClickChangeStatus($event, product)"
-                  >
-                    {{ product.status !== 1 ? "Hoạt động" : "Ẩn" }}
-                  </p>
-                  <p
-                    style="margin-top: 5px"
-                    (click)="openDiaLogDelete($event, product)"
-                  >
-                    Xóa
-                  </p>
-                </td>
-              </tr>
-              <tr style="position: relative; height: 15px">
-                <button
-                  style="
-                    border: none;
-                    background-color: #fff;
-                    position: absolute;
-                    top: -10px;
-                    left: 40%;
-                    width: 200px;
-                    z-index: 1;
-                    color: #626161;
-                  "
-                  class="col-lg-12"
-                  [style.display]="
-                    this.showAllVariants.get(product.id) === 0 ? 'hide' : 'block'
-                  "
-                  (click)="toggleShowAllVariants(product.id)"
-                >
-                  {{
-                    this.showAllVariants.get(product.id) === 1
-                      ? "Xem thêm " +
-                        (product.productVariants.length - 3) +
-                        " sản phẩm"
-                      : this.showAllVariants.get(product.id) === 2
-                      ? "Thu gọn " +
-                        (product.productVariants.length - 3) +
-                        " sản phẩm"
-                      : ""
-                  }}
-                </button>
-              </tr>
-            </ng-template>
-  
-            <ng-template pTemplate="paginatorleft">
-              <p-button
-                type="button"
-                icon="pi pi-plus"
-                styleClass="p-button-text"
-              ></p-button>
-            </ng-template>
-            <ng-template pTemplate="paginatorright">
-              <p-button
-                type="button"
-                icon="pi pi-cloud"
-                styleClass="p-button-text"
-              ></p-button>
-            </ng-template>
-          </p-table>
-          <div class="paginator">
-            <p-paginator
-              [rows]="this.pageSize"
-              [totalRecords]="this.totalRecords > 0 ? this.totalRecords : 1"
-              [rowsPerPageOptions]="[30, 20, 10]"
-              (onPageChange)="onPageChange($event)"
-            ></p-paginator>
-          </div>
-        </div>
-      </div>
-      <div class="dialog-background" *ngIf="showDiaLogDelete">
-        <div style="width: 35%" class="dialog-containerdelete">
-          <div style="padding: 15px" class="card-body" *ngIf="productDelete">
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="card-title">Xóa Sản Phẩm</h5>
-              <p-button
-                icon="pi pi-times"
-                [rounded]="true"
-                [text]="true"
-                severity="danger"
-                [style]="{ 'border-radius': '25%' }"
-                (click)="closeDiaLogDelete()"
-              ></p-button>
-            </div>
-            <!-- General Form Elements -->
-            <form>
-              <div class="row mb-12">
-                <label
-                  >Bạn có chắc muốn xóa sẩn phẩm này? Lưu ý: Sau khi xóa bạn không
-                  thể hoàn tác hay khôi phục sẩn phẩm.</label
-                >
-                <strong style="text-align: center" class="name-delete">{{
-                  productDelete.name
-                }}</strong>
-              </div>
-              <div class="row mb-12 mt-5">
-                <div class="col-sm-12 buttonsl">
-                  <button
-                    pButton
-                    pRipple
-                    label="Hủy"
-                    class="p-button-success buttoncloses"
-                    type="button"
-                    (click)="closeDiaLogDelete()"
-                  ></button>
-                  <button
-                    pButton
-                    pRipple
-                    label="Đồng ý"
-                    class="p-button-success buttondelete"
-                    type="submit"
-                    (click)="ClickDelete()"
-                  ></button>
+                            <td
+                                class="n-product-status"
+                                style="
+                                    padding-left: 10px;
+                                    border-bottom: none;
+                                    border-left: none;
+                                    border-right: none;
+                                "
+                            >
+                                <div
+                                    *ngFor="
+                                        let variant of this.showAllVariants.get(
+                                            product.id
+                                        ) === 0 ||
+                                        this.showAllVariants.get(product.id) ===
+                                            2
+                                            ? product.productVariants
+                                            : product.productVariants.slice(
+                                                  0,
+                                                  3
+                                              )
+                                    "
+                                    style="
+                                        margin: 15px 0;
+                                        width: 90%;
+                                        height: 23px;
+                                        border: 1px solid #d9d9d9;
+                                        border-radius: 15px;
+                                        text-align: center;
+                                        background-color: red;
+                                    "
+                                    [style.background-color]="
+                                        variant.quantity === 0
+                                            ? '#E24343'
+                                            : product.status === 1
+                                            ? '#57f298'
+                                            : '#DCDCDC'
+                                    "
+                                >
+                                    {{
+                                        variant.quantity === 0
+                                            ? "Hết hàng"
+                                            : product.status === 1
+                                            ? "Hoạt động"
+                                            : "Ẩn"
+                                    }}
+                                </div>
+                                <div
+                                    *ngIf="product.productVariants.length === 0"
+                                    style="
+                                        margin: 15px 0;
+                                        width: 90%;
+                                        height: 23px;
+                                        border: 1px solid #d9d9d9;
+                                        border-radius: 15px;
+                                        text-align: center;
+                                        background-color: red;
+                                    "
+                                    [style.background-color]="
+                                        product.totalQuantity === 0
+                                            ? '#f23939'
+                                            : product.status === 1
+                                            ? '#57f298'
+                                            : '#d9d9d9'
+                                    "
+                                >
+                                    {{
+                                        product.totalQuantity === 0
+                                            ? "Hết hàng"
+                                            : product.status === 1
+                                            ? "Hoạt động"
+                                            : "Ẩn"
+                                    }}
+                                </div>
+                            </td>
+                            <td>{{ product.brandName }}</td>
+                            <td>
+                                {{ product.createdAt | date : "dd/MM/yyyy" }}
+                            </td>
+                            <td class="actions">
+                                <!-- [routerLink]="['/admin/quanlysanpham/themsanpham']" -->
+                                <a
+                                    [routerLink]="[
+                                        '/pages/products/update-product',
+                                        product.id
+                                    ]"
+                                >
+                                    <p>Cập nhật</p>
+                                </a>
+                                <p
+                                    style="
+                                        margin: 5px 0;
+                                        text-align: center;
+                                        cursor: pointer;
+                                    "
+                                    (click)="ClickChangeStatus($event, product)"
+                                >
+                                    {{
+                                        product.status !== 1
+                                            ? "Hoạt động"
+                                            : "Ẩn"
+                                    }}
+                                </p>
+                                <p
+                                    style="margin-top: 5px"
+                                    (click)="openDiaLogDelete($event, product)"
+                                >
+                                    Xóa
+                                </p>
+                            </td>
+                        </tr>
+                        <tr style="position: relative; height: 15px">
+                            <button
+                                style="
+                                    border: none;
+                                    background-color: #fff;
+                                    position: absolute;
+                                    top: -10px;
+                                    left: 40%;
+                                    width: 200px;
+                                    z-index: 1;
+                                    color: #626161;
+                                "
+                                class="col-lg-12"
+                                [style.display]="
+                                    this.showAllVariants.get(product.id) === 0
+                                        ? 'hide'
+                                        : 'block'
+                                "
+                                (click)="toggleShowAllVariants(product.id)"
+                            >
+                                {{
+                                    this.showAllVariants.get(product.id) === 1
+                                        ? "Xem thêm " +
+                                          (product.productVariants.length - 3) +
+                                          " sản phẩm"
+                                        : this.showAllVariants.get(
+                                              product.id
+                                          ) === 2
+                                        ? "Thu gọn " +
+                                          (product.productVariants.length - 3) +
+                                          " sản phẩm"
+                                        : ""
+                                }}
+                            </button>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="paginatorleft">
+                        <p-button
+                            type="button"
+                            icon="pi pi-plus"
+                            styleClass="p-button-text"
+                        ></p-button>
+                    </ng-template>
+                    <ng-template pTemplate="paginatorright">
+                        <p-button
+                            type="button"
+                            icon="pi pi-cloud"
+                            styleClass="p-button-text"
+                        ></p-button>
+                    </ng-template>
+                </p-table>
+                <div class="paginator">
+                    <p-paginator
+                        [rows]="this.pageSize"
+                        [totalRecords]="
+                            this.totalRecords > 0 ? this.totalRecords : 1
+                        "
+                        [rowsPerPageOptions]="[30, 20, 10]"
+                        (onPageChange)="onPageChange($event)"
+                    ></p-paginator>
                 </div>
-              </div>
-            </form>
-            <!-- End General Form Elements -->
-          </div>
+            </div>
         </div>
-      </div>
+        <div class="dialog-background" *ngIf="showDiaLogDelete">
+            <div style="width: 35%" class="dialog-containerdelete">
+                <div
+                    style="padding: 15px"
+                    class="card-body"
+                    *ngIf="productDelete"
+                >
+                    <div
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                        <h5 class="card-title">Xóa Sản Phẩm</h5>
+                        <p-button
+                            icon="pi pi-times"
+                            [rounded]="true"
+                            [text]="true"
+                            severity="danger"
+                            [style]="{ 'border-radius': '25%' }"
+                            (click)="closeDiaLogDelete()"
+                        ></p-button>
+                    </div>
+                    <!-- General Form Elements -->
+                    <form>
+                        <div class="row mb-12">
+                            <label
+                                >Bạn có chắc muốn xóa sẩn phẩm này? Lưu ý: Sau
+                                khi xóa bạn không thể hoàn tác hay khôi phục sẩn
+                                phẩm.</label
+                            >
+                            <strong
+                                style="text-align: center"
+                                class="name-delete"
+                                >{{ productDelete.name }}</strong
+                            >
+                        </div>
+                        <div class="row mb-12 mt-5">
+                            <div class="col-sm-12 buttonsl">
+                                <button
+                                    pButton
+                                    pRipple
+                                    label="Hủy"
+                                    class="p-button-success buttoncloses"
+                                    type="button"
+                                    (click)="closeDiaLogDelete()"
+                                ></button>
+                                <button
+                                    pButton
+                                    pRipple
+                                    label="Đồng ý"
+                                    class="p-button-success buttondelete"
+                                    type="submit"
+                                    (click)="ClickDelete()"
+                                ></button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- End General Form Elements -->
+                </div>
+            </div>
+        </div>
     </section>
-  </main>
-  
+</main>

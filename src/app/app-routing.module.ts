@@ -12,14 +12,14 @@ import { AppLayoutComponent } from './layout/app.layout.component';
                     component: AppLayoutComponent,
                     children: [
                         {
-                            path: '',
+                            path: 'dashboard',
                             loadChildren: () =>
                                 import(
                                     'src/app/components/dashboard/dashboard.module'
                                 ).then((m) => m.DashboardModule),
                         },
                         {
-                            path: '',
+                            path: 'pages',
                             loadChildren: () =>
                                 import('./components/pages/pages.module').then(
                                     (m) => m.PagesModule
@@ -40,6 +40,13 @@ import { AppLayoutComponent } from './layout/app.layout.component';
                         import(
                             'src/app/components/landing/landing.module'
                         ).then((m) => m.LandingModule),
+                },
+                {
+                    path: 'activate-warranty',
+                    loadChildren: () =>
+                        import(
+                            'src/app/components/activate-warranty/activate-warranty.module'
+                        ).then((m) => m.ActivateWarrantyModule),
                 },
                 { path: 'notfound', component: NotfoundComponent },
                 { path: '**', redirectTo: '/notfound' },
