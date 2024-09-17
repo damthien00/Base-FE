@@ -212,16 +212,6 @@
                         <span>{{ node.label }}</span>
                       </ng-template>
                     </p-treeSelect>
-                    <!-- <p-treeSelect
-                    [options]="categorieandchild"
-                    [(ngModel)]="selectedCategory"
-                    placeholder="Chọn danh mục"
-                    (onNodeSelect)="onNodeSelect($event)"
-                    style="width: 100%">
-                    <ng-template let-node pTemplate="default">
-                      <span>{{ node.name }}</span>
-                    </ng-template>
-                    </p-treeSelect> -->
                     <div *ngIf="showNameError5" class="text-danger">
                       Danh mục đã vượt quá cấp 5.
                     </div>

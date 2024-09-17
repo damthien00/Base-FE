@@ -114,6 +114,11 @@ export class CreateProductComponent implements OnInit {
   skus: string[] = []; // To store the list of all entered barcodes
   duplicateSkuError: boolean = false; // To track if there are duplicate barcodes
   errorMessageSku: string = 'Trùng mã Sku'; // Error message for duplicates
+  duplicateBarcode: boolean = false; // To track if there are duplicate barcodes
+  errorMessageBarcode: string = 'Mã vạch trùng với mã vạch sản phẩm';
+  duplicateSKU: boolean = false; // To track if there are duplicate barcodes
+  errorMessageSKU: string = 'Mã sku trùng với mã sku sản phẩm';
+  
 
   units = [{ name: 'Kg' }, { name: 'Lít' }, { name: 'Cái' }];
 
@@ -1156,6 +1161,42 @@ export class CreateProductComponent implements OnInit {
     return null;
   }
 
+  checkDuplicateBarcode(newBarcode: string): boolean {
+    const existingBarcode = this.productForm.get('barcode')?.value;
+    const barcodes = this.valueProperties2Array.controls.map((control: any) => control.value.barcode);
+    return existingBarcode === newBarcode || barcodes.includes(newBarcode);
+  }
+
+  checkDuplicateSKU(newSku: string): boolean {
+    const existingSku = this.productForm.get('sku')?.value;
+    const skus = this.valueProperties2Array.controls.map((control: any) => control.value.sku);
+    return existingSku === newSku || skus.includes(newSku);
+  }
+
+  onBarcodeInput2(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newBarcode = input.value;
+
+    // Check for duplicates
+    if (this.checkDuplicateBarcode(newBarcode)) {
+      this.duplicateBarcode = true;
+    } else {
+      this.duplicateBarcode = false;
+    }
+  }
+
+  onSKUInput2(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newSKU = input.value;
+
+    // Check for duplicates
+    if (this.checkDuplicateBarcode(newSKU)) {
+      this.duplicateSKU = true;
+    } else {
+      this.duplicateSKU = false;
+    }
+  }
+
   onSkuInput(event: Event, i: number, j: number): void {
     const inputElement = event.target as HTMLInputElement;
     const sku = inputElement.value;
@@ -1224,6 +1265,14 @@ export class CreateProductComponent implements OnInit {
         },
       ];
       return; // Prevent form submission
+    }
+
+    if (this.duplicateBarcode) {
+      hasError = true;
+    }
+
+    if (this.duplicateSKU) {
+      hasError = true;
     }
 
     if (

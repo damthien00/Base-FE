@@ -114,12 +114,23 @@ export class CategoryService {
     }
 
     // Phương thức để chuyển đổi dữ liệu API thành định dạng TreeNode[]
+    // private mapToTreeNodes(data: any[]): TreeNode[] {
+    //     return data.map((category) => ({
+    //         label: category.name,
+    //         data: category,
+    //         leaf: !category.children || category.children.length === 0,
+    //         children: this.mapToTreeNodes(category.children),
+    //     }));
+    // }
+
     private mapToTreeNodes(data: any[]): TreeNode[] {
-        return data.map((category) => ({
+        return data
+          .filter(category => category.status === 1) // Only include categories with status = 1
+          .map(category => ({
             label: category.name,
             data: category,
             leaf: !category.children || category.children.length === 0,
-            children: this.mapToTreeNodes(category.children),
-        }));
-    }
+            children: category.children ? this.mapToTreeNodes(category.children) : []
+          }));
+      }
 }

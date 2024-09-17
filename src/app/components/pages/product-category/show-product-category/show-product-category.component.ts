@@ -65,7 +65,6 @@ export class ShowProductCategoryComponent implements OnInit {
   constructor(private categoryService: CategoryService) { }
 
   ngOnInit(): void {
-    this.loadCategories();
     this.cols = [
       { field: 'product', header: 'Product' },
       { field: 'price', header: 'Price' },
@@ -80,21 +79,16 @@ export class ShowProductCategoryComponent implements OnInit {
       { label: 'InputText', route: '/inputtext' },
     ];
     this.searchTermChanged
-      .pipe(
-        debounceTime(300), // Chờ 300ms sau khi người dùng nhập trước khi gọi hàm
-        distinctUntilChanged() // Chỉ gọi khi giá trị thay đổi
-      )
-      .subscribe(searchTerm => {
-        this.getCategories();
-        // this.getAllSubcategories();
-      });
-    this.getCategories();
-  }
-
-  loadCategories(): void {
-    this.categoryService.getCategoryAll().subscribe((data) => {
-      this.categories = data.data;
+    .pipe(
+      debounceTime(300), // Chờ 300ms sau khi người dùng nhập trước khi gọi hàm
+      distinctUntilChanged() // Chỉ gọi khi giá trị thay đổi
+    )
+    .subscribe(searchTerm => {
+      this.getCategories();
+      // this.getAllSubcategories();
     });
+    this.getCategories();
+    // this.loadCategories();
   }
 
   getCategoriesAndChild() {
@@ -459,7 +453,7 @@ export class ShowProductCategoryComponent implements OnInit {
           life: 3000
         }];
         this.getCategoriesAndChild()
-        this.loadCategories();
+        this.getCategories();
 
         // Tắt các thông báo lỗi
         this.showNameError = false;
