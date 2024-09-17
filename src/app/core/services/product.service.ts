@@ -140,6 +140,14 @@ export class ProductService {
         );
     }
 
+    CheckSku(
+        sku: string
+    ): Observable<{ data: boolean; [key: string]: any }> {
+        return this.http.get<{ data: boolean; [key: string]: any }>(
+            `${this.url}/api/product/checksku?sku=${sku}`
+        );
+    }
+
     createStockIn(data: any): Observable<any> {
         return this.http
             .post<any>(`${this.url}/api/inventory-stock-in/create`, data)
@@ -167,10 +175,19 @@ export class ProductService {
         return this.http.get<any>(url);
     }
 
+    checkSkuUpdate(sku: string, productId: number) {
+        const url = `${this.url}/api/product/checksku?sku=${sku}&id=${productId}`;
+        return this.http.get<any>(url);
+    }
+
     getShipmentProductByCode(productCode: string): Observable<any> {
         const encodedProductCode = encodeURIComponent(productCode);
         return this.http.get<any>(
             `${this.url}/api/shipments/getshipmentproduct?productCode=${encodedProductCode}`
         );
     }
+
+    getStockDetailsByProductCode(productCode: string): Observable<any> {
+        return this.http.get(`${this.url}/api/inventory-stock-in/getstockindetailsbyproductcode?productCode=${productCode}`);
+      }
 }

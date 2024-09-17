@@ -65,6 +65,13 @@ export class UpdateProductComponent implements OnInit {
   formattedPrice: string | null = null;
   formattedPriceSale: string | null = null;
   isSerialProduct: boolean = false;
+  formattedSellingPrice: string | null = null;
+  formattedImPrice: string | null = null;
+  formattedPrices: string[][] = [];
+  isEditMode = false;
+  isEditMode2 = false;
+  isEditMode3: boolean[][] = [];
+  showDialog3 = false;
 
   productForm!: FormGroup;
   selectedCategory: TreeNode | null = null;
@@ -169,6 +176,8 @@ export class UpdateProductComponent implements OnInit {
       unitName: [null]
     });
 
+    this.initEditModes();
+
     for (let i = 0; i < this.valueProperties1Array.length; i++) {
       this.productForm.addControl(`sku${i}`, this.fb.control(0, [Validators.required, Validators.min(0)]));
       this.productForm.addControl(`barcode${i}`, this.fb.control(0, [Validators.required, Validators.min(0)]));
@@ -223,6 +232,7 @@ export class UpdateProductComponent implements OnInit {
   CallSnaphot(): void {
     this.productId = +this.route.snapshot.paramMap.get('id')!;
   }
+  
 
   FillDataGetById(): void {
     this.productService.getProductbyId(this.productId).subscribe((response: any) => {
@@ -270,7 +280,7 @@ export class UpdateProductComponent implements OnInit {
 
       this.setDefaultCategory();
 
-      this.disableSerialOption();
+      // this.disableSerialOption();
 
       if (this.productById.status === 1) {
         this.productForm.get('status')?.setValue(true);
@@ -285,6 +295,8 @@ export class UpdateProductComponent implements OnInit {
       }
 
       this.FillWarrantySwitchChange();
+
+      this.checkStockDataAndDisableSerial();
 
       const prices: number[] = this.productById.productVariants.map((variant: any) => variant.price); // Lấy mảng giá tiền từ các biến thể sản phẩm
       const quantities: number[] = this.productById.productVariants.map((variant: any) => variant.quantity); // Lấy mảng giá tiền từ các biến thể sản phẩm
@@ -320,11 +332,33 @@ export class UpdateProductComponent implements OnInit {
     // this.loadCategoriesAndChild();
   }
 
-  disableSerialOption(): void {
+  checkStockDataAndDisableSerial(): void {
+    const productCode = this.productById.code;
+    this.productService.getStockDetailsByProductCode(productCode).subscribe((stockResponse: any) => {
+      const hasStockData = stockResponse.data.length > 0;
+      const isProductTypeZero = this.productById.productType === 0;
+      const isProductTypeZero2 = this.productById.productType === 1;
+      const hasVariantWithQuantity = this.productById.productVariants.some((variant: any) => variant.quantity > 0);
+  
+      if (isProductTypeZero && hasStockData || hasVariantWithQuantity) {
+        this.productForm.get('productType')?.disable();
+      } else {
+        this.productForm.get('productType')?.enable();
+      }
+
+      if (isProductTypeZero2 && hasStockData) {
+        this.productForm.get('productType')?.disable();
+      } else {
+        this.productForm.get('productType')?.enable();
+      }
+    });
+  }
+
+  disableSerialOption(stockData: any[] = []): void {
     const totalQuantity = this.productForm.get('totalQuantity')?.value;
     const wareQuantities = this.productById.productVariants.map((variant: any) => variant.quantity);
 
-    const isDisabled = totalQuantity > 0 || wareQuantities.some((q: number) => q > 0);
+    const isDisabled = totalQuantity > 0 || wareQuantities.some((q: number) => q > 0) || stockData.length > 0;
 
     if (isDisabled) {
       this.productForm.get('productType')?.disable();
@@ -371,6 +405,13 @@ export class UpdateProductComponent implements OnInit {
     }
   }
 
+  openDialog3(): void {
+    this.showDialog3 = true;
+  }
+
+  closeDialog3() {
+    this.showDialog3 = false;
+  }
 
   organizeVariantsByProperties(variants: any[]): any[] {
     const organizedVariants: any[] = [];
@@ -403,6 +444,66 @@ export class UpdateProductComponent implements OnInit {
     if (input) {
       this.showNameError15 = false;  // Ẩn thông báo lỗi khi người dùng nhập dữ liệu
     }
+  }
+
+  convertToCurrency() {
+    const sellingPriceValue = this.productForm.get('sellingPrice')?.value;
+    if (sellingPriceValue) {
+      // Chuyển đổi sang định dạng tiền VND
+      this.formattedSellingPrice = this.formatCurrency(sellingPriceValue);
+      this.isEditMode = false; // Sau khi chuyển sang currency thì tắt chế độ chỉnh sửa
+    }
+  }
+
+  convertToCurrency2() {
+    const imPriceValue = this.productForm.get('importPrice')?.value;
+    if (imPriceValue) {
+      // Chuyển đổi sang định dạng tiền VND
+      this.formattedImPrice = this.formatCurrency(imPriceValue);
+      this.isEditMode2 = false; // Sau khi chuyển sang currency thì tắt chế độ chỉnh sửa
+    }
+  }
+
+  convertPriceToCurrency(i: number, j: number) {
+    const controlName = this.getPriceControlName(i, j);
+    const priceValue = this.productForm.get(controlName)?.value;
+    
+    if (priceValue) {
+      this.formattedPrices[i][j] = this.formatCurrency(priceValue);
+      this.isEditMode3[i][j] = false;  // Ẩn chế độ chỉnh sửa sau khi chuyển đổi
+    }
+  }
+
+  initEditModes() {
+    // Giả sử bạn có một cấu trúc lặp lại với các giá trị `i` và `j`, cần khởi tạo các trạng thái ban đầu
+    for (let i = 0; i < 10; i++) {
+      this.formattedPrices[i] = [];
+      this.isEditMode3[i] = [];
+      for (let j = 0; j < 5; j++) {
+        this.formattedPrices[i][j] = null;  // Ban đầu chưa có giá trị formatted
+        this.isEditMode3[i][j] = true;        // Ban đầu là chế độ chỉnh sửa
+      }
+    }
+  }
+
+  toggleEditMode3(i: number, j: number) {
+    this.isEditMode3[i][j] = !this.isEditMode3[i][j];
+  }
+
+  formatCurrency(value: number): string {
+    // Sử dụng hàm quốc tế hóa số để định dạng tiền tệ VND
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(value);
+  }
+
+  toggleEditMode() {
+    this.isEditMode = !this.isEditMode;
+  }
+
+  toggleEditMode2() {
+    this.isEditMode2 = !this.isEditMode2;
   }
 
   getLinkImage(index: number): string | null {
@@ -943,8 +1044,32 @@ export class UpdateProductComponent implements OnInit {
     this.productForm.get('globalPrice')?.reset();
     this.productForm.get('globalWare')?.reset();
     this.productForm.get('base64_FileImage')?.reset();
-    this.productForm.get('price')?.reset();
-    this.productForm.get('totalQuantity')?.reset();
+    for (let i = 0; i < this.valueProperties1Array.controls.length; i++) {
+      // Loop through the second array (valueProperties2Array)
+      for (let j = 0; j < this.valueProperties2Array.controls.length; j++) {
+        // Clear the Price control
+        const priceControl = this.getPriceControlName(i, j);
+        if (priceControl) {
+          this.productForm.get(priceControl)?.reset(); // or setValue('') if you want an empty string
+        }
+  
+        // Clear the Barcode control
+        const barcodeControl = this.getBarcodeControlName(i, j);
+        if (barcodeControl) {
+          this.productForm.get(barcodeControl)?.reset(); // or setValue('') if you want an empty string
+        }
+
+        const skuControl = this.getSkuControlName(i, j);
+        if (skuControl) {
+          this.productForm.get(skuControl)?.reset(); // or setValue('') if you want an empty string
+        }
+
+        const quantityControl = this.getWareControlName(i, j);
+        if (quantityControl) {
+          this.productForm.get(quantityControl)?.reset(); // or setValue('') if you want an empty string
+        }
+      }
+    }
     this.valueProperties1Array.clear();
     // this.addProperty1();
     this.buttonVariants = true;
@@ -957,8 +1082,6 @@ export class UpdateProductComponent implements OnInit {
     this.productForm.get('globalPrice')?.reset();
     this.productForm.get('globalWare')?.reset();
     this.productForm.get('base64_FileImage')?.reset();
-    this.productForm.get('price')?.reset();
-    this.productForm.get('totalQuantity')?.reset();
     this.valueProperties2Array.clear();
     // this.addProperty2();
     this.buttonVariants2 = true;
@@ -971,8 +1094,32 @@ export class UpdateProductComponent implements OnInit {
     this.productForm.get('globalPrice')?.reset();
     this.productForm.get('globalWare')?.reset();
     this.productForm.get('base64_FileImage')?.reset();
-    this.productForm.get('price')?.reset();
-    this.productForm.get('totalQuantity')?.reset();
+    for (let i = 0; i < this.valueProperties1Array.controls.length; i++) {
+      // Loop through the second array (valueProperties2Array)
+      for (let j = 0; j < this.valueProperties2Array.controls.length; j++) {
+        // Clear the Price control
+        const priceControl = this.getPriceControlName(i, j);
+        if (priceControl) {
+          this.productForm.get(priceControl)?.reset(); // or setValue('') if you want an empty string
+        }
+  
+        // Clear the Barcode control
+        const barcodeControl = this.getBarcodeControlName(i, j);
+        if (barcodeControl) {
+          this.productForm.get(barcodeControl)?.reset(); // or setValue('') if you want an empty string
+        }
+
+        const skuControl = this.getSkuControlName(i, j);
+        if (skuControl) {
+          this.productForm.get(skuControl)?.reset(); // or setValue('') if you want an empty string
+        }
+
+        const quantityControl = this.getWareControlName(i, j);
+        if (quantityControl) {
+          this.productForm.get(quantityControl)?.reset(); // or setValue('') if you want an empty string
+        }
+      }
+    }
     this.valueProperties1Array.clear();
     // this.addProperty1();
     this.buttonVariants = true;
@@ -985,8 +1132,6 @@ export class UpdateProductComponent implements OnInit {
     this.productForm.get('globalPrice')?.reset();
     this.productForm.get('globalWare')?.reset();
     this.productForm.get('base64_FileImage')?.reset();
-    this.productForm.get('price')?.reset();
-    this.productForm.get('totalQuantity')?.reset();
     this.valueProperties2Array.clear();
     // this.addProperty2();
     this.buttonVariants2 = true;
@@ -996,7 +1141,6 @@ export class UpdateProductComponent implements OnInit {
     const control = this.productForm.get(`base64_FileImage${index}`);
     return control ? control.value : null;
   }
-
 
   getPriceControlError(i: number, j: number) {
     const control = this.productForm.get(this.getPriceControlName(i, j));
@@ -1130,6 +1274,70 @@ export class UpdateProductComponent implements OnInit {
       );
     });
     console.log(this.base64_FileIamges)
+  }
+
+  checkBarcodeAndUpdate() {
+    const newBarcode = this.productForm.get('barcode')!.value;
+    const originalBarcode = this.productById.barcode;
+
+    // Kiểm tra xem mã vạch có thay đổi không
+    if (newBarcode === originalBarcode) {
+      // Mã vạch không thay đổi, trực tiếp cập nhật sản phẩm
+      this.onSubmitUpdate();
+    } else {
+      // Mã vạch đã thay đổi, kiểm tra mã vạch mới
+      this.productService.checkBarcodeUpdate(newBarcode, this.productById.id).subscribe(
+        (response) => {
+          if (response.data) {
+            // Mã vạch đã tồn tại
+            this.messages = [{
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Mã vạch đã tồn tại. Vui lòng sử dụng mã vạch khác.',
+              life: 2000,
+            }];
+          } else {
+            // Mã vạch không tồn tại, tiếp tục cập nhật sản phẩm
+            this.onSubmitUpdate();
+          }
+        },
+        (error) => {
+          console.error('Lỗi khi kiểm tra mã vạch:', error);
+        }
+      );
+    }
+  }
+
+  checkSkuAndUpdate() {
+    const newSku = this.productForm.get('sku')!.value;
+    const originalSku = this.productById.sku;
+
+    // Kiểm tra xem mã vạch có thay đổi không
+    if (newSku === originalSku) {
+      // Mã vạch không thay đổi, trực tiếp cập nhật sản phẩm
+      this.onSubmitUpdate();
+    } else {
+      // Mã vạch đã thay đổi, kiểm tra mã vạch mới
+      this.productService.checkSkuUpdate(newSku, this.productById.id).subscribe(
+        (response) => {
+          if (response.data) {
+            // Mã vạch đã tồn tại
+            this.messages = [{
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Mã sku đã tồn tại. Vui lòng sử dụng mã vạch khác.',
+              life: 2000,
+            }];
+          } else {
+            // Mã vạch không tồn tại, tiếp tục cập nhật sản phẩm
+            this.onSubmitUpdate();
+          }
+        },
+        (error) => {
+          console.error('Lỗi khi kiểm tra mã vạch:', error);
+        }
+      );
+    }
   }
 
   onSubmitUpdate(): void {

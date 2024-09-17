@@ -126,6 +126,27 @@ export class AppMenuComponent implements OnInit {
                     },
                 ],
             },
+            {
+                label: '',
+                items: [
+                    {
+                        label: 'Quản trị hệ thống',
+                        icon: 'pi pi-users',
+                        items: [
+                            {
+                                label: 'Nhóm quyền',
+                                icon: 'pi pi-circle',
+                                routerLink: ['/warranty/warranty-certificate'],
+                            },
+                            {
+                                label: 'Quản lý tài khoản',
+                                icon: 'pi pi-circle',
+                                routerLink: ['/warranty/warranty-request'],
+                            }
+                        ],
+                    },
+                ],
+            },
         ];
     }
 }
