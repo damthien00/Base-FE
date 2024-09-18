@@ -209,7 +209,7 @@
                                                 maxlength="100"
                                             /> 
                                     </div>                               
-                                    <div class="col-lg-4" *ngIf="productById.productVariants.length === 0 && !formattedSellingPrice || isEditMode">
+                                    <div class="col-lg-4" *ngIf="productById.productVariants?.length === 0 && !formattedSellingPrice || isEditMode">
                                       <label class="labelip">Giá bán </label>
                                       <input
                                           type="text"
@@ -265,7 +265,7 @@
                             </div>                     
                             <div class="col-lg-12">
                                 <div class="row">
-                                    <div class="col-lg-4"  *ngIf="productForm.get('productType').value === 0 && productById.productVariants.length === 0">
+                                    <div class="col-lg-4"  *ngIf="productForm.get('productType')?.value === 0 && productById.productVariants?.length === 0">
                                         <label class="labelip">Kho hàng</label>
                                             <input
                                                 type="text"
@@ -761,7 +761,7 @@
                                             <th style="width: 20%">SKU phân loại</th>
                                             <th style="width: 10%">Mã vạch/Mã Barcode</th>
                                             <th style="width: 10%">Giá bán</th>
-                                            <th  *ngIf="productForm.get('productType').value === 0">Tồn kho</th>
+                                            <th  *ngIf="productForm.get('productType')?.value === 0">Tồn kho</th>
                                           </tr>
                                         </ng-template>
                                         <ng-template pTemplate="body" let-row let-i="rowIndex"
@@ -801,8 +801,11 @@
                                                   type="text"
                                                   [formControlName]="getSkuControlName(i, j)"
                                                   [style]="{ height: '35px', width: '200px' }"
-                                                  (input)="onInput3($event); onSkuInput($event, i, j); onSKUInput2($event, i, j)"
+                                                  (input)="onInput3($event); onSkuInput($event, i, j); onSkuInput3($event, i, j)"
                                                 />
+                                                <div *ngIf="skuErrors[i + '-' + j]" class="text-danger">
+                                                  {{ errorMessageSKU }}
+                                                </div>
                                             </td>
                                             <td>
                                               <input
@@ -810,9 +813,12 @@
                                                 type="text"
                                                 [formControlName]="getBarcodeControlName(i, j)"
                                                 (keypress)="onKeyPress($event)"
-                                                (input)="onInput2($event); onBarcodeInput($event, i, j); onBarcodeInput2($event, i, j)"
+                                                (input)="onInput2($event); onBarcodeInput($event, i, j); onBarcodeInput3($event, i, j)"
                                                 [style]="{ height: '35px', width: '200px' }"
-                                              />                              
+                                              />
+                                              <div *ngIf="barcodeErrors[i + '-' + j]" class="text-danger">
+                                                {{ errorMessageBarcode }}
+                                              </div>                              
                                             </td>
                                             <td *ngIf="!formattedPrices[i][j] || isEditMode3[i][j]">
                                               <input
@@ -840,7 +846,7 @@
                                                   (click)="toggleEditMode3(i, j)"
                                               />
                                             </td>
-                                            <td  *ngIf="productForm.get('productType').value === 0">
+                                            <td  *ngIf="productForm.get('productType')?.value === 0">
                                               <input
                                                 class="form-control"
                                                 type="text"

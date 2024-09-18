@@ -118,6 +118,8 @@ export class CreateProductComponent implements OnInit {
   errorMessageBarcode: string = 'Mã vạch trùng với mã vạch sản phẩm';
   duplicateSKU: boolean = false; // To track if there are duplicate barcodes
   errorMessageSKU: string = 'Mã sku trùng với mã sku sản phẩm';
+  barcodeErrors: { [key: string]: boolean } = {};
+  skuErrors: { [key: string]: boolean } = {};
   
 
   units = [{ name: 'Kg' }, { name: 'Lít' }, { name: 'Cái' }];
@@ -1011,9 +1013,10 @@ export class CreateProductComponent implements OnInit {
             severity: 'error',
             summary: 'Lỗi',
             detail: 'Mã barcode hoặc mã sku của biến thể đã tồn tại. Vui lòng kiểm tra lại.',
-            life: 4000,
+            life: 3000,
           },
         ];
+        this.isSubmittingCheck = false;
         return
       }
     }).catch((error) => {
@@ -1247,6 +1250,66 @@ export class CreateProductComponent implements OnInit {
   }
 
 
+  checkDuplicateBarcode2(newBarcode: string, i: number, j: number): boolean {
+    const mainBarcode = this.productForm.get('barcode')?.value;
+
+    // Get all entered barcodes from the form array
+    const barcodes = this.valueProperties2Array.controls.map(
+      (control: any, index: number) => control.get(this.getBarcodeControlName(index, j))?.value
+    );
+
+    // Check if new barcode matches main barcode or any existing barcode except the current one
+    return (
+      mainBarcode === newBarcode || 
+      barcodes.some((barcode, index) => barcode === newBarcode && index !== i)
+    );
+  }
+
+  checkDuplicateSku2(newSku: string, i: number, j: number): boolean {
+    const mainSku = this.productForm.get('sku')?.value;
+
+    // Get all entered barcodes from the form array
+    const skus = this.valueProperties2Array.controls.map(
+      (control: any, index: number) => control.get(this.getSkuControlName(index, j))?.value
+    );
+
+    // Check if new barcode matches main barcode or any existing barcode except the current one
+    return (
+      mainSku === newSku || 
+      skus.some((sku, index) => sku === newSku && index !== i)
+    );
+  }
+
+  onBarcodeInput3(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newBarcode = input.value;
+
+    // Check if the barcode is a duplicate
+    const isDuplicate = this.checkDuplicateBarcode2(newBarcode, i, j);
+
+    // Update error state for this specific field
+    this.barcodeErrors[`${i}-${j}`] = isDuplicate;
+  }
+
+  onSkuInput3(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newSku = input.value;
+
+    // Check if the barcode is a duplicate
+    const isDuplicate = this.checkDuplicateSku2(newSku, i, j);
+
+    // Update error state for this specific field
+    this.skuErrors[`${i}-${j}`] = isDuplicate;
+  }
+
+  hasBarcodeErrors(): boolean {
+    return Object.values(this.barcodeErrors).some(error => error);
+  }
+
+  hasSkuErrors(): boolean {
+    return Object.values(this.skuErrors).some(error => error);
+  }
+
   onSubmit(): void {
     if (this.isSubmitting) {
       return;
@@ -1261,30 +1324,17 @@ export class CreateProductComponent implements OnInit {
       hasError = true;
     }
 
-    if (this.duplicateBarcodeError) {
+    if (this.hasBarcodeErrors() || this.hasSkuErrors()) {
       this.messages = [
         {
           severity: 'warn',
           summary: 'Lỗi',
-          detail: 'Có mã Barcode của biến thể bị trùng! Vui lòng nhập lại.',
+          detail: 'Có mã Barcode hoặc mã Sku trùng với sản phẩm',
           life: 3000,
         },
       ];
       this.isSubmitting = false;
-      return; // Prevent form submission
-    }
-
-    if (this.duplicateSkuError) {
-      this.messages = [
-        {
-          severity: 'warn',
-          summary: 'Lỗi',
-          detail: 'Có mã SKU của biến thể bị trùng! Vui lòng nhập lại.',
-          life: 3000,
-        },
-      ];
-      this.isSubmitting = false;
-      return; // Prevent form submission
+      return; // Prevent form submission if there are barcode errors
     }
 
     if (this.duplicateBarcodeError || this.duplicateSkuError) {
@@ -1292,7 +1342,7 @@ export class CreateProductComponent implements OnInit {
         {
           severity: 'warn',
           summary: 'Lỗi',
-          detail: 'Mã Barcode và Sku của biến thể bị trùng! Vui lòng nhập lại.',
+          detail: 'Có mã Barcode hoặc mã Sku của biến thể bị trùng! Vui lòng nhập lại.',
           life: 3000,
         },
       ];
@@ -1300,46 +1350,6 @@ export class CreateProductComponent implements OnInit {
       return; // Prevent form submission
     }
 
-     if (this.duplicateBarcode) {
-      // Display warning message and prevent form submission
-      this.messages = [
-        {
-          severity: 'warn',
-          summary: '',
-          detail: 'Mã vạch biến thể không được trùng với mã vạch sản phẩm',
-          life: 3000,
-        },
-      ];
-      this.isSubmitting = false;
-      return; // Prevent further execution of onSubmit
-    }
-
-    if (this.duplicateSKU) {
-      this.messages = [
-        {
-          severity: 'warn',
-          summary: '',
-          detail: 'Mã sku biến thể không được trùng với mã sku sản phẩm',
-          life: 3000,
-        },
-      ];
-      this.isSubmitting = false;
-      return
-    }
-
-    if (this.duplicateBarcode || this.duplicateSKU) {
-      // Display warning message and prevent form submission
-      this.messages = [
-        {
-          severity: 'warn',
-          summary: '',
-          detail: 'Mã vạch và Sku của biến thể không được trùng với mã vạch và Sku sản phẩm',
-          life: 3000,
-        },
-      ];
-      this.isSubmitting = false;
-      return; // Prevent further execution of onSubmit
-    }
 
     if (
       !productData.name ||

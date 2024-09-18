@@ -132,6 +132,8 @@ export class UpdateProductComponent implements OnInit {
   errorMessageBarcode: string = 'Mã vạch trùng với mã vạch sản phẩm';
   duplicateSKU: boolean = false; // To track if there are duplicate barcodes
   errorMessageSKU: string = 'Mã sku trùng với mã sku sản phẩm';
+  barcodeErrors: { [key: string]: boolean } = {};
+  skuErrors: { [key: string]: boolean } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -230,19 +232,19 @@ export class UpdateProductComponent implements OnInit {
         this.updatePriceControls(newSellingPrice);
       }
     });
-  
+
     this.productForm.get('totalQuantity')?.valueChanges.subscribe((newTotalQuantity) => {
       if (this.addVariants) {
         this.updateWareControls(newTotalQuantity);
       }
-    }); 
+    });
   }
 
 
   CallSnaphot(): void {
     this.productId = +this.route.snapshot.paramMap.get('id')!;
   }
-  
+
 
   FillDataGetById(): void {
     this.productService.getProductbyId(this.productId).subscribe((response: any) => {
@@ -298,11 +300,11 @@ export class UpdateProductComponent implements OnInit {
         this.productForm.get('status')?.setValue(false);
       }
 
-      if (this.productById.productType === 1) {
-        this.productForm.get('productType')?.disable();
-      } else {
-        this.productForm.get('productType')?.enable();
-      }
+      // if (this.productById.productType === 1) {
+      //   this.productForm.get('productType')?.disable();
+      // } else {
+      //   this.productForm.get('productType')?.enable();
+      // }
 
       this.FillWarrantySwitchChange();
 
@@ -343,22 +345,26 @@ export class UpdateProductComponent implements OnInit {
   }
 
   checkStockDataAndDisableSerial(): void {
+    const productType = this.productById.productType;
     const productCode = this.productById.code;
-    this.productService.getStockDetailsByProductCode(productCode).subscribe((stockResponse: any) => {
-      const hasStockData = stockResponse.data.length > 0;
-      const isProductTypeZero = this.productById.productType === 0;
-      const isProductTypeZero2 = this.productById.productType === 1;
-      const hasVariantWithQuantity = this.productById.productVariants.some((variant: any) => variant.quantity > 0);
-  
-      if (isProductTypeZero || hasStockData || hasVariantWithQuantity) {
-        this.productForm.get('productType')?.disable();
-      } else {
-        this.productForm.get('productType')?.enable();
-      }
+    this.productService.getStockDetailsByProductCode(productCode).subscribe((apiResponse: any) => {
+      const hasData = apiResponse.data.length > 0;
+      const wareQuantities = this.productById.productVariants.map((variant: any) => variant.quantity);
+      const variantHasQuantity = wareQuantities.some((q: number) => q > 0);
 
-      if (isProductTypeZero2 || hasStockData) {
+      if (productType === 0 && (variantHasQuantity || hasData)) {
+        // Auto-select "Sản phẩm thường" and disable "Sản phẩm Serial/iMei"
+        this.productForm.get('productType')?.setValue(0);
         this.productForm.get('productType')?.disable();
-      } else {
+      }
+      // Logic for productType = 1 (Sản phẩm Serial/iMei)
+      else if (productType === 1 && hasData) {
+        // Auto-select "Sản phẩm Serial/iMei" and disable "Sản phẩm thường"
+        this.productForm.get('productType')?.setValue(1);
+        this.productForm.get('productType')?.disable();
+      }
+      // If no specific condition is met, allow both options
+      else {
         this.productForm.get('productType')?.enable();
       }
     });
@@ -477,7 +483,7 @@ export class UpdateProductComponent implements OnInit {
   convertPriceToCurrency(i: number, j: number) {
     const controlName = this.getPriceControlName(i, j);
     const priceValue = this.productForm.get(controlName)?.value;
-    
+
     if (priceValue) {
       this.formattedPrices[i][j] = this.formatCurrency(priceValue);
       this.isEditMode3[i][j] = false;  // Ẩn chế độ chỉnh sửa sau khi chuyển đổi
@@ -764,7 +770,7 @@ export class UpdateProductComponent implements OnInit {
       this.updateWareControls(this.productForm.get('totalQuantity')?.value);
     }
   }
-  
+
   onKeyPressPrice(event: KeyboardEvent) {
     const inputChar = event.key;
     if (!this.isNumberOrDecimalKey(inputChar, event.target!)) {
@@ -800,12 +806,12 @@ export class UpdateProductComponent implements OnInit {
         this.updatePriceControls(newSellingPrice);
       }
     });
-  
+
     this.productForm.get('totalQuantity')?.valueChanges.subscribe((newTotalQuantity) => {
       if (this.addVariants) {
         this.updateWareControls(newTotalQuantity);
       }
-    }); 
+    });
   }
 
   addProperty2(): void {
@@ -1062,7 +1068,7 @@ export class UpdateProductComponent implements OnInit {
         if (priceControl) {
           this.productForm.get(priceControl)?.reset(); // or setValue('') if you want an empty string
         }
-  
+
         // Clear the Barcode control
         const barcodeControl = this.getBarcodeControlName(i, j);
         if (barcodeControl) {
@@ -1112,7 +1118,7 @@ export class UpdateProductComponent implements OnInit {
         if (priceControl) {
           this.productForm.get(priceControl)?.reset(); // or setValue('') if you want an empty string
         }
-  
+
         // Clear the Barcode control
         const barcodeControl = this.getBarcodeControlName(i, j);
         if (barcodeControl) {
@@ -1353,10 +1359,10 @@ export class UpdateProductComponent implements OnInit {
   onBarcodeInput(event: Event, i: number, j: number): void {
     const inputElement = event.target as HTMLInputElement;
     const barcode = inputElement.value;
-  
+
     // Update the barcode value in the array based on its control name
     const controlName = this.getBarcodeControlName(i, j);
-  
+
     if (barcode.trim() === '') {
       // If the input is empty, remove it from the barcodes array
       this.barcodes[i * 10 + j] = null; // Assuming there are max 10 variants
@@ -1364,11 +1370,11 @@ export class UpdateProductComponent implements OnInit {
       // Otherwise, update the barcode
       this.barcodes[i * 10 + j] = barcode;
     }
-  
+
     // Check for duplicates
     this.checkForDuplicateBarcodes();
   }
-  
+
   checkForDuplicateBarcodes(): void {
     const filledBarcodes = this.barcodes.filter(barcode => barcode); // Only consider non-empty barcodes
     const uniqueBarcodes = new Set(filledBarcodes);
@@ -1383,7 +1389,7 @@ export class UpdateProductComponent implements OnInit {
         },
       ];
     }
-  } 
+  }
 
   checkDuplicateBarcode(newBarcode: string): boolean {
     const existingBarcode = this.productForm.get('barcode')?.value;
@@ -1434,10 +1440,10 @@ export class UpdateProductComponent implements OnInit {
   onSkuInput(event: Event, i: number, j: number): void {
     const inputElement = event.target as HTMLInputElement;
     const sku = inputElement.value;
-  
+
     // Update the barcode value in the array based on its control name
     const controlName = this.getSkuControlName(i, j);
-  
+
     if (sku.trim() === '') {
       // If the input is empty, remove it from the barcodes array
       this.skus[i * 10 + j] = null; // Assuming there are max 10 variants
@@ -1445,7 +1451,7 @@ export class UpdateProductComponent implements OnInit {
       // Otherwise, update the barcode
       this.skus[i * 10 + j] = sku;
     }
-  
+
     // Check for duplicates
     this.checkForDuplicateSku();
   }
@@ -1465,7 +1471,67 @@ export class UpdateProductComponent implements OnInit {
       ];
     }
   }
-  
+
+  checkDuplicateBarcode2(newBarcode: string, i: number, j: number): boolean {
+    const mainBarcode = this.productForm.get('barcode')?.value;
+
+    // Get all entered barcodes from the form array
+    const barcodes = this.valueProperties2Array.controls.map(
+      (control: any, index: number) => control.get(this.getBarcodeControlName(index, j))?.value
+    );
+
+    // Check if new barcode matches main barcode or any existing barcode except the current one
+    return (
+      mainBarcode === newBarcode || 
+      barcodes.some((barcode, index) => barcode === newBarcode && index !== i)
+    );
+  }
+
+  checkDuplicateSku2(newSku: string, i: number, j: number): boolean {
+    const mainSku = this.productForm.get('sku')?.value;
+
+    // Get all entered barcodes from the form array
+    const skus = this.valueProperties2Array.controls.map(
+      (control: any, index: number) => control.get(this.getSkuControlName(index, j))?.value
+    );
+
+    // Check if new barcode matches main barcode or any existing barcode except the current one
+    return (
+      mainSku === newSku || 
+      skus.some((sku, index) => sku === newSku && index !== i)
+    );
+  }
+
+  onBarcodeInput3(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newBarcode = input.value;
+
+    // Check if the barcode is a duplicate
+    const isDuplicate = this.checkDuplicateBarcode2(newBarcode, i, j);
+
+    // Update error state for this specific field
+    this.barcodeErrors[`${i}-${j}`] = isDuplicate;
+  }
+
+  onSkuInput3(event: Event, i: number, j: number): void {
+    const input = event.target as HTMLInputElement;
+    const newSku = input.value;
+
+    // Check if the barcode is a duplicate
+    const isDuplicate = this.checkDuplicateSku2(newSku, i, j);
+
+    // Update error state for this specific field
+    this.skuErrors[`${i}-${j}`] = isDuplicate;
+  }
+
+  hasBarcodeErrors(): boolean {
+    return Object.values(this.barcodeErrors).some(error => error);
+  }
+
+  hasSkuErrors(): boolean {
+    return Object.values(this.skuErrors).some(error => error);
+  }
+
 
   onSubmitUpdate(): void {
     if (this.isSubmitting) {
@@ -1481,56 +1547,30 @@ export class UpdateProductComponent implements OnInit {
       hasError = true;
     }
 
-    if (this.duplicateBarcodeError) {
-      this.messages = [
-        {
-          severity: 'error',
-          summary: 'Lỗi',
-          detail: 'Có mã Barcode của biến thể bị trùng! Vui lòng nhập lại.',
-          life: 4000,
-        },
-      ];
-      this.isSubmitting = false;
-      return; // Prevent form submission
-    }
-
-    if (this.duplicateSkuError) {
-      this.messages = [
-        {
-          severity: 'error',
-          summary: 'Lỗi',
-          detail: 'Có mã SKU của biến thể bị trùng! Vui lòng nhập lại.',
-          life: 4000,
-        },
-      ];
-      this.isSubmitting = false;
-      return; // Prevent form submission
-    }
-
-    if (this.duplicateBarcode) {
+    if (this.hasBarcodeErrors() || this.hasSkuErrors()) {
       this.messages = [
         {
           severity: 'warn',
-          summary: '',
-          detail: 'Mã vạch biến thể không được trùng với mã vạch sản phẩm',
+          summary: 'Lỗi',
+          detail: 'Có mã Barcode hoặc mã Sku trùng với sản phẩm',
           life: 3000,
         },
       ];
       this.isSubmitting = false;
-      return
+      return; // Prevent form submission if there are barcode errors
     }
 
-    if (this.duplicateSKU) {
+    if (this.duplicateBarcodeError || this.duplicateSkuError) {
       this.messages = [
         {
           severity: 'warn',
-          summary: '',
-          detail: 'Mã sku biến thể không được trùng với mã sku sản phẩm',
+          summary: 'Lỗi',
+          detail: 'Có mã Barcode hoặc mã Sku của biến thể bị trùng! Vui lòng nhập lại.',
           life: 3000,
         },
       ];
       this.isSubmitting = false;
-      return
+      return; // Prevent form submission
     }
 
     // if (!productData.name || productData.name.trim().length < 6 || productData.name.trim().length > 100) {
@@ -1572,6 +1612,8 @@ export class UpdateProductComponent implements OnInit {
       return
     }
 
+    const productTypeValue = productData.productType === 1 ? 1 : 0;
+
     const product: Products = {
       id: productData.id,
       name: productData.name,
@@ -1599,7 +1641,7 @@ export class UpdateProductComponent implements OnInit {
       warning: productData.warning ? 1 : 0,
       unitName: productData.unitName,
       numberDay: productData.numberDay,
-      productType: productData.productType
+      productType: productTypeValue
     };
 
     this.productById.name = productData.name;
@@ -1625,7 +1667,7 @@ export class UpdateProductComponent implements OnInit {
     this.productById.warning = productData.warning ? 1 : 0;
     this.productById.numberDay = productData.numberDay;
     this.productById.unitName = productData.unitName;
-    this.productById.productType = productData.productType;
+    this.productById.productType = productTypeValue;
 
 
     let hasVariants = false;
