@@ -7,6 +7,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
+import { SharedModule } from 'src/app/shared/modules/shared.module';
 
 @NgModule({
     imports: [
@@ -16,7 +17,8 @@ import { InputTextModule } from 'primeng/inputtext';
         CheckboxModule,
         InputTextModule,
         FormsModule,
-        PasswordModule
+        PasswordModule,
+        SharedModule
     ],
     declarations: [LoginComponent]
 })
