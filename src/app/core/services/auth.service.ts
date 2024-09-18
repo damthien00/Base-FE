@@ -14,7 +14,11 @@ import { RefreshTokenRequest } from '../models/identity/refresh-token-request.in
     providedIn: 'root',
 })
 export class AuthService {
-    constructor(private http: HttpClient, private localStorageService: LocalStorageService, private httpService: HttpService) { }
+    constructor(
+        private http: HttpClient,
+        private localStorageService: LocalStorageService,
+        private httpService: HttpService
+    ) {}
 
     public url = environment.url;
 
@@ -27,16 +31,15 @@ export class AuthService {
         return false;
     }
 
-
     // tny add
     login(request: any): Observable<any> {
         return this.http
             .post<any>(`${this.url}/api/auth/login-by-email`, request)
             .pipe(catchError(this.handleError));
     }
-    private isInitAuthSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private isInitAuthSubject: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false);
     isInitAuth$: Observable<boolean> = this.isInitAuthSubject.asObservable();
-
 
     private currentUserSubject = new BehaviorSubject<any>(null);
     public userCurrent = this.currentUserSubject.asObservable();
@@ -49,11 +52,11 @@ export class AuthService {
         this.currentUserSubject.next(user);
     }
 
-
-
     //Auth token
     getAuthTokenLocalStorage(): AuthToken | null {
-        const authToken: AuthToken | null = this.localStorageService.getItem(LocalStorage.AuthToken);
+        const authToken: AuthToken | null = this.localStorageService.getItem(
+            LocalStorage.AuthToken
+        );
 
         return authToken;
     }
@@ -62,24 +65,31 @@ export class AuthService {
         this.localStorageService.setItem(LocalStorage.AuthToken, authToken);
     }
 
-
     getUserCurrentApi(): Observable<ApiResult<UserCurrent>> {
-        return this.http.get<ApiResult<UserCurrent>>(`${this.url}'/api/user/user-info'`);
+        return this.http.get<ApiResult<UserCurrent>>(
+            `${this.url}'/api/user/user-info'`
+        );
     }
 
     fetchUserCurrent(): Observable<ApiResult<UserCurrent>> {
         let headers = this.httpService.addSkipLoadingHeader();
 
-        return this.http.get<ApiResult<UserCurrent>>(`${this.url}/api/user/user-info`, { headers });
+        return this.http.get<ApiResult<UserCurrent>>(
+            `${this.url}/api/user/user-info`,
+            { headers }
+        );
     }
 
-
-    refreshToken(request: RefreshTokenRequest): Observable<ApiResult<AuthToken>> {
-        return this.http.post<ApiResult<AuthToken>>(`${this.url}/api/auth/refresh-token`, request);
+    refreshToken(
+        request: RefreshTokenRequest
+    ): Observable<ApiResult<AuthToken>> {
+        return this.http.post<ApiResult<AuthToken>>(
+            `${this.url}/api/auth/refresh-token`,
+            request
+        );
     }
 
     hasRole(role: string): boolean {
-
         if (!this.currentUserSubject.value) {
             return false;
         }
@@ -92,7 +102,6 @@ export class AuthService {
     }
 
     hasRoleAsync(user: any, role: string): boolean {
-
         if (!user) {
             return false;
         }
@@ -105,9 +114,11 @@ export class AuthService {
     }
 
     logout(): Observable<ApiResult<boolean>> {
-        return this.http.post<ApiResult<boolean>>(`${this.url}/api/auth/logout`, null);
+        return this.http.post<ApiResult<boolean>>(
+            `${this.url}/api/auth/logout`,
+            null
+        );
     }
-
 
     private handleError(error: HttpErrorResponse): Observable<any> {
         console.error('An error occurred:', error);
