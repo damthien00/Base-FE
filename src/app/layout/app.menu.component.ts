@@ -156,7 +156,7 @@ export class AppMenuComponent implements OnInit {
                             {
                                 label: 'Quản lý tài khoản',
                                 icon: 'pi pi-fw pi-circle',
-                                routerLink: ['/user/show-user'],
+                                routerLink: ['/pages/user/show-user'],
                             },
                         ],
                     },

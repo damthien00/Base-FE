@@ -102,6 +102,13 @@ import { RouterModule } from '@angular/router';
                         './user/user.module'
                     ).then((m) => m.UserModule),
             },
+            {
+                path: 'group-right/show-group-right',
+                loadChildren: () =>
+                    import(
+                        './group-list/group-rights/group-rights.module'
+                    ).then((m) => m.GroupRightsModule),
+            },
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],

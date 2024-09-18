@@ -9,6 +9,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { GroupRightsComponent } from './group-rights.component';
 
 
+
 @NgModule({
   imports: [
     [
