@@ -553,11 +553,11 @@
                                                   type="text"
                                                   [formControlName]="getSkuControlName(i, j)"
                                                   [style]="{ height: '35px', width: '200px' }"
-                                                  (input)="onInput3($event); onSkuInput($event, i, j); onSKUInput2($event, i, j)"
+                                                  (input)="onInput3($event); onSkuInput($event, i, j); onSkuInput3($event, i, j)"
                                                 />
-                                                <!-- <div *ngIf="duplicateSkuError" class="text-danger">
-                                                  {{ errorMessageSku }}
-                                                </div>                             -->
+                                                <div *ngIf="skuErrors[i + '-' + j]" class="text-danger">
+                                                  {{ errorMessageSKU }}
+                                                </div>
                                             </td>
                                             <td>
                                               <input
@@ -565,12 +565,12 @@
                                                 type="text"
                                                 [formControlName]="getBarcodeControlName(i, j)"
                                                 (keypress)="onKeyPress($event)"
-                                                (input)="onInput2($event); onBarcodeInput($event, i, j); onBarcodeInput2($event, i, j)"
+                                                (input)="onInput2($event); onBarcodeInput($event, i, j); onBarcodeInput3($event, i, j)"
                                                 [style]="{ height: '35px', width: '200px' }"
                                               />
-                                              <!-- <div *ngIf="duplicateBarcodeError" class="text-danger">
-                                                {{ errorMessageCheck }}
-                                              </div> -->
+                                              <div *ngIf="barcodeErrors[i + '-' + j]" class="text-danger">
+                                                {{ errorMessageBarcode }}
+                                              </div>
                                             </td>
                                             <td *ngIf="!formattedPrices[i][j] || isEditMode3[i][j]">
                                               <input
