@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { OptionsFilterStockIn } from '../DTOs/stock-in/optionFilterStockIn';
-
+import { OptionsFilterProductVariant } from '../DTOs/stock-in/optionFilterProductVariant';
 @Injectable({
     providedIn: 'root',
 })
@@ -91,5 +91,21 @@ export class StockInService {
 
         // Gửi yêu cầu POST với URL và body đã khởi tạo
         return this.http.post<any>(url, body);
+    }
+
+    FilterProductVariant(options: OptionsFilterProductVariant): Promise<any> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let response = await this.http
+                    .post<OptionsFilterProductVariant>(
+                        `${this.url}/api/productvariants/filter`,
+                        options
+                    )
+                    .toPromise();
+                resolve(response);
+            } catch (error) {
+                reject(JSON.parse(JSON.stringify(error)));
+            }
+        });
     }
 }

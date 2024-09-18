@@ -15,6 +15,7 @@ import { ProductService } from 'src/app/core/services/product.service';
 import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { OptionsFilterProductVariant } from 'src/app/core/DTOs/stock-in/optionFilterProductVariant';
 
 export interface WarehouseReceipt {
     id?: number;
@@ -52,7 +53,7 @@ export class CreateComponent implements OnInit {
     temporaryDiscountUnit: string = 'VND';
 
     displayDiscountModal = false;
-    optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
+    optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
     frameNumber: any;
     engineNumber: any;
 
@@ -181,14 +182,15 @@ export class CreateComponent implements OnInit {
         const input = event.target as HTMLInputElement;
         const searchTerm = input.value.toLowerCase();
         if (this.onBarcode) {
-            this.optionsFillerProduct.pageIndex = 1;
-            this.optionsFillerProduct.pageSize = 1;
-            this.optionsFillerProduct.productName = '';
-            this.optionsFillerProduct.Barcode = searchTerm.toLowerCase();
+            this.optionsFilterProduct.pageIndex = 1;
+            this.optionsFilterProduct.pageSize = 1;
+            this.optionsFilterProduct.KeyWord = '';
+            this.optionsFilterProduct.Barcode = searchTerm.toLowerCase();
             try {
-                const response = await this.productService.FilterProduct(
-                    this.optionsFillerProduct
-                );
+                const response =
+                    await this.stockInReceipt.FilterProductVariants(
+                        this.optionsFilterProduct
+                    );
                 if (response.data.length > 0) {
                     console.log(response.data);
                     this.addToCart(response.data[0]);
@@ -203,10 +205,10 @@ export class CreateComponent implements OnInit {
             } finally {
             }
         } else {
-            this.optionsFillerProduct.pageIndex = 1;
-            this.optionsFillerProduct.pageSize = 10;
-            this.optionsFillerProduct.KeyWord = searchTerm.toLowerCase();
-            this.optionsFillerProduct.Barcode = null;
+            this.optionsFilterProduct.pageIndex = 1;
+            this.optionsFilterProduct.pageSize = 10;
+            this.optionsFilterProduct.KeyWord = searchTerm.toLowerCase();
+            this.optionsFilterProduct.Barcode = null;
             try {
                 // const response =
                 //     await this.productService.SearchProductVariants(
@@ -229,13 +231,66 @@ export class CreateComponent implements OnInit {
     }
 
     async loadProducts() {
-        this.optionsFillerProduct.pageIndex = 1;
-        this.optionsFillerProduct.pageSize = 10;
+        this.optionsFilterProduct.pageIndex = 1;
+        this.optionsFilterProduct.pageSize = 10;
         let response = await this.productService.FilterProduct(
-            this.optionsFillerProduct
+            this.optionsFilterProduct
         );
-        this.filteredDatas = response.data;
-        console.log(this.filteredDatas);
+
+        let listP = [];
+
+        response.data.forEach((item: any) => {
+            if (item.productVariants && item.productVariants.length > 0) {
+                item.productVariants.forEach((itemVariant) => {
+                    listP.push({
+                        productId: item.id,
+                        productImage: itemVariant.linkImage, // Lấy hình ảnh từ itemVariant
+                        productVariantId: itemVariant.id,
+                        productName:
+                            item.name +
+                            '-' +
+                            (itemVariant.valuePropeties1 || '') +
+                            '-' +
+                            (itemVariant.valuePropeties2 || ''),
+                        productType: item.productType,
+                        quantity: item.productType === 1 ? 0 : 1,
+                        productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
+                        price: itemVariant.price,
+                        unit: item.unitName,
+                        mass: itemVariant.sellCounts
+                            ? itemVariant.sellCounts
+                            : 0,
+                        total:
+                            item.productType === 1 ? 0 : itemVariant.price * 1,
+                        frameNumber: '',
+                        engineNumber: '',
+                    });
+                });
+            } else {
+                listP.push({
+                    productId: item.id,
+                    productImage:
+                        item.productImages && item.productImages.length > 0
+                            ? item.productImages[0].link
+                            : null,
+                    productName: item.name,
+                    productType: item.productType,
+                    quantity: item.productType === 1 ? 0 : 1,
+                    productCode: item.code || '', // Đảm bảo mã sản phẩm
+                    price: item.sellingPrice,
+                    unit: item.unitName,
+                    mass: item.mass,
+                    total: item.productType === 1 ? 0 : item.sellingPrice * 1,
+                    frameNumber: '',
+                    engineNumber: '',
+                });
+            }
+        });
+        console.log(listP);
+
+        this.filteredDatas = listP;
+
+        // console.log(this.filteredDatas);
     }
 
     @HostListener('document:click', ['$event'])
@@ -296,7 +351,15 @@ export class CreateComponent implements OnInit {
         console.log(item);
         // Kiểm tra xem sản phẩm đã có trong inventoryStockInDetails hay chưa
         const existingDetail = this.stockInReceipt.inventoryStockInDetails.find(
-            (detail) => detail.productId === item.id
+            (detail) => {
+                console.log(detail);
+                return (
+                    detail.productId === item.id
+                    // &&
+                    // (detail.productVariantId ??
+                    //     detail.productVariantId === item.productVariantId)
+                );
+            }
         );
 
         if (existingDetail) {
@@ -306,17 +369,17 @@ export class CreateComponent implements OnInit {
                 existingDetail.quantity * existingDetail.price;
         } else {
             // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
-
             const newDetail = {
-                productId: item.id,
-                productImage: item.productImages[0]?.link,
-                productName: item.name,
+                productId: item.productId,
+                productImage: item.productImage,
+                productName: item.productName,
+                productVariantId: item.productVariantId,
                 productType: item.productType,
                 quantity: item.productType === 1 ? 0 : 1,
-                productCode: item.code,
-                price: item.sellingPrice,
-                unit: item.unitName,
-                total: item.productType === 1 ? 0 : item.sellingPrice * 1,
+                productCode: item.productCode ? '' : '',
+                price: item.price,
+                unit: item.unit,
+                total: item.productType === 1 ? 0 : item.price * 1,
                 frameNumber: '',
                 engineNumber: '',
             };
@@ -437,7 +500,6 @@ export class CreateComponent implements OnInit {
     }
 
     onSubmit() {
-        console.log(this.stockInReceipt);
         this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
             if (product.quantity == 0) {
                 product.isValid = true;
@@ -477,6 +539,7 @@ export class CreateComponent implements OnInit {
                         })) || [];
                     return {
                         productId: product.productId,
+                        productVariantId: product.productVariantId,
                         productName: product.productName,
                         productCode: product.productCode,
                         productImage: product.productImage,
@@ -503,6 +566,7 @@ export class CreateComponent implements OnInit {
                 note: this.stockInReceipt.note,
                 inventoryStockInDetails: products,
             };
+
             this.productService.createStockIn(formData).subscribe(
                 (response) => {
                     this.messageService.add({
@@ -512,7 +576,7 @@ export class CreateComponent implements OnInit {
                     });
 
                     setTimeout(() => {
-                        this.router.navigate(['/warehouse/stock-in']);
+                        this.router.navigate(['/pages/warehouse/stock-in']);
                     }, 1000); // Thời gian trễ 2 giây
                 },
                 (error) => {

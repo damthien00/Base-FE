@@ -30,7 +30,6 @@
                         type="text"
                         spellcheck="false"
                         placeholder="Nhập số điện thoại"
-                        formControlName="name"
                     />
                 </div>
             </div>
@@ -47,7 +46,6 @@
                         type="text"
                         spellcheck="false"
                         placeholder="Nhập họ tên khách hàng"
-                        formControlName="name"
                     />
                 </div>
             </div>
@@ -64,11 +62,10 @@
                         type="text"
                         spellcheck="false"
                         placeholder="Nhập họ tên khách hàng"
-                        formControlName="name"
                     />
                 </div>
             </div>
-            <div class="col-12 md:col-11 py-1">
+            <div class="col-12 md:col-10 py-1">
                 <div class="field mb-0">
                     <label style="font-weight: 600; color: #000" htmlFor="name1"
                         >Serial sản phẩm<span class="red-asterisk"
@@ -81,19 +78,14 @@
                         type="text"
                         spellcheck="false"
                         placeholder="Nhập hoặc quét mã sản phẩm"
-                        formControlName="name"
                     />
                 </div>
             </div>
-            <div class="col-12 md:col-1 py-1">
+            <div
+                class="col-12 md:col-2 py-1 flex align-items-end justify-content-center"
+            >
                 <div class="field mb-0">
-                    <!-- <svg
-                        [ngStyle]="{
-                            'border-radius': '4px',
-                            'background-color': activeBarcode
-                                ? '#2a2986'
-                                : 'transparent'
-                        }"
+                    <svg
                         class="block p-2"
                         _ngcontent-ng-c955548431=""
                         stroke-width="0"
@@ -101,16 +93,40 @@
                         height="42px"
                         width="42px"
                         xmlns="http://www.w3.org/2000/svg"
-                        [attr.stroke]="activeBarcode ? '#fff' : '#cccbcc'"
-                        [attr.fill]="activeBarcode ? '#fff' : '#cccbcc'"
+                        [attr.stroke]="'#cccbcc'"
+                        [attr.fill]="'#cccbcc'"
                     >
                         <path
                             _ngcontent-ng-c955548431=""
                             d="M232,48V88a8,8,0,0,1-16,0V56H184a8,8,0,0,1,0-16h40A8,8,0,0,1,232,48ZM72,200H40V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16Zm152-40a8,8,0,0,0-8,8v32H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,224,160ZM32,96a8,8,0,0,0,8-8V56H72a8,8,0,0,0,0-16H32a8,8,0,0,0-8,8V88A8,8,0,0,0,32,96ZM80,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,80,80Zm104,88V88a8,8,0,0,0-16,0v80a8,8,0,0,0,16,0ZM144,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,144,80Zm-32,0a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,112,80Z"
                         ></path>
-                    </svg> -->
+                    </svg>
                 </div>
             </div>
+        </div>
+        <div class="mt-3">
+            <p-table [value]="products">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Mã SP</th>
+                        <th>Thông tin sản phẩm</th>
+                        <th>Bảo hành</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product>
+                    <tr>
+                        <td>2323i32</td>
+                        <td>Máy cắt cỏ trục băm (Quật cỏ) Mitsubishi TL662</td>
+                        <td>24 tháng</td>
+                        <td>
+                            <span>
+                                <i class="pi pi-trash"></i>
+                            </span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
         </div>
     </div>
 </div>
