@@ -61,22 +61,17 @@
                                                     >
                                                         <img
                                                             *ngIf="
-                                                                item
-                                                                    .productImages[0]
+                                                                item.productImage
                                                             "
                                                             [src]="
                                                                 imageUrl +
-                                                                item
-                                                                    .productImages[0]
-                                                                    ?.link
+                                                                item.productImage
                                                             "
                                                             alt="Product Image"
                                                         />
-
                                                         <svg
                                                             *ngIf="
-                                                                !item
-                                                                    .productImages[0]
+                                                                !item.productImage
                                                             "
                                                             viewBox="0 0 24 24"
                                                             fill="none"
@@ -109,7 +104,9 @@
                                                         <h1
                                                             class="product-name"
                                                         >
-                                                            {{ item.name }}
+                                                            {{
+                                                                item.productName
+                                                            }}
                                                         </h1>
                                                         <span
                                                             class="product-code"
@@ -128,7 +125,7 @@
                                                             class="product-price"
                                                         >
                                                             {{
-                                                                item.sellingPrice
+                                                                item.price
                                                                     | currency
                                                                         : "VND"
                                                                         : "symbol"
