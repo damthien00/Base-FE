@@ -10,7 +10,7 @@ import { OptionsFilterWard } from '../DTOs/address/optionsFilterWard';
     providedIn: 'root',
 })
 export class AddressService {
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
     public url = environment.url;
 
     getDistricts(keyword: any): Observable<any> {
@@ -27,6 +27,26 @@ export class AddressService {
 
     getWards(districtId: number): Observable<any> {
         let url = `${this.url}/api/address/get-wards?districtId=${districtId}`;
+        return this.http.get<any>(url);
+    }
+
+    getCitiesByIdCountry(countryId: number): Observable<any> {
+        const url = `${this.url}/api/address/get-cities?countryId=${countryId}`;
+        return this.http.get<any>(url);
+    }
+
+    // getDistrictsByIdCity(cityName: number): Observable<any> {
+    //     const url = `${this.url}/api/address/get-districts?cityName=${cityName}`;
+    //     return this.http.get<any>(url);
+    // }
+
+    getDistrictsByIdCity(cityId: number): Observable<any> {
+        const url = `${this.url}/api/address/get-districts?cityId=${cityId}`;
+        return this.http.get<any>(url);
+    }
+
+    getWardsByIdDistrict(districtId: number): Observable<any> {
+        const url = `${this.url}/api/address/get-wards?districtId=${districtId}`;
         return this.http.get<any>(url);
     }
 }

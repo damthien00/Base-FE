@@ -146,151 +146,63 @@
               <!-- General Form Elements -->
               <form [formGroup]="RoleGroupForm" (ngSubmit)="onSubmit()">
                 <div class="row mb-12">
-                  <div style="margin-bottom: 20px;" class="col-lg-6" formGroupName="userRegist">
+                  <div style="margin-bottom: 20px;" class="col-lg-6">
                       <label class="labelip">Nhóm quyền<span class="red-asterisk">*</span></label>
-                      <p-dropdown
-                      [style]="{ height: '35px', width: '100%' }"
-                      [options]="Roles"
-                      optionLabel="name"
-                      [showClear]="true"
-                      placeholder="Chọn nhóm quyền"
-                      optionValue="id"
-                      formControlName="roleGroupId"
-                      ></p-dropdown>
-                      <div
-                      *ngIf="
-                        (RoleGroupForm.get('userRegist.roleGroupId')?.invalid &&
-                          (RoleGroupForm.get('userRegist.roleGroupId')?.dirty ||
-                            RoleGroupForm.get('userRegist.roleGroupId')?.touched)) ||
-                        showNameError
-                      "
-                    >
-                      <div
-                        *ngIf="RoleGroupForm.get('userRegist.roleGroupId')?.errors?.['required']"
-                        class="error-message"
-                      >
-                        Nhóm quyền không được bỏ trống
-                      </div>
-                    </div>
+                      <p-multiSelect
+                        [style]="{ height: '40px', width: '100%' }"
+                        [options]="Roles"
+                        optionLabel="name"
+                        [showClear]="true"
+                        placeholder="Chọn nhóm quyền"
+                        [filter]="true"
+                        formControlName="roles"
+                      ></p-multiSelect>           
                   </div>
-                  <div style="margin-bottom: 20px;" class="col-lg-6" formGroupName="userRegist">
-                      <label class="labelip">Nhóm quyền<span class="red-asterisk">*</span></label>
+                  <div style="margin-bottom: 20px;" class="col-lg-6">
+                      <label class="labelip">Chi nhánh<span class="red-asterisk">*</span></label>
                       <p-dropdown
-                      [style]="{ height: '35px', width: '100%' }"
-                      [options]="Roles"
-                      optionLabel="name"
-                      [showClear]="true"
-                      placeholder="Chọn nhóm quyền"
-                      optionValue="id"
-                      formControlName="roleGroupId"
-                      ></p-dropdown>
-                      <div
-                      *ngIf="
-                        (RoleGroupForm.get('userRegist.roleGroupId')?.invalid &&
-                          (RoleGroupForm.get('userRegist.roleGroupId')?.dirty ||
-                            RoleGroupForm.get('userRegist.roleGroupId')?.touched)) ||
-                        showNameError
-                      "
-                    >
-                      <div
-                        *ngIf="RoleGroupForm.get('userRegist.roleGroupId')?.errors?.['required']"
-                        class="error-message"
-                      >
-                        Nhóm quyền không được bỏ trống
-                      </div>
-                    </div>
+                        [style]="{ height: '40px', width: '100%' }"
+                        [options]="branch"
+                        optionLabel="name"
+                        [showClear]="true"
+                        placeholder="Chọn chi nhánh"
+                        optionValue="id"
+                        formControlName="branchId"
+                      ></p-dropdown>               
                   </div>
                   <div style="margin-bottom: 20px;" class="col-lg-12">
                     <div class="row">
-                      <div class="col-lg-6" formGroupName="userRegist">
+                      <div class="col-lg-6">
                         <label class="labelip"
                         >Tài khoản<span class="red-asterisk">*</span></label>
                           <input
                           type="text"
                           class="form-control"
                           pInputText
-                          [style]="{ height: '35px', width: '95%' }"
-                          formControlName="userName"
+                          [style]="{ height: '35px', width: '100%' }"
+                          formControlName="email"
                           placeholder="Nhập tài khoản"
                           (input)="onInputChange($event)"
                           />
-                          <div *ngIf="RoleGroupForm.get('userRegist.userName')?.invalid && (RoleGroupForm.get('userRegist.userName')?.dirty || RoleGroupForm.get('userRegist.userName')?.touched) || showNameError3">
-                            <small style="color: red;" *ngIf="RoleGroupForm.get('userRegist.userName')?.errors?.['required']">Tài khoản là bắt buộc.</small>
-                            <small style="color: red;" *ngIf="RoleGroupForm.get('userRegist.userName')?.errors?.['pattern']">Tài khoản chỉ được chứa chữ và số.</small>
-                            <small style="color: red;" *ngIf="RoleGroupForm.get('userRegist.userName')?.errors?.['minlength']">Tài khoản phải lớn hơn hoặc bằng 6 ký tự</small>
-                          </div>
-                          <div *ngIf="errorMessage" class="error-message">
-                            {{ errorMessage }}
-                          </div>
                       </div>
                       <div class="col-lg-6">
                         <label class="labelip"
-                        >Họ tên nhân viên<span class="red-asterisk">*</span></label>
+                        >Mật khẩu<span class="red-asterisk">*</span></label>
                       <input
                         type="text"
                         class="form-control"
                         pInputText
-                        [style]="{ height: '35px', width: '95%' }"
-                        formControlName="name"
-                        placeholder="Nhập tên nhân viên"
+                        [style]="{ height: '35px', width: '100%' }"
+                        formControlName="password"
+                        placeholder="Nhập mật khẩu"
                         maxlength="100"
                         (input)="onInputChange($event)"
                       />
-                      <div
-                      *ngIf="
-                        (RoleGroupForm.get('name')?.invalid &&
-                          (RoleGroupForm.get('name')?.dirty ||
-                            RoleGroupForm.get('name')?.touched)) || showNameError2
-                      "
-                      >
-                      <!-- <div
-                        *ngIf="RoleGroupForm.get('name')?.errors?.['required']"
-                        class="error-message"
-                      >
-                          Bạn vui lòng nhập tên hàng hóa
-                      </div> -->
-                      <div
-                        *ngIf="RoleGroupForm.get('name')?.errors?.['minlength']  && !isWhitespace(RoleGroupForm.get('name')?.value)"
-                        class="error-message"
-                      >
-                        Tên nhân viên phải lớn hơn hoặc bằng 6 ký tự
-                      </div>
-                      <div class="error-message" *ngIf="RoleGroupForm.controls['name'].hasError('whitespace')">
-                        {{ getErrorMessage() }}
-                      </div>
-                    </div>
                       </div>
                     </div>
                   </div>
                   <div class="col-lg-12">
                     <div class="row">
-                      <div class="col-lg-6">
-                          <div class="row">
-                            <label class="labelip">Ngày sinh</label>
-                            <p-calendar
-                              [showIcon]="true"
-                              [style]="{ height: '35px', width: '100%' }"
-                              dateFormat="dd/mm/yy"
-                              formControlName="dayOfBirth"
-                              [showClear]="true"
-                              placeholder="Chọn ngày sinh"
-                            ></p-calendar>
-                          </div>
-                          <div
-                            *ngIf="
-                              RoleGroupForm.get('dayOfBirth')?.invalid &&
-                              (RoleGroupForm.get('dayOfBirth')?.dirty ||
-                                RoleGroupForm.get('dayOfBirth')?.touched)
-                            "
-                          >
-                            <div
-                              *ngIf="RoleGroupForm.get('dayOfBirth')?.errors?.['invalidDateOfBirth']"
-                              class="error-message"
-                            >
-                              Ngày sinh phải nhỏ hơn hoặc bằng ngày hiện tại.
-                            </div>
-                          </div>
-                        </div>
                         <div class="col-lg-6">
                           <label class="labelip"
                             >Số điện thoại</label
@@ -324,6 +236,53 @@
                             </div>
                           </div>
                         </div>
+                        <div class="col-lg-6">
+                          <label class="labelip">Tỉnh/Thành</label>
+                          <p-dropdown
+                            [options]="cities"
+                            [style]="{ height: '35px', width: '100%' }"
+                            optionLabel="name"
+                            [showClear]="true"
+                            placeholder="Chọn Tỉnh/Thành"
+                            optionValue="id"
+                            (onChange)="onCityChange($event.value)"
+                            (onClear)="onClearCity()"
+                          ></p-dropdown>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-6 mt-3">
+                        <label class="labelip">Quận/Huyện</label>
+                        <p-dropdown
+                          [options]="districts"
+                          [style]="{ height: '35px', width: '100%' }"
+                          optionLabel="name"
+                          [showClear]="true"
+                          placeholder="Chọn Quận/Huyện"
+                          optionValue="id"
+                          (onChange)="onDistrictChange($event.value)"
+                          (onClear)="onClearDistrict()"
+                          [emptyMessage]="'Vui lòng chọn tỉnh trước!'"
+                          formControlName="districtId"
+                        ></p-dropdown>
+                      </div>
+                      <div class="col-lg-6 mt-3">
+                        <label class="labelip">Xã/Phường</label>
+                        <p-dropdown
+                          [options]="wards"
+                          [style]="{ height: '35px', width: '100%' }"
+                          optionLabel="name"
+                          [showClear]="true"
+                          placeholder="Chọn Xã/Phường"
+                          optionValue="id"
+                          (onChange)="onWardChange($event.value)"
+                          (onClear)="onClearWard()"
+                          formControlName="wardId"
+                          [emptyMessage]="'Vui lòng chọn tỉnh/huyện trước!'"
+                        ></p-dropdown>
+                      </div>
                     </div>
                   </div>
                 </div>

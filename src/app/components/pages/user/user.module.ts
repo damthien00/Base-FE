@@ -7,6 +7,7 @@ import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
 import { PaginatorModule } from 'primeng/paginator';
 import { UserComponent } from './user.component';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @NgModule({
   imports: [
@@ -20,7 +21,8 @@ import { UserComponent } from './user.component';
     InputSwitchModule,
     MessagesModule,
     ToastModule,
-    PaginatorModule
+    PaginatorModule,
+    MultiSelectModule
   ],
   declarations: [UserComponent],
 })

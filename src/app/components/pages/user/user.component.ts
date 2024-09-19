@@ -13,6 +13,8 @@ import {
 import { UserService } from 'src/app/core/services/user.service';
 import { OptionsFilterCommodities } from 'src/app/core/models/option-filter-commodities';
 import { BranchService } from 'src/app/core/services/branch.service';
+import { RoleService } from 'src/app/core/services/role.service';
+import { AddressService } from 'src/app/core/services/address.service';
 
 @Component({
     selector: 'app-user',
@@ -28,6 +30,7 @@ export class UserComponent implements OnInit {
     showDialog4 = false;
     selectedCommodityId: number | null = null;
     branch: any[] = [];
+    Roles: any[] = [];
     PageIndex: number = 1;
     PageSize: number = 30;
     WordSearch: string = '';
@@ -49,6 +52,13 @@ export class UserComponent implements OnInit {
     roleSelected: boolean = false;
     roleGroupId: number | null = null;
     selectedRoleGroupId: number | null = null;
+    cities: any[] = [];
+    districts: any[] = [];
+    wards: any[] = [];
+    selectedCountryId!: number;
+    selectedCityId!: number;
+    selectedDistrictId!: number;
+    selectedWardId!: number;
 
     optionsFilterCommodities: OptionsFilterCommodities =
         new OptionsFilterCommodities();
@@ -85,44 +95,36 @@ export class UserComponent implements OnInit {
     constructor(
         private usersService: UserService,
         private branchService: BranchService,
+        private roleService: RoleService,
+        private addressService: AddressService,
         private router: Router,
         private fb: FormBuilder
     ) {
         this.RoleGroupForm = this.fb.group({
             name: ['', Validators.compose([
-              Validators.required,
-              Validators.minLength(6),
-              Validators.maxLength(100),
-              this.noWhitespaceValidator
+                Validators.required,
+                Validators.minLength(6),
+                Validators.maxLength(100),
+                this.noWhitespaceValidator
             ])],
             phoneNumber: [null, [Validators.required, Validators.pattern(/^(03|05|07|08|09)[0-9]{8}$/),
             Validators.minLength(10),
             Validators.maxLength(10),]],
-            branchId: [0, Validators.required],
+            branchId: [null, Validators.required],
             roles: [[]],
             branchName: [null, Validators.required],
             email: ['', Validators.compose([
-              Validators.required,
-              Validators.minLength(6),
-              Validators.maxLength(100),
-              Validators.required, Validators.pattern('^[a-zA-Z0-9]*$'),
-              this.noWhitespaceValidator
-            ])],
-            password: [null, Validators.required],
-            address: [null, Validators.required],
-            userRegist: this.fb.group({
-              userName: ['', Validators.compose([
                 Validators.required,
                 Validators.minLength(6),
                 Validators.maxLength(100),
                 Validators.required, Validators.pattern('^[a-zA-Z0-9]*$'),
                 this.noWhitespaceValidator
-              ])],
-              password: [null, Validators.required],
-              email: [null, [Validators.required, Validators.email]],
-              roleGroupId: ['', Validators.required]
-            })
-          });
+            ])],
+            password: [null, Validators.required],
+            address: [null, Validators.required],
+            wardId: [null],
+            districtId: [null],
+        });
         this.RoleGroupForm2 = this.fb.group({
             id: [''],
             name: [
@@ -178,31 +180,98 @@ export class UserComponent implements OnInit {
     }
 
     ngOnInit() {
-        // this.getAllFilterRoleGroup();
+        this.getCitiesByCountry(1);
         this.Filters();
+        this.getAllFilterBranch();
+        this.getAllFilterRole();
     }
 
     getAllFilterBranch(): void {
-      this.branchService.getBranchsAll().subscribe((response: any) => {
-        this.branch = response.data.items;
-      });
+        this.branchService.getBranchsAll().subscribe((response: any) => {
+            this.branch = response.data.items;
+        });
     }
+
+    getAllFilterRole(): void {
+        this.roleService.getRoleAll().subscribe((response: any) => {
+            this.Roles = response.data.items;
+        });
+    }
+
+    getCitiesByCountry(countryId: number) {
+        this.addressService.getCitiesByIdCountry(countryId)
+            .subscribe(cities => {
+                this.cities = cities.data;
+                //console.log(cities)
+            });
+    }
+
+    getDistrictsByCity(cityId: number) {
+        this.addressService.getDistrictsByIdCity(cityId)
+            .subscribe(districts => {
+                this.districts = districts.data;
+            });
+    }
+
+    getWardsByDistrict(districtId: number) {
+        this.addressService.getWardsByIdDistrict(districtId)
+            .subscribe(wards => {
+                this.wards = wards.data;
+            });
+    }
+
+    onCountryChange(countryId: number) {
+        this.selectedCountryId = countryId;
+        this.getCitiesByCountry(countryId);
+        this.districts = [];
+        this.wards = [];
+    }
+
+    onCityChange(cityId: number) {
+        this.selectedCityId = cityId;
+        this.getDistrictsByCity(cityId);
+        this.districts = [];
+        this.wards = [];
+        this.RoleGroupForm.get('wardId')?.setValue(null);
+        this.RoleGroupForm.get('districtId')?.setValue(null);
+    }
+
+    onDistrictChange(districtId: number) {
+        this.selectedDistrictId = districtId;
+        this.getWardsByDistrict(districtId);
+        this.wards = [];
+        this.RoleGroupForm.get('wardId')?.setValue(null);
+    }
+
+    onClearCity() {
+        this.RoleGroupForm.get('wardId')?.setValue(null);
+        this.RoleGroupForm.get('districtId')?.setValue(null);
+    }
+
+    onClearDistrict() {
+        this.RoleGroupForm.get('wardId')?.setValue(null);
+    }
+
+    onClearWard() {
+        this.RoleGroupForm.get('wardId')?.setValue(null);
+    }
+
 
     Filters(): void {
         //debugger
         this.usersService.getFilters(this.PageSize, this.PageIndex, this.Name, this.PhoneNumber, this.Address)
-          .subscribe(
-            response => {
-              this.users = response.data.items;
-              this.totalRecords = response.data.totalRecords;
-              this.updateCurrentPageReport();
-              //console.log(this.users)
-            },
-            error => {
-              console.error('Error fetching filtered customers:', error);
-            }
-          );
-      }
+            .subscribe(
+                response => {
+                    this.users = response.data.items;
+                    this.totalRecords = response.data.totalRecords;
+                    this.updateCurrentPageReport();
+                    //console.log(this.users)
+                },
+                error => {
+                    console.error('Error fetching filtered customers:', error);
+                }
+            );
+    }
 
     clickButtonFilter() {
         if (this.selectedName) {
@@ -641,7 +710,7 @@ export class UserComponent implements OnInit {
     //       }
     //     );
     // }
-    
+
 
     onPageChange(event: any): void {
         this.PageIndex = event.page + 1;
