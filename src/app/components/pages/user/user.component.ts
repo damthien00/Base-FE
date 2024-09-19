@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { UserService } from 'src/app/core/services/user.service';
 import { OptionsFilterCommodities } from 'src/app/core/models/option-filter-commodities';
+import { BranchService } from 'src/app/core/services/branch.service';
 
 @Component({
     selector: 'app-user',
@@ -20,13 +21,13 @@ import { OptionsFilterCommodities } from 'src/app/core/models/option-filter-comm
 })
 export class UserComponent implements OnInit {
     filterForm!: FormGroup;
-    totalRecordsCount: number = 0;
+    totalRecords: number = 0;
     maxLength: number = 100;
     isSubmitting: boolean = false;
     isWhitespaceOnlys: boolean = false;
     showDialog4 = false;
     selectedCommodityId: number | null = null;
-    Roles: any[] = [];
+    branch: any[] = [];
     PageIndex: number = 1;
     PageSize: number = 30;
     WordSearch: string = '';
@@ -34,12 +35,16 @@ export class UserComponent implements OnInit {
     RoleGroupForm2!: FormGroup;
     pageSize: number = 30;
     pageNumber: number = 1;
-    keySearch!: string;
+    Name!: string;
+    PhoneNumber!: string;
+    Address!: string;
     users: any[] = [];
     commodities: any[] = [];
     commoditiesForm!: FormGroup;
     commoditiesForm2!: FormGroup;
-    selectedKeySearch!: string;
+    selectedName!: string;
+    selectedPhoneNumber!: string;
+    selectedAddress!: string;
     savingInProgress = false;
     roleSelected: boolean = false;
     roleGroupId: number | null = null;
@@ -79,47 +84,45 @@ export class UserComponent implements OnInit {
 
     constructor(
         private usersService: UserService,
+        private branchService: BranchService,
         private router: Router,
         private fb: FormBuilder
     ) {
         this.RoleGroupForm = this.fb.group({
-            name: [
-                '',
-                Validators.compose([
-                    Validators.required,
-                    Validators.minLength(6),
-                    Validators.maxLength(100),
-                    this.noWhitespaceValidator,
-                ]),
-            ],
-            phoneNumber: [
-                null,
-                [
-                    Validators.required,
-                    Validators.pattern(/^(03|05|07|08|09)[0-9]{8}$/),
-                    Validators.minLength(10),
-                    Validators.maxLength(10),
-                ],
-            ],
-            departmentId: [0, Validators.required],
-            dayOfBirth: [null],
+            name: ['', Validators.compose([
+              Validators.required,
+              Validators.minLength(6),
+              Validators.maxLength(100),
+              this.noWhitespaceValidator
+            ])],
+            phoneNumber: [null, [Validators.required, Validators.pattern(/^(03|05|07|08|09)[0-9]{8}$/),
+            Validators.minLength(10),
+            Validators.maxLength(10),]],
+            branchId: [0, Validators.required],
+            roles: [[]],
+            branchName: [null, Validators.required],
+            email: ['', Validators.compose([
+              Validators.required,
+              Validators.minLength(6),
+              Validators.maxLength(100),
+              Validators.required, Validators.pattern('^[a-zA-Z0-9]*$'),
+              this.noWhitespaceValidator
+            ])],
+            password: [null, Validators.required],
+            address: [null, Validators.required],
             userRegist: this.fb.group({
-                userName: [
-                    '',
-                    Validators.compose([
-                        Validators.required,
-                        Validators.minLength(6),
-                        Validators.maxLength(100),
-                        Validators.required,
-                        Validators.pattern('^[a-zA-Z0-9]*$'),
-                        this.noWhitespaceValidator,
-                    ]),
-                ],
-                password: [null, Validators.required],
-                email: [null, [Validators.required, Validators.email]],
-                roleGroupId: ['', Validators.required],
-            }),
-        });
+              userName: ['', Validators.compose([
+                Validators.required,
+                Validators.minLength(6),
+                Validators.maxLength(100),
+                Validators.required, Validators.pattern('^[a-zA-Z0-9]*$'),
+                this.noWhitespaceValidator
+              ])],
+              password: [null, Validators.required],
+              email: [null, [Validators.required, Validators.email]],
+              roleGroupId: ['', Validators.required]
+            })
+          });
         this.RoleGroupForm2 = this.fb.group({
             id: [''],
             name: [
@@ -176,14 +179,71 @@ export class UserComponent implements OnInit {
 
     ngOnInit() {
         // this.getAllFilterRoleGroup();
-        // this.Filters();
+        this.Filters();
     }
 
-    // getAllFilterRoleGroup(): void {
-    //   this.authenticationService.GetAllRoleGroup(this.pageSize, this.pageNumber, this.WordSearch).subscribe((response: any) => {
-    //     this.Roles = response.data;
-    //   });
-    // }
+    getAllFilterBranch(): void {
+      this.branchService.getBranchsAll().subscribe((response: any) => {
+        this.branch = response.data.items;
+      });
+    }
+
+    Filters(): void {
+        //debugger
+        this.usersService.getFilters(this.PageSize, this.PageIndex, this.Name, this.PhoneNumber, this.Address)
+          .subscribe(
+            response => {
+              this.users = response.data.items;
+              this.totalRecords = response.data.totalRecords;
+              this.updateCurrentPageReport();
+              //console.log(this.users)
+            },
+            error => {
+              console.error('Error fetching filtered customers:', error);
+            }
+          );
+      }
+
+    clickButtonFilter() {
+        if (this.selectedName) {
+            this.Name = this.selectedName.trim();
+            this.PhoneNumber = this.selectedPhoneNumber;
+            this.Address = this.selectedAddress;
+            this.PageIndex = 1;
+            const elementshighlight = document.querySelectorAll(
+                `p-paginator .p-highlight`
+            );
+            elementshighlight.forEach((element) => {
+                element.classList.remove('p-highlight');
+            });
+            const elements = document.querySelectorAll(
+                `p-paginator [aria-label="Page 1"]`
+            );
+            elements.forEach((element) => {
+                element.classList.add('p-highlight');
+            });
+            this.Filters();
+        } else {
+            this.Name = this.selectedName.trim();
+            this.PhoneNumber = this.selectedPhoneNumber;
+            this.Address = this.selectedAddress;
+            this.PageIndex = 1;
+            const elementshighlight = document.querySelectorAll(
+                `p-paginator .p-highlight`
+            );
+            elementshighlight.forEach((element) => {
+                element.classList.remove('p-highlight');
+            });
+            const elements = document.querySelectorAll(
+                `p-paginator [aria-label="Page 1"]`
+            );
+            elements.forEach((element) => {
+                element.classList.add('p-highlight');
+            });
+            this.Filters();
+        }
+        this.Filters();
+    }
 
     onInputChange(event: any) {
         const input = event.target;
@@ -238,19 +298,6 @@ export class UserComponent implements OnInit {
     //     this.totalRecordsCount = 0;
     //   })
     // }
-    ClickFilter() {
-        this.optionsFilterCommodities.PageSize =
-            this.optionsFilterCommodities.PageSize;
-        this.optionsFilterCommodities.PageIndex = 1;
-
-        // this.commodityService.FilterTCommondities(this.optionsFilterCommodities).subscribe((response) => {
-        //   this.comodity = response.data;
-        //   this.totalRecordsCount = response.totalRecordsCount;
-        // }, (err) => {
-        //   this.comodity = null;
-        //   this.totalRecordsCount = 0;
-        // });
-    }
 
     openDialog() {
         // this.showDialog = true;
@@ -594,71 +641,34 @@ export class UserComponent implements OnInit {
     //       }
     //     );
     // }
-    clickButtonFilter() {
-        if (this.selectedKeySearch) {
-            this.keySearch = this.selectedKeySearch.trim();
-            this.roleGroupId = this.selectedRoleGroupId;
-            this.pageNumber = 1;
-            const elementshighlight = document.querySelectorAll(
-                `p-paginator .p-highlight`
-            );
-            elementshighlight.forEach((element) => {
-                element.classList.remove('p-highlight');
-            });
-            const elements = document.querySelectorAll(
-                `p-paginator [aria-label="Page 1"]`
-            );
-            elements.forEach((element) => {
-                element.classList.add('p-highlight');
-            });
-            // this.Filters();
-        } else {
-            this.keySearch = this.selectedKeySearch;
-            this.roleGroupId = this.selectedRoleGroupId;
-            this.pageNumber = 1;
-            const elementshighlight = document.querySelectorAll(
-                `p-paginator .p-highlight`
-            );
-            elementshighlight.forEach((element) => {
-                element.classList.remove('p-highlight');
-            });
-            const elements = document.querySelectorAll(
-                `p-paginator [aria-label="Page 1"]`
-            );
-            elements.forEach((element) => {
-                element.classList.add('p-highlight');
-            });
-            // this.Filters();
-        }
-        // this.Filters();
-    }
+    
 
     onPageChange(event: any): void {
-        this.pageNumber = event.page + 1;
-        this.pageSize = event.rows;
-        // this.Filters();
+        this.PageIndex = event.page + 1;
+        this.PageSize = event.rows;
+        this.Filters();
     }
 
     goToPreviousPage(): void {
-        if (this.pageNumber > 1) {
-            this.pageNumber--;
-            // this.Filters();
+        if (this.PageIndex > 1) {
+            this.PageIndex--;
+            this.Filters();
         }
     }
 
     goToNextPage(): void {
-        const lastPage = Math.ceil(this.totalRecordsCount / this.pageSize);
-        if (this.pageNumber < lastPage) {
-            this.pageNumber++;
-            // this.Filters();
+        const lastPage = Math.ceil(this.totalRecords / this.PageSize);
+        if (this.PageIndex < lastPage) {
+            this.PageIndex++;
+            this.Filters();
         }
     }
     updateCurrentPageReport(): void {
-        const startRecord = (this.pageNumber - 1) * this.pageSize + 1;
+        const startRecord = (this.PageIndex - 1) * this.PageSize + 1;
         const endRecord = Math.min(
-            this.pageNumber * this.pageSize,
-            this.totalRecordsCount
+            this.PageIndex * this.PageSize,
+            this.totalRecords
         );
-        this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecordsCount}</strong> nhân viên`;
+        this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
     }
 }

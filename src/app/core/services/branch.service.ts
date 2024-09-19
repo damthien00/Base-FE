@@ -20,6 +20,12 @@ export class BranchService {
         return this.http.get<any>(url);
     }
 
+    getBranchsAll(): Observable<any> {
+        return this.http.get<any>(
+            `${this.url}/api/branch/paging`
+        );
+    }
+
     createBranch(data: any): Observable<any> {
         return this.http
             .post<any>(`${this.url}/api/branch/create`, data)
