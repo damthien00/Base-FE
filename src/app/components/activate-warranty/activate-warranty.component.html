@@ -52,9 +52,49 @@
             <div class="col-12 md:col-12 py-1">
                 <div class="field mb-0">
                     <label style="font-weight: 600; color: #000" htmlFor="name1"
-                        >Địa chỉ chi tiết<span class="red-asterisk"
-                            >*</span
-                        ></label
+                        >Tỉnh/thành</label
+                    >
+                    <p-autoComplete
+                        formControlName="selectedCountry"
+                        [suggestions]="filteredCountries"
+                        (completeMethod)="filterCountry($event)"
+                        placeholder="Chọn tỉnh/thành"
+                        field="name"
+                    />
+                </div>
+            </div>
+            <div class="col-12 md:col-12 py-1">
+                <div class="field mb-0">
+                    <label style="font-weight: 600; color: #000" htmlFor="name1"
+                        >Quận/huyện</label
+                    >
+                    <p-autoComplete
+                        formControlName="selectedCountry"
+                        [suggestions]="filteredCountries"
+                        (completeMethod)="filterCountry($event)"
+                        placeholder="Chọn quận/huyện"
+                        field="name"
+                    />
+                </div>
+            </div>
+            <div class="col-12 md:col-12 py-1">
+                <div class="field mb-0">
+                    <label style="font-weight: 600; color: #000" htmlFor="name1"
+                        >Xã/phường</label
+                    >
+                    <p-autoComplete
+                        formControlName="selectedCountry"
+                        [suggestions]="filteredCountries"
+                        (completeMethod)="filterCountry($event)"
+                        placeholder="Chọn xã/phường"
+                        field="name"
+                    />
+                </div>
+            </div>
+            <div class="col-12 md:col-12 py-1">
+                <div class="field mb-0">
+                    <label style="font-weight: 600; color: #000" htmlFor="name1"
+                        >Địa chỉ chi tiết</label
                     >
                     <input
                         pInputText
@@ -68,9 +108,7 @@
             <div class="col-12 md:col-10 py-1">
                 <div class="field mb-0">
                     <label style="font-weight: 600; color: #000" htmlFor="name1"
-                        >Serial sản phẩm<span class="red-asterisk"
-                            >*</span
-                        ></label
+                        >Serial sản phẩm</label
                     >
                     <input
                         pInputText
@@ -82,7 +120,7 @@
                 </div>
             </div>
             <div
-                class="col-12 md:col-2 py-1 flex align-items-end justify-content-center"
+                class="col-12 md:col-2 py-1 flex align-items-end justify-content-center pl-0"
             >
                 <div class="field mb-0">
                     <svg
@@ -128,5 +166,29 @@
                 </ng-template>
             </p-table>
         </div>
+        <div class="flex gap-2 mt-5">
+            <button
+                pButton
+                pRipple
+                severity="secondary"
+                type="button"
+                label="Hủy"
+                class="p-button-danger flex-1"
+            ></button>
+            <button
+                pButton
+                pRipple
+                type="button"
+                label="Kích hoạt"
+                class="flex-1"
+            ></button>
+        </div>
     </div>
+    <footer class="footer">
+        <h1>THÔNG TIN CHUNG</h1>
+        <h1 class="name-company">CÔNG TY TNHH TMDV & XNK TIẾN LINH</h1>
+        <span>Địa chỉ: Mễ Hạ, Yên Phú, Yên Mỹ, Hưng Yên</span>
+        <span>Email: tienlinhgroups&#64;gmail.com</span>
+        <span>SĐT:0961462860</span>
+    </footer>
 </div>

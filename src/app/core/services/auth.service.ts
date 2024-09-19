@@ -27,7 +27,6 @@ export class AuthService {
         if (token) {
             return true;
         }
-
         return false;
     }
 
@@ -37,13 +36,12 @@ export class AuthService {
             .post<any>(`${this.url}/api/auth/login-by-email`, request)
             .pipe(catchError(this.handleError));
     }
+
     private isInitAuthSubject: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false);
     isInitAuth$: Observable<boolean> = this.isInitAuthSubject.asObservable();
-
     private currentUserSubject = new BehaviorSubject<any>(null);
     public userCurrent = this.currentUserSubject.asObservable();
-
     getUserCurrent() {
         return this.currentUserSubject.value;
     }
@@ -94,7 +92,7 @@ export class AuthService {
             return false;
         }
 
-        if (this.currentUserSubject.value.roles.includes(role)) {
+        if (this.currentUserSubject.value.roleNames.includes(role)) {
             return true;
         } else {
             return false;
@@ -106,7 +104,7 @@ export class AuthService {
             return false;
         }
 
-        if (user.roles.includes(role)) {
+        if (user.roleNames.includes(role)) {
             return true;
         } else {
             return false;

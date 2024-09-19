@@ -152,6 +152,7 @@ export class AppMenuComponent implements OnInit {
                             {
                                 label: 'Nhóm quyền',
                                 icon: 'pi pi-fw pi-circle',
+                                // routerLink: ['/activate-warranty'],
                             },
                             {
                                 label: 'Quản lý tài khoản',

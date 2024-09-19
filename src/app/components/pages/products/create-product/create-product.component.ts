@@ -1464,7 +1464,7 @@ export class CreateProductComponent implements OnInit {
           },
         ];
         setTimeout(() => {
-          this.router.navigate(['/products/show-product']);
+          this.router.navigate(['/pages/products/show-product']);
           this.isSubmitting = false;
         }, 1000);
       },

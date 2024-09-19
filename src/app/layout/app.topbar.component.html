@@ -27,20 +27,22 @@
                 layoutService.state.profileSidebarVisible
         }"
     >
-        <button class="p-link layout-topbar-button">
-            <i class="pi pi-calendar"></i>
-            <span>Calendar</span>
-        </button>
-        <button class="p-link layout-topbar-button">
-            <i class="pi pi-user"></i>
-            <span>Profile</span>
-        </button>
-        <button
-            class="p-link layout-topbar-button"
-            [routerLink]="'/documentation'"
-        >
-            <i class="pi pi-cog"></i>
-            <span>Settings</span>
-        </button>
+        <div class="box-user" *ngIf="userCurrent != null">
+            <div class="user-info" (click)="toggleDropdown()" #userInfo>
+                <span>{{ userCurrent?.name }}</span>
+                <span class="avatar">
+                    <img [src]="baseImageUrl + userCurrent.avatarUrl" />
+                </span>
+            </div>
+            <div class="dropdown-user-info" *ngIf="showDropdown">
+                <ul class="user-info-list">
+                    <li class="user-info-item">Xem thông tin</li>
+                    <li class="user-info-item" (click)="handleLogOut()">
+                        Đăng xuất
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- <p-menubar [model]="tieredItems"></p-menubar> -->
     </div>
 </div>

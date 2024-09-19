@@ -3540,10 +3540,10 @@
     transition: box-shadow 0.2s;
   }
   .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
-    background: var(--primary-color);
-    border-color: #EEF2FF;
-    color: #fff;
-    transition: 0.2s linear;
+    background: var(--primary-color) !important;
+    border-color: #EEF2FF !important;
+    color: #fff !important;
+    transition: 0.2s linear !important;
   }
   .p-paginator .p-paginator-pages .p-paginator-page:not(.p-highlight):hover {
     background: transparent;
@@ -6564,4 +6564,18 @@
 ol{
     padding-left: 0 !important;
     margin-bottom: 0 !important;
+}
+
+
+.p-datatable-table td{
+    border: 1px solid #e1e3e6 !important;
+    padding: 8px;
+    cursor: pointer;
+}
+
+
+.p-datatable-table th {
+    border: 1px solid #e1e3e6 !important;
+    padding: 8px;
+    cursor: pointer;
 }

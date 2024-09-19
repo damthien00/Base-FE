@@ -1,37 +1,46 @@
-.activate-warranty{
+.activate-warranty {
     width: 390px;
     margin: 0 auto;
     background-color: #fff;
     user-select: none;
 }
 
-.banner img{
+.banner img {
     width: 100%;
 }
 
-.container{
+.container {
     padding: 12px;
     background-color: #fff;
     height: 100%;
 }
 
-.back{
+.back {
     display: flex;
     align-items: center;
     gap: 5px;
     font-weight: 500;
 }
 
-i{
-    display:block;
+i {
+    display: block;
     font-size: 13px;
 }
 
-.title{
+.title {
+    margin-top: 10px
+}
+
+.title-success{
+    color: #35B011 !important;
     margin-top:10px
 }
 
-.title h1{
+.info-customer{
+    margin-top: 10px;
+}
+
+.title h1 {
     font-size: 15px;
     color: #E24343;
 }
@@ -39,28 +48,28 @@ i{
 .title p {
     font-size: 14px;
     font-weight: 500;
-    line-height:22px;
-    margin-top:10px
+    line-height: 22px;
+    margin-top: 10px
 }
 
-.form{
-    margin-top:10px
+.form {
+    margin-top: 10px
 }
 
-.footer{
+.footer {
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
     gap: 12px;
     padding: 12px;
-border-top: 1px solid #ccc;
+    border-top: 1px solid #ccc;
 }
 
-.footer h1{
+.footer h1 {
     font-size: 14px;
     font-weight: 600;
 }
 
-.name-company{
+.name-company {
     color: var(--primary-color);
 }
 

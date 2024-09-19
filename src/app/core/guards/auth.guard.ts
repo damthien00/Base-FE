@@ -1,45 +1,55 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import {
+    CanActivate,
+    Router,
+    ActivatedRouteSnapshot,
+    RouterStateSnapshot,
+} from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthToken } from '../models/identity/auth-token.interface';
 import { AuthService } from '../services/auth.service';
+import { Page } from '../enums/page.enum';
 
 @Injectable({
-	providedIn: 'root',
+    providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-	constructor(private authService: AuthService, private router: Router) { }
+    constructor(private authService: AuthService, private router: Router) {}
 
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-		if (this.authService.getUserCurrent()) {
-			return of(true);
-		} else {
-			const authToken: AuthToken | null = this.authService.getAuthTokenLocalStorage();
+    canActivate(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+    ): Observable<boolean> {
+        if (this.authService.getUserCurrent()) {
+            return of(true);
+        } else {
+            const authToken: AuthToken | null =
+                this.authService.getAuthTokenLocalStorage();
 
-			if (authToken?.accessToken) {
-				return this.authService.fetchUserCurrent().pipe(
-					map(res => {
-						if (res.status) {
-							this.authService.setUserCurrent(res.data);
-							return true;
-						} else {
-							this.authService.setUserCurrent(null);
-							// this.router.navigate([Page.Login]);
-							return false;
-						}
-					}),
-					catchError(() => {
-						this.authService.setUserCurrent(null);
-						// this.router.navigate([Page.Login]);
-						return of(false);
-					})
-				);
-			} else {
-				this.authService.setUserCurrent(null);
-				// this.router.navigate([Page.Login]);
-				return of(false);
-			}
-		}
-	}
+            if (authToken?.accessToken) {
+                return this.authService.fetchUserCurrent().pipe(
+                    map((res) => {
+                        if (res.status) {
+                            this.authService.setUserCurrent(res.data);
+                            return true;
+                        } else {
+                            this.authService.setUserCurrent(null);
+                            this.router.navigate([Page.Login]);
+                            return false;
+                        }
+                    }),
+                    catchError(() => {
+                        this.authService.setUserCurrent(null);
+                        this.router.navigate([Page.Login]);
+                        return of(false);
+                    })
+                );
+            } else {
+                this.authService.setUserCurrent(null);
+                this.router.navigate([Page.Login]);
+                return of(false);
+            }
+        }
+    }
 }

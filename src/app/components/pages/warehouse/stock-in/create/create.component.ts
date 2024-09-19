@@ -351,16 +351,19 @@ export class CreateComponent implements OnInit {
         console.log(item);
         // Kiểm tra xem sản phẩm đã có trong inventoryStockInDetails hay chưa
         const existingDetail = this.stockInReceipt.inventoryStockInDetails.find(
-            (detail) => {
-                console.log(detail);
+            (detail: any) => {
+                console.log(detail, item);
+                const isProductVariantIdExist =
+                    detail.productVariantId !== undefined &&
+                    item.productVariantId !== undefined;
                 return (
-                    detail.productId === item.id
-                    // &&
-                    // (detail.productVariantId ??
-                    //     detail.productVariantId === item.productVariantId)
+                    detail.productId === item.productId &&
+                    (!isProductVariantIdExist ||
+                        detail.productVariantId === item.productVariantId)
                 );
             }
         );
+        console.log(existingDetail);
 
         if (existingDetail) {
             // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá

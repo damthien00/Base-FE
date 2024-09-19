@@ -1,3 +1,4 @@
+<app-loading *ngIf="isLoading"></app-loading>
 <div class="grid">
     <div class="col-12">
         <p-toolbar styleClass="mb-2">
@@ -23,6 +24,7 @@
                 #dt
                 [value]="stockInList"
                 responsiveLayout="scroll"
+                styleClass="p-datatable-striped"
                 [rows]="pageSize"
                 [first]="pageNumber * pageSize"
                 [paginator]="false"

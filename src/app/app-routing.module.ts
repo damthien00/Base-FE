@@ -2,6 +2,10 @@ import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { NotfoundComponent } from 'src/app/components/notfound/notfound.component';
 import { AppLayoutComponent } from './layout/app.layout.component';
+import { userInfoGuardGuard } from './core/guards/user-info.guard';
+import { aU } from '@fullcalendar/core/internal-common';
+import { AuthGuard } from './core/guards/auth.guard';
+import { AdminGuard } from './core/guards/admin.guard';
 
 @NgModule({
     imports: [
@@ -9,10 +13,20 @@ import { AppLayoutComponent } from './layout/app.layout.component';
             [
                 {
                     path: '',
+                    canActivate: [userInfoGuardGuard],
                     component: AppLayoutComponent,
                     children: [
                         {
+                            path: '',
+                            canActivate: [AdminGuard],
+                            loadChildren: () =>
+                                import(
+                                    'src/app/components/dashboard/dashboard.module'
+                                ).then((m) => m.DashboardModule),
+                        },
+                        {
                             path: 'dashboard',
+                            canActivate: [AdminGuard],
                             loadChildren: () =>
                                 import(
                                     'src/app/components/dashboard/dashboard.module'
@@ -20,6 +34,7 @@ import { AppLayoutComponent } from './layout/app.layout.component';
                         },
                         {
                             path: 'pages',
+                            canActivate: [AdminGuard],
                             loadChildren: () =>
                                 import('./components/pages/pages.module').then(
                                     (m) => m.PagesModule
@@ -47,6 +62,20 @@ import { AppLayoutComponent } from './layout/app.layout.component';
                         import(
                             'src/app/components/activate-warranty/activate-warranty.module'
                         ).then((m) => m.ActivateWarrantyModule),
+                },
+                {
+                    path: 'activate-success',
+                    loadChildren: () =>
+                        import(
+                            'src/app/components/activate-success/activate-success.module'
+                        ).then((m) => m.ActivateSuccessModule),
+                },
+                {
+                    path: 'warranty-mb',
+                    loadChildren: () =>
+                        import(
+                            'src/app/components/warranty-mb/warranty-mb.module'
+                        ).then((m) => m.WarrantyMbModule),
                 },
                 { path: 'notfound', component: NotfoundComponent },
                 { path: '**', redirectTo: '/notfound' },
