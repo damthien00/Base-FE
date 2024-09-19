@@ -144,19 +144,47 @@
                 <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" [style]="{'border-radius': '25%'}" (click)="closeDialog()"></p-button>
               </div>
               <!-- General Form Elements -->
-              <form [formGroup]="RoleGroupForm" (ngSubmit)="onSubmit()">
+              <form [formGroup]="RoleGroupForm" (ngSubmit)="checkUserExistsAndSubmit()">
                 <div class="row mb-12">
-                  <div style="margin-bottom: 20px;" class="col-lg-6">
-                      <label class="labelip">Nhóm quyền<span class="red-asterisk">*</span></label>
-                      <p-multiSelect
-                        [style]="{ height: '40px', width: '100%' }"
-                        [options]="Roles"
-                        optionLabel="name"
-                        [showClear]="true"
-                        placeholder="Chọn nhóm quyền"
-                        [filter]="true"
-                        formControlName="roles"
-                      ></p-multiSelect>           
+                  <div style="margin-bottom: 20px;" class="col-lg-12">
+                    <label class="labelip">Nhóm quyền<span class="red-asterisk">*</span></label>
+                    <p-multiSelect
+                      [style]="{ height: '40px', width: '100%' }"
+                      [options]="Roles"
+                      optionLabel="name"
+                      [showClear]="true"
+                      placeholder="Chọn nhóm quyền"
+                      [filter]="true"
+                      formControlName="roles"
+                      (onBlur)="checkRolesSelection()"
+                    ></p-multiSelect>
+                    <div *ngIf="rolesControl?.hasError('required') && rolesControl?.touched" class="error-message">
+                      Vui lòng chọn ít nhất một nhóm quyền.
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <label class="labelip"
+                    >Tên người dùng<span class="red-asterisk">*</span></label>
+                      <input
+                      type="text"
+                      class="form-control"
+                      pInputText
+                      [style]="{ height: '40px', width: '100%' }"
+                      formControlName="name"
+                      placeholder="Nhập tên người dùng"
+                      (input)="onInputChange($event)"
+                      />
+                      <div
+                      *ngIf="
+                        (RoleGroupForm.get('name')?.invalid &&
+                          (RoleGroupForm.get('name')?.dirty ||
+                            RoleGroupForm.get('name')?.touched)) || showNameError
+                      "
+                      >
+                      <div class="error-message" *ngIf="RoleGroupForm.controls['name'].hasError('whitespace')">
+                        {{ getErrorMessage() }}
+                      </div>
+                    </div>
                   </div>
                   <div style="margin-bottom: 20px;" class="col-lg-6">
                       <label class="labelip">Chi nhánh<span class="red-asterisk">*</span></label>
@@ -168,7 +196,23 @@
                         placeholder="Chọn chi nhánh"
                         optionValue="id"
                         formControlName="branchId"
-                      ></p-dropdown>               
+                      >
+                    </p-dropdown>      
+                    <div
+                    *ngIf="
+                      (RoleGroupForm.get('branchId')?.invalid &&
+                        (RoleGroupForm.get('branchId')?.dirty ||
+                          RoleGroupForm.get('branchId')?.touched)) ||
+                      showNameError2
+                    "
+                  >
+                    <div
+                      *ngIf="RoleGroupForm.get('branchId')?.errors?.['required']"
+                      class="error-message"
+                    >
+                      Chi nhánh không được bỏ trống
+                    </div>
+                  </div>         
                   </div>
                   <div style="margin-bottom: 20px;" class="col-lg-12">
                     <div class="row">
@@ -179,11 +223,22 @@
                           type="text"
                           class="form-control"
                           pInputText
-                          [style]="{ height: '35px', width: '100%' }"
+                          [style]="{ height: '40px', width: '100%' }"
                           formControlName="email"
                           placeholder="Nhập tài khoản"
                           (input)="onInputChange($event)"
                           />
+                          <div
+                          *ngIf="
+                            (RoleGroupForm.get('email')?.invalid &&
+                              (RoleGroupForm.get('email')?.dirty ||
+                                RoleGroupForm.get('email')?.touched)) || showNameError3
+                          "
+                          >
+                          <div class="error-message" *ngIf="RoleGroupForm.controls['email'].hasError('whitespace')">
+                            {{ getErrorMessage3() }}
+                          </div>
+                        </div>
                       </div>
                       <div class="col-lg-6">
                         <label class="labelip"
@@ -192,12 +247,23 @@
                         type="text"
                         class="form-control"
                         pInputText
-                        [style]="{ height: '35px', width: '100%' }"
+                        [style]="{ height: '40px', width: '100%' }"
                         formControlName="password"
                         placeholder="Nhập mật khẩu"
                         maxlength="100"
                         (input)="onInputChange($event)"
                       />
+                      <div
+                      *ngIf="
+                        (RoleGroupForm.get('password')?.invalid &&
+                          (RoleGroupForm.get('password')?.dirty ||
+                            RoleGroupForm.get('password')?.touched)) || showNameError4
+                      "
+                      >
+                      <div class="error-message" *ngIf="RoleGroupForm.controls['password'].hasError('whitespace')">
+                        {{ getErrorMessage4() }}
+                      </div>
+                    </div>
                       </div>
                     </div>
                   </div>
@@ -205,46 +271,47 @@
                     <div class="row">
                         <div class="col-lg-6">
                           <label class="labelip"
-                            >Số điện thoại</label
+                            >Số điện thoại<span class="red-asterisk">*</span></label
                           >
                           <input
                             type="text"
                             class="form-control"
                             pInputText
-                            [style]="{ height: '35px', width: '100%' }"
+                            [style]="{ height: '40px', width: '100%' }"
                             (keypress)="onKeyPress($event)"
                             formControlName="phoneNumber"
                             placeholder="Nhập số điện thoại"
                           />
-                          <div *ngIf="showNameError4" class="error-message">
-                            Số điện thoại không được trùng nhau
-                          </div>
                           <div
-                            *ngIf="
-                              (RoleGroupForm.get('phoneNumber')?.invalid &&
-                                (RoleGroupForm.get('phoneNumber')?.dirty ||
-                                  RoleGroupForm.get('phoneNumber')?.touched)) ||
-                              showNameError5
-                            "
+                          *ngIf="
+                            (RoleGroupForm.get('phoneNumber')?.invalid &&
+                              (RoleGroupForm.get('phoneNumber')?.dirty ||
+                                RoleGroupForm.get('phoneNumber')?.touched)) ||
+                            showNameError5
+                          "
+                        >
+                        <div class="error-message" *ngIf="RoleGroupForm.controls['phoneNumber'].hasError('whitespace')">
+                          {{ getErrorMessage5() }}
+                        </div>
+                          <div
+                            *ngIf="RoleGroupForm.get('phoneNumber')?.errors?.['pattern']"
+                            class="error-message"
                           >
-                            <div
-                              *ngIf="RoleGroupForm.get('phoneNumber')?.errors?.['pattern']"
-                              class="error-message"
-                            >
-                              Số điện thoại phải bắt đầu bằng 03, 05, 07, 08, hoặc 09 và có
-                              10 chữ số.
-                            </div>
+                            Số điện thoại phải bắt đầu bằng 03, 05, 07, 08, hoặc 09 và có
+                            10 chữ số.
                           </div>
+                        </div>
                         </div>
                         <div class="col-lg-6">
                           <label class="labelip">Tỉnh/Thành</label>
                           <p-dropdown
                             [options]="cities"
-                            [style]="{ height: '35px', width: '100%' }"
+                            [style]="{ height: '40px', width: '100%' }"
                             optionLabel="name"
                             [showClear]="true"
                             placeholder="Chọn Tỉnh/Thành"
                             optionValue="id"
+                            formControlName="cityId"
                             (onChange)="onCityChange($event.value)"
                             (onClear)="onClearCity()"
                           ></p-dropdown>
@@ -257,7 +324,7 @@
                         <label class="labelip">Quận/Huyện</label>
                         <p-dropdown
                           [options]="districts"
-                          [style]="{ height: '35px', width: '100%' }"
+                          [style]="{ height: '40px', width: '100%' }"
                           optionLabel="name"
                           [showClear]="true"
                           placeholder="Chọn Quận/Huyện"
@@ -272,7 +339,7 @@
                         <label class="labelip">Xã/Phường</label>
                         <p-dropdown
                           [options]="wards"
-                          [style]="{ height: '35px', width: '100%' }"
+                          [style]="{ height: '40px', width: '100%' }"
                           optionLabel="name"
                           [showClear]="true"
                           placeholder="Chọn Xã/Phường"
@@ -289,7 +356,7 @@
                 <div class="row mb-12 mt-5">
                   <div class="col-sm-12 buttonsl">
                       <button pButton pRipple label="Hủy" class="p-button-success buttoncloses" type="button" (click)="closeDialog()"></button>
-                      <button pButton pRipple label="Lưu" class="p-button-success butttonsave" type="submit"></button>
+                      <button pButton pRipple label="Thêm" class="p-button-success butttonsave" type="submit"></button>
                   </div>
                 </div>
               </form><!-- End General Form Elements -->

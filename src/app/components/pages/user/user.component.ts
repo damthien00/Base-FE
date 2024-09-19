@@ -87,10 +87,12 @@ export class UserComponent implements OnInit {
     showDialog = false;
     showDialog2 = false;
     showDialog3 = false;
+    rolesError: boolean = false;
 
     formatdate: string = 'dd/mm/yy';
     autoCompleteSubject: any;
     currentPageReport: string = '';
+    isRolesTouched: boolean = false;
 
     constructor(
         private usersService: UserService,
@@ -107,22 +109,27 @@ export class UserComponent implements OnInit {
                 Validators.maxLength(100),
                 this.noWhitespaceValidator
             ])],
-            phoneNumber: [null, [Validators.required, Validators.pattern(/^(03|05|07|08|09)[0-9]{8}$/),
+            phoneNumber: ['', [Validators.required, this.noWhitespaceValidator, Validators.pattern(/^(03|05|07|08|09)[0-9]{8}$/),
             Validators.minLength(10),
             Validators.maxLength(10),]],
             branchId: [null, Validators.required],
-            roles: [[]],
+            roles: [[], Validators.required],
             branchName: [null, Validators.required],
             email: ['', Validators.compose([
                 Validators.required,
                 Validators.minLength(6),
                 Validators.maxLength(100),
-                Validators.required, Validators.pattern('^[a-zA-Z0-9]*$'),
                 this.noWhitespaceValidator
             ])],
-            password: [null, Validators.required],
+            password: ['', Validators.compose([
+                Validators.required,
+                Validators.minLength(6),
+                Validators.maxLength(100),
+                this.noWhitespaceValidator
+            ])],
             address: [null, Validators.required],
             wardId: [null],
+            cityId: [null],
             districtId: [null],
         });
         this.RoleGroupForm2 = this.fb.group({
@@ -174,6 +181,22 @@ export class UserComponent implements OnInit {
     isWhitespace(str: string) {
         return str.trim().length === 0;
     }
+
+    get rolesControl() {
+        return this.RoleGroupForm.get('roles');
+    }
+
+    // Hàm kiểm tra khi rời khỏi p-multiSelect
+    checkRolesSelection() {
+        // Kiểm tra nếu trường chưa có giá trị
+        if (!this.rolesControl?.value || this.rolesControl.value.length === 0) {
+            this.rolesControl.setErrors({ required: true }); // Đặt lỗi required
+            this.rolesControl.markAsTouched(); // Đánh dấu trường là touched
+        } else {
+            this.rolesControl.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+        }
+    }
+
 
     get username() {
         return this.RoleGroupForm.get('username');
@@ -332,9 +355,30 @@ export class UserComponent implements OnInit {
 
     getErrorMessage() {
         if (this.RoleGroupForm.controls['name'].hasError('required')) {
-            return 'Tên nhân viên không được để trống';
+            return 'Tên người dùng không được để trống';
         }
-        return 'Tên nhân viên không được chứa toàn ký tự trắng';
+        return 'Tên người không được chứa toàn ký tự trắng';
+    }
+
+    getErrorMessage3() {
+        if (this.RoleGroupForm.controls['email'].hasError('required')) {
+            return 'Tên tài khoản không được để trống';
+        }
+        return 'Tên tài khoản không được chứa toàn ký tự trắng';
+    }
+
+    getErrorMessage4() {
+        if (this.RoleGroupForm.controls['password'].hasError('required')) {
+            return 'Mật khẩu không được để trống';
+        }
+        return 'Mật khẩu không được chứa toàn ký tự trắng';
+    }
+
+    getErrorMessage5() {
+        if (this.RoleGroupForm.controls['phoneNumber'].hasError('required')) {
+            return 'Số điện thoại không được để trống';
+        }
+        return 'Số điện thoại không được chứa toàn ký tự trắng';
     }
 
     getErrorMessage2() {
@@ -390,6 +434,7 @@ export class UserComponent implements OnInit {
         this.showNameError2 = false;
         this.showNameError3 = false;
         this.showNameError4 = false;
+        this.showNameError5 = false;
         this.errorMessage = null;
     }
 
@@ -480,6 +525,17 @@ export class UserComponent implements OnInit {
         this.showDialog4 = false;
     }
 
+    onKeyPress(event: KeyboardEvent) {
+        const inputChar = event.key;
+        if (!this.isNumberKey(inputChar)) {
+            event.preventDefault();
+        }
+    }
+
+    isNumberKey(char: string) {
+        return /^\d+$/.test(char);
+    }
+
     // confirmDelete() {
     //   if (this.selectedCommodityId !== null) {
     //     this.commodityService.deleteCommodity(this.selectedCommodityId).subscribe(
@@ -500,217 +556,128 @@ export class UserComponent implements OnInit {
         return error && typeof error.StatusCode === 'number';
     }
 
-    // async onSubmit() {
-    //   //debugger
-    //   if (this.savingInProgress) {
-    //     return;
-    //   }
+    checkUserExistsAndSubmit() {
+        const formValues = this.RoleGroupForm.value;
 
-    //   this.isSubmitting = true;
-    //   const commo = this.RoleGroupForm.value;
+        // Gọi service để kiểm tra sự tồn tại của người dùng
+        this.usersService.checkUserExists(formValues.phoneNumber, formValues.email).subscribe(response => {
+            if (response.data === true) {
+                // Người dùng tồn tại, hiển thị thông báo lỗi
+                // this.messages.add({ severity: 'error', summary: 'Lỗi', detail: 'Số điện thoại hoặc email đã tồn tại!' });
+                this.messages = [{
+                    severity: 'warn',
+                    summary: 'Lỗi',
+                    detail: 'Số điện thoại hoặc email đã tồn tại!',
+                    life: 3000
+                }];
+            } else {
+                // Người dùng không tồn tại, gọi hàm onSubmit để tiếp tục
+                this.onSubmit();
+            }
+        }, error => {
+            // Xử lý lỗi khi gọi API
+            console.error('Có lỗi xảy ra khi kiểm tra tồn tại người dùng', error);
+        });
+    }
 
-    //   let hasError = false;
+    async onSubmit() {
+        if (this.savingInProgress) {
+            return;
+        }
 
-    //   if (!commo.userRegist.roleGroupId || commo.userRegist.roleGroupId.length === 0) {
-    //     this.showNameError = true;
-    //     hasError = true;
-    //   }
+        this.isSubmitting = true;
+        const formValues = this.RoleGroupForm.value;
 
-    //   if (!commo.name || commo.name.length === 0) {
-    //     this.showNameError2 = true;
-    //     hasError = true;
-    //   }
+        let hasError = false;
 
-    //   if (!commo.userRegist.userName || commo.userRegist.userName.length === 0) {
-    //     this.showNameError3 = true;
-    //     hasError = true;
-    //   }
+        this.checkRolesSelection()
 
-    //   if (!commo.name || commo.name.length < 6) {
-    //     hasError = true;
-    //   }
+        if (!formValues.name || formValues.name.length === 0) {
+            this.showNameError = true;
+            hasError = true;
+        }
 
-    //   if (commo.phoneNumber && commo.phoneNumber.length != 10) {
-    //     hasError = true;
-    //   }
+        if (!formValues.branchId || formValues.branchId.length === 0) {
+            this.showNameError2 = true;
+            hasError = true;
+        }
 
-    //   if (!commo.userRegist.userName || commo.userRegist.userName.length < 6) {
-    //     hasError = true;
-    //   }
+        if (!formValues.email || formValues.email.length === 0) {
+            this.showNameError3 = true;
+            hasError = true;
+        }
 
-    //   if (hasError) {
-    //     this.messages = [{
-    //       severity: 'error',
-    //       summary: 'Không thể lưu vì:',
-    //       detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-    //       life: 5000
-    //     }];
-    //     this.isSubmitting = false;
-    //     return
-    //   }
+        if (!formValues.password || formValues.password.length === 0) {
+            this.showNameError4 = true;
+            hasError = true;
+        }
 
-    //   this.errorMessage = null;
+        if (!formValues.phoneNumber || formValues.phoneNumber.length === 0) {
+            this.showNameError5 = true;
+            hasError = true;
+        }
 
-    //   try {
-    //     this.savingInProgress = true;
-    //     if (this.RoleGroupForm.value.dayOfBirth !== null) {
-    //       const dateString = this.RoleGroupForm.value.dayOfBirth;
-    //       const dateObject = moment.tz(dateString, 'ddd MMM DD YYYY HH:mm:ss GMTZZ (z)', 'Asia/Ho_Chi_Minh').add(7, 'hours');
-    //       const isoString = dateObject.toISOString();
-    //       this.RoleGroupForm.value.dayOfBirth = new Date(new Date(isoString).getTime() + (0 * 60 * 60 * 1000)).toISOString();
-    //     }
-    //     const createResponse = await this.usersService.createEmployee(this.RoleGroupForm.value).toPromise();
-    //     //console.log('commodity created successfully!', createResponse);
-    //     this.messages = [{
-    //       severity: 'success',
-    //       summary: 'Thành công',
-    //       detail: 'Nhân viên đã được thêm thành công',
-    //       life: 3000
-    //     }];
-    //     // this.filterCustomers();
-    //     this.closeDialog();
-    //     this.Filters();
-    //   } catch (error) {
-    //     let err = error as any;
-    //     if (err.error.StatusCode === 4005) {
-    //       this.errorMessage = 'Tên tài khoản đã tồn tại.';
-    //     }
-    //     this.messages = [{
-    //       severity: 'error',
-    //       summary: 'Không thể lưu vì:',
-    //       detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-    //       life: 3000
-    //     }];
-    //     // this.filterCustomers();
-    //   } finally {
-    //     this.savingInProgress = false;
-    //   }
+        if (formValues.phoneNumber && formValues.phoneNumber.length != 10) {
+            hasError = true;
+          }
 
-    // }
+        if (hasError) {
+            this.messages = [{
+                severity: 'error',
+                summary: 'Không thể lưu vì:',
+                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                life: 5000
+            }];
+            this.isSubmitting = false;
+            return
+        }
+        try {
+            this.savingInProgress = true;
+            const selectedCity = this.cities.find(city => city.id === formValues.cityId)?.name || '';
+            const selectedDistrict = this.districts.find(district => district.id === formValues.districtId)?.name || '';
+            const selectedWard = this.wards.find(ward => ward.id === formValues.wardId)?.name || '';
 
-    // async onUpdateSubmit() {
-    //   if (this.authService.hasRole('User_Update')) {
-    //     if (this.savingInProgress) {
-    //       return;
-    //     }
+            // Tạo chuỗi địa chỉ bằng cách nối các giá trị lại với nhau
+            const address = `${selectedCity} - ${selectedDistrict} - ${selectedWard}`.trim();
 
-    //     this.isSubmitting = true;
-    //     const commo = this.RoleGroupForm2.value;
+            const userData = {
+                name: formValues.name,
+                branchId: formValues.branchId,
+                branchName: this.branch.find(branch => branch.id === formValues.branchId)?.name || '',
+                email: formValues.email,
+                phoneNumber: formValues.phoneNumber,
+                password: formValues.password,
+                status: true,  // Hoặc giá trị khác nếu cần
+                address: address, // Địa chỉ đã được tạo
+                role: formValues.roles.map(role => role.name) // Lấy tên của các nhóm quyền
+            };
 
-    //     let hasError = false;
-
-    //     if (!commo.roleGroupId || commo.roleGroupId.length === 0) {
-    //       this.showNameError = true;
-    //       hasError = true;
-    //     }
-
-    //     if (!commo.name || commo.name.length === 0) {
-    //       this.showNameError2 = true;
-    //       hasError = true;
-    //     }
-
-    //     if (!commo.accountName || commo.accountName.length === 0) {
-    //       this.showNameError3 = true;
-    //       hasError = true;
-    //     }
-
-    //     if (!commo.name || commo.name.length < 6) {
-    //       this.showNameError2 = true;
-    //       hasError = true;
-    //     }
-
-    //     if(commo.phoneNumber !== null) {
-    //       const phonNumberTrim = commo.phoneNumber.trim()
-    //       commo.phoneNumber = phonNumberTrim;
-    //     }
-
-    //     if (commo.phoneNumber && commo.phoneNumber.length != 10) {
-    //       this.showNameError5 = true
-    //       hasError = true;
-    //     }
-
-    //     if (!commo.accountName || commo.accountName.length < 6) {
-    //       this.showNameError3 = true;
-    //       hasError = true;
-    //     }
-
-    //     if (hasError) {
-    //       this.messages = [{
-    //         severity: 'error',
-    //         summary: 'Không thể lưu vì:',
-    //         detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-    //         life: 5000
-    //       }];
-    //       this.isSubmitting = false;
-    //       return
-    //     }
-
-    //     this.errorMessage = null;
-    //     // this.employessById.version++;
-
-    //     try {
-    //       this.savingInProgress = true;
-    //       if (this.RoleGroupForm2.value.dayOfBirth !== null) {
-    //         const dateString = this.RoleGroupForm2.value.dayOfBirth;
-    //         const dateObject = moment.tz(dateString, 'ddd MMM DD YYYY HH:mm:ss GMTZZ (z)', 'Asia/Ho_Chi_Minh').add(7, 'hours');
-    //         const isoString = dateObject.toISOString();
-    //         this.RoleGroupForm2.value.dayOfBirth = new Date(new Date(isoString).getTime() + (0 * 60 * 60 * 1000)).toISOString();
-    //       }
-    //       const updateResponse = await this.usersService.updateEmployee(this.RoleGroupForm2.value).toPromise();
-    //       //console.log('commodity updated successfully!', updateResponse);
-    //       this.messages = [{
-    //         severity: 'success',
-    //         summary: 'Thành công',
-    //         detail: 'Nhân viên đã được cập nhật thành công',
-    //         life: 3000
-    //       }];
-    //       this.RoleGroupForm2.reset();
-    //       this.closeDialog2();
-    //       this.Filters();
-    //     } catch (error) {
-    //       let err = error as any;
-    //       if (err.error.StatusCode === 4005) {
-    //         this.errorMessage = 'Tên tài khoản đã tồn tại.';
-    //       }
-    //       this.messages = [{
-    //         severity: 'error',
-    //         summary: 'Không thể lưu vì:',
-    //         detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-    //         life: 3000
-    //       }];
-    //       // this.openDialog2(this.employessId2);
-    //       this.Filters();
-    //     } finally {
-    //       this.savingInProgress = false;
-    //       this.Filters();
-    //     }
-    //   } else {
-    //     this.messages = [{
-    //       severity: 'warn',
-    //       summary: 'Không có quyền',
-    //       detail: 'Bạn không có quyền cập nhật',
-    //       life: 3000
-    //     }];
-    //   }
-
-    // }
-
-    // Filters(): void {
-    //   //debugger
-    //   this.usersService.getFilters(this.pageSize, this.pageNumber, this.keySearch, this.roleGroupId!)
-    //     .subscribe(
-    //       response => {
-    //         this.users = response.data;
-    //         this.totalRecordsCount = response.totalRecordsCount;
-    //         this.updateCurrentPageReport();
-    //         //console.log(this.users)
-    //       },
-    //       error => {
-    //         console.error('Error fetching filtered customers:', error);
-    //       }
-    //     );
-    // }
-
+            // Gửi yêu cầu tới API để thêm người dùng
+            this.usersService.createUser(userData).subscribe(response => {
+                console.log('Người dùng đã được tạo thành công', response);
+                this.messages = [{
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: 'Khách hàng đã được thêm thành công',
+                    life: 3000
+                }];
+                this.closeDialog();  // Đóng dialog sau khi thêm thành công
+                this.Filters();
+            }, error => {
+                console.error('Có lỗi xảy ra khi thêm người dùng', error);
+            });
+        } catch (error) {
+            this.messages = [{
+                severity: 'error',
+                summary: 'Không thể lưu vì:',
+                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                life: 3000
+            }];
+            // this.filterCustomers();
+        } finally {
+            this.savingInProgress = false;
+        }
+    }
 
     onPageChange(event: any): void {
         this.PageIndex = event.page + 1;

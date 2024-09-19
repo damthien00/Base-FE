@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
 })
 export class UserService {
     public url = environment.url;
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
     login(email: string, password: string): Observable<User> {
         return this.http.post<User>(
@@ -28,21 +28,30 @@ export class UserService {
 
     getFilters(PageSize: number, PageIndex: number, Name?: string, PhoneNumber?: string, Address?: string): Observable<any> {
         let params = new HttpParams()
-          .set('PageSize', PageSize.toString())
-          .set('PageIndex', PageIndex.toString());
-    
+            .set('PageSize', PageSize.toString())
+            .set('PageIndex', PageIndex.toString());
+
         if (Name) {
-          params = params.set('Name', Name);
+            params = params.set('Name', Name);
         }
-    
+
         if (PhoneNumber) {
-          params = params.set('PhoneNumber', PhoneNumber);
+            params = params.set('PhoneNumber', PhoneNumber);
         }
 
         if (Address) {
-          params = params.set('Address', Address);
+            params = params.set('Address', Address);
         }
-    
+
         return this.http.get<any>(`${this.url}/api/user/paging`, { params: params });
-      }
+    }
+
+    createUser(userData: any): Observable<any> {
+        return this.http.post(`${this.url}/api/user/create`, userData);
+    }
+
+    checkUserExists(phoneNumber: string, email: string): Observable<any> {
+        const data = { phoneNumber, email };
+        return this.http.post<any>(`${this.url}/api/user/check-exists`, data);
+    }
 }
