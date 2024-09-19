@@ -8,12 +8,13 @@
                     [home]="{ icon: 'pi pi-home' }"
                 ></p-breadcrumb>
             </div>
-            <ng-template pTemplate="right"> </ng-template>
+            <ng-template pTemplate="right"></ng-template>
         </p-toolbar>
         <div class="card">
             <p-toast></p-toast>
             <p-table
                 #dt
+                styleClass="p-datatable-striped"
                 [value]="warrantyOrders"
                 [columns]="cols"
                 responsiveLayout="scroll"

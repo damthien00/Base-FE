@@ -22,6 +22,8 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { ChipsModule } from 'primeng/chips';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { MenubarModule } from 'primeng/menubar';
+import { MenuModule } from 'primeng/menu';
 
 // import { ToastModule } from 'primeng/toast';
 
@@ -32,11 +34,13 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
         ReactiveFormsModule,
         ButtonModule,
         TableModule,
+        MenuModule,
         CalendarModule,
         ChipsModule,
         FileUploadModule,
         AutoCompleteModule,
         InputSwitchModule,
+        MenubarModule,
         SplitButtonModule,
         RippleModule,
         ToastModule,
@@ -46,6 +50,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
         PaginatorModule,
         InputTextareaModule,
         DropdownModule,
+
         RadioButtonModule,
         InputNumberModule,
         DialogModule,
@@ -55,6 +60,8 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     exports: [
         CommonModule,
         FormsModule,
+        MenubarModule,
+        MenuModule,
         ReactiveFormsModule,
         ChipsModule,
         ButtonModule,

@@ -4,6 +4,7 @@ import { StockInService } from './../../../../../core/services/stock-in.service'
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { environment } from 'src/environments/environment';
+import { B } from '@fullcalendar/core/internal-common';
 
 @Component({
     selector: 'app-show',
@@ -25,6 +26,7 @@ export class ShowComponent implements OnInit {
     pageSize: number = 10;
     pageNumber: number = 1;
     totalRecordsCount: any;
+    isLoading: boolean = true;
 
     constructor(private stockInService: StockInService) {}
 
@@ -42,6 +44,7 @@ export class ShowComponent implements OnInit {
     }
 
     loadStockIn() {
+        this.isLoading = true;
         this.optionsFilterStockIn.pageIndex = this.pageNumber;
         this.optionsFilterStockIn.pageSize = this.pageSize;
         this.stockInService
@@ -51,6 +54,7 @@ export class ShowComponent implements OnInit {
                 this.stockInList = response.data.items;
                 console.log(this.totalRecordsCount);
             });
+        this.isLoading = false;
     }
 
     showStockInDetail(stockIn: any) {

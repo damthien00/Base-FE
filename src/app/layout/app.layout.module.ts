@@ -15,8 +15,11 @@ import { RouterModule } from '@angular/router';
 import { AppTopBarComponent } from './app.topbar.component';
 import { AppFooterComponent } from './app.footer.component';
 import { AppConfigModule } from './config/config.module';
-import { AppSidebarComponent } from "./app.sidebar.component";
-import { AppLayoutComponent } from "./app.layout.component";
+import { AppSidebarComponent } from './app.sidebar.component';
+import { AppLayoutComponent } from './app.layout.component';
+import { MenubarModule } from 'primeng/menubar';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
 
 @NgModule({
     declarations: [
@@ -32,8 +35,11 @@ import { AppLayoutComponent } from "./app.layout.component";
         FormsModule,
         HttpClientModule,
         BrowserAnimationsModule,
+        ButtonModule,
         InputTextModule,
         SidebarModule,
+        MenubarModule,
+        MenuModule,
         BadgeModule,
         RadioButtonModule,
         InputSwitchModule,
@@ -41,6 +47,6 @@ import { AppLayoutComponent } from "./app.layout.component";
         RouterModule,
         // AppConfigModule
     ],
-    exports: [AppLayoutComponent]
+    exports: [AppLayoutComponent],
 })
-export class AppLayoutModule { }
+export class AppLayoutModule {}
