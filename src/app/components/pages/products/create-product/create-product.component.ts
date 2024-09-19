@@ -1350,7 +1350,6 @@ export class CreateProductComponent implements OnInit {
       return; // Prevent form submission
     }
 
-
     if (
       !productData.name ||
       (productData.name.length > 0 && productData.name.trim().length === 0)
