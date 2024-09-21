@@ -54,4 +54,19 @@ export class UserService {
         const data = { phoneNumber, email };
         return this.http.post<any>(`${this.url}/api/user/check-exists`, data);
     }
+
+    getUserById(userId: number): Observable<any> {
+        const url = `${this.url}/api/user/get-by-id?UserId=${userId}`;
+        return this.http.get<any>(url);
+    }
+
+    updateUser(data: any): Observable<any> {
+        const url = `${this.url}/api/user/edit-user-info`; // Endpoint API cho việc cập nhật thương hiệu
+        return this.http.put<any>(url, data);
+    }
+
+    assignRolesToUser(assignRolesPayload: any): Observable<any> {
+        return this.http.put(`${this.url}/api/user/assign-user-to-roles`, assignRolesPayload);
+    }
+
 }

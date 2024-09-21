@@ -15,6 +15,7 @@ import { OptionsFilterCommodities } from 'src/app/core/models/option-filter-comm
 import { BranchService } from 'src/app/core/services/branch.service';
 import { RoleService } from 'src/app/core/services/role.service';
 import { AddressService } from 'src/app/core/services/address.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-user',
@@ -59,9 +60,11 @@ export class UserComponent implements OnInit {
     selectedCityId!: number;
     selectedDistrictId!: number;
     selectedWardId!: number;
+    passwordHash: string;
+    initialPhoneNumber: string = '';
+    initialEmail: string = '';
 
-    optionsFilterCommodities: OptionsFilterCommodities =
-        new OptionsFilterCommodities();
+    optionsFilterCommodities: OptionsFilterCommodities = new OptionsFilterCommodities();
 
     autoCompleteCustomer: any;
     autoCompleteEmployeeDraw: any;
@@ -84,6 +87,8 @@ export class UserComponent implements OnInit {
     showNameError3: boolean = false;
     showNameError4: boolean = false;
     showNameError5: boolean = false;
+    showNameError6: boolean = false;
+    showNameError7: boolean = false;
     showDialog = false;
     showDialog2 = false;
     showDialog3 = false;
@@ -109,7 +114,37 @@ export class UserComponent implements OnInit {
                 Validators.maxLength(100),
                 this.noWhitespaceValidator
             ])],
-            phoneNumber: ['', [Validators.required, this.noWhitespaceValidator, Validators.pattern(/^(03|05|07|08|09)[0-9]{8}$/),
+            phoneNumber: ['', [Validators.required, this.noWhitespaceValidator,
+            Validators.minLength(10),
+            Validators.maxLength(10),]],
+            branchId: [null, Validators.required],
+            roles: [[], Validators.required],
+            branchName: [null, Validators.required],
+            email: ['', Validators.compose([
+                Validators.required,
+                Validators.email,
+                this.noWhitespaceValidator
+            ])],
+            password: ['', Validators.compose([
+                Validators.required,
+                Validators.minLength(6),
+                Validators.maxLength(100),
+                this.noWhitespaceValidator
+            ])],
+            address: [null, Validators.required],
+            wardId: [null],
+            cityId: [null],
+            districtId: [null],
+        });
+        this.RoleGroupForm2 = this.fb.group({
+            id: [''],
+            name: ['', Validators.compose([
+                Validators.required,
+                Validators.minLength(6),
+                Validators.maxLength(100),
+                this.noWhitespaceValidator
+            ])],
+            phoneNumber: ['', [Validators.required, this.noWhitespaceValidator,
             Validators.minLength(10),
             Validators.maxLength(10),]],
             branchId: [null, Validators.required],
@@ -132,50 +167,6 @@ export class UserComponent implements OnInit {
             cityId: [null],
             districtId: [null],
         });
-        this.RoleGroupForm2 = this.fb.group({
-            id: [''],
-            name: [
-                '',
-                Validators.compose([
-                    Validators.required,
-                    Validators.minLength(6),
-                    Validators.maxLength(100),
-                    this.noWhitespaceValidator,
-                ]),
-            ],
-            phoneNumber: [
-                null,
-                [
-                    Validators.required,
-                    Validators.pattern(/^(03|05|07|08|09)[0-9]{8}$/),
-                    Validators.minLength(10),
-                    Validators.maxLength(10),
-                ],
-            ],
-            departmentId: [0, Validators.required],
-            dayOfBirth: [null],
-            accountName: [
-                '',
-                Validators.compose([
-                    Validators.required,
-                    Validators.minLength(6),
-                    Validators.maxLength(100),
-                    Validators.required,
-                    Validators.pattern('^[a-zA-Z0-9]*$'),
-                    this.noWhitespaceValidator,
-                ]),
-            ],
-            password: [null, Validators.required],
-            email: [null, [Validators.required, Validators.email]],
-            roleGroupId: ['', Validators.required],
-            roleGroupName: [null],
-            roleGroup: [null],
-            code: [null],
-            version: [null],
-            // userRegist: this.fb.group({
-
-            // })
-        });
     }
 
     isWhitespace(str: string) {
@@ -184,6 +175,14 @@ export class UserComponent implements OnInit {
 
     get rolesControl() {
         return this.RoleGroupForm.get('roles');
+    }
+
+    get rolesControl2() {
+        return this.RoleGroupForm2.get('roles');
+    }
+
+    get emailControl() {
+        return this.RoleGroupForm.get('email');
     }
 
     // Hàm kiểm tra khi rời khỏi p-multiSelect
@@ -197,6 +196,16 @@ export class UserComponent implements OnInit {
         }
     }
 
+    checkRolesSelection2() {
+        // Kiểm tra nếu trường chưa có giá trị
+        if (!this.rolesControl2?.value || this.rolesControl2.value.length === 0) {
+            this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
+            this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
+        } else {
+            this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+        }
+    }
+
 
     get username() {
         return this.RoleGroupForm.get('username');
@@ -205,8 +214,8 @@ export class UserComponent implements OnInit {
     ngOnInit() {
         this.getCitiesByCountry(1);
         this.Filters();
-        this.getAllFilterBranch();
         this.getAllFilterRole();
+        this.getAllFilterBranch();
     }
 
     getAllFilterBranch(): void {
@@ -297,10 +306,10 @@ export class UserComponent implements OnInit {
     }
 
     clickButtonFilter() {
-        if (this.selectedName) {
-            this.Name = this.selectedName.trim();
-            this.PhoneNumber = this.selectedPhoneNumber;
-            this.Address = this.selectedAddress;
+        if (this.selectedName || this.selectedPhoneNumber || this.selectedAddress) {
+            this.Name = this.selectedName?.trim();
+            this.PhoneNumber = this.selectedPhoneNumber?.trim();
+            this.Address = this.selectedAddress?.trim();
             this.PageIndex = 1;
             const elementshighlight = document.querySelectorAll(
                 `p-paginator .p-highlight`
@@ -316,9 +325,9 @@ export class UserComponent implements OnInit {
             });
             this.Filters();
         } else {
-            this.Name = this.selectedName.trim();
-            this.PhoneNumber = this.selectedPhoneNumber;
-            this.Address = this.selectedAddress;
+            this.Name = this.selectedName?.trim();
+            this.PhoneNumber = this.selectedPhoneNumber?.trim();
+            this.Address = this.selectedAddress?.trim();
             this.PageIndex = 1;
             const elementshighlight = document.querySelectorAll(
                 `p-paginator .p-highlight`
@@ -435,56 +444,67 @@ export class UserComponent implements OnInit {
         this.showNameError3 = false;
         this.showNameError4 = false;
         this.showNameError5 = false;
-        this.errorMessage = null;
+        this.showNameError6 = false;
+        this.showNameError7 = false;
+        this.Filters();
     }
 
-    // openDialog2(employessId: number): void {
-    //   if (this.authService.hasRole('User_GetOne')) {
-    //     this.employessId2 = employessId;
-    //     this.usersService.getEmployessById(employessId).subscribe(
-    //       (response: any) => {
-    //         if (response.isSucceeded) {
-    //           this.employessById = response.data;
-    //           if (this.employessById.dayOfBirth !== null) {
-    //             const dateOfBirth = new Date(this.employessById.dayOfBirth);
-    //             this.employessById.dayOfBirth = dateOfBirth;
-    //           }
-    //           this.showDialog2 = true;
-    //           if (this.employessById.phoneNumber !== null) {
-    //             const phonNumberTrim = this.employessById.phoneNumber.trim();
-    //             this.employessById.phoneNumber = phonNumberTrim;
-    //           }
-    //           this.RoleGroupForm2.patchValue({
-    //             id: this.employessById.id,
-    //             code: this.employessById.code,
-    //             name: this.employessById.name,
-    //             accountName: this.employessById.accountName,
-    //             dayOfBirth: this.employessById.dayOfBirth,
-    //             phoneNumber: this.employessById.phoneNumber,
-    //             roleGroupId: this.employessById.roleGroupId,
-    //             roleGroupName: this.employessById.roleGroupName,
-    //             roleGroup: this.Roles.find(role => role.id === this.employessById.roleGroupId),
-    //             isDeleted: this.employessById.isDeleted,
-    //             version: this.employessById.version,
-    //           });
-    //         } else {
-    //           console.error("Failed to get brand by ID:", response.message);
+    getAllFilterRole2(): void {
+        this.roleService.getRoleAll().subscribe((response: any) => {
+            this.Roles = response.data.items.map((role: any) => ({
+                label: role.name,  // Tên của role
+                value: role.id     // Giá trị là ID của role
+            }));
+        });
+    }
 
-    //         }
-    //       },
-    //       error => {
-    //         console.error("Error:", error);
-    //       }
-    //     );
-    //   } else {
-    //     this.messages = [{
-    //       severity: 'warn',
-    //       summary: 'Không có quyền',
-    //       detail: 'Bạn không có quyền truy cập',
-    //       life: 3000
-    //     }];
-    //   }
-    // }
+    maskPassword(password: string): string {
+        // Nếu password quá dài, chỉ lấy 8 dấu sao
+        return password.length > 8 ? '*******************' : '*******************'.slice(0, password.length);
+    }
+
+    openDialog2(userId: number): void {
+        this.employessId2 = userId;
+        this.getAllFilterRole2();
+        this.usersService.getUserById(userId).subscribe(
+            (response: any) => {
+                this.employessById = response.data;
+                this.getDistrictsByCity(this.employessById.cityId);
+                this.getWardsByDistrict(this.employessById.districtId);
+                const userRoleIds = this.employessById.roles.map((role: any) => role.id);
+                this.passwordHash = this.employessById.passwordHash;
+                this.showDialog2 = true;
+                if (this.employessById.phoneNumber !== null) {
+                    const phonNumberTrim = this.employessById.phoneNumber.trim();
+                    this.employessById.phoneNumber = phonNumberTrim;
+                }
+                this.RoleGroupForm2.patchValue({
+                    id: this.employessById.id,
+                    name: this.employessById.name,
+                    phoneNumber: this.employessById.phoneNumber,
+                    email: this.employessById.email,
+                    address: this.employessById.address,
+                    password: this.maskPassword(this.passwordHash),
+                    branchId: this.employessById.branchId,
+                    branchName: this.employessById.branchName,
+                    cityId: this.employessById.cityId,
+                    cityName: this.employessById.cityName,
+                    districtId: this.employessById.districtId,
+                    districtName: this.employessById.districtName,
+                    wardId: this.employessById.wardId,
+                    wardName: this.employessById.wardName,
+                    // branchGroup: this.branch.find(branch => branch.id === this.employessById.branchId),
+                    roles: userRoleIds
+                });
+
+                this.initialPhoneNumber = this.employessById.phoneNumber;
+                this.initialEmail = this.employessById.email;
+            },
+            error => {
+                console.error("Error:", error);
+            }
+        );
+    }
 
     closeDialog2() {
         this.showDialog2 = false;
@@ -493,15 +513,18 @@ export class UserComponent implements OnInit {
         this.showNameError2 = false;
         this.showNameError3 = false;
         this.showNameError4 = false;
-        this.errorMessage = null;
+        this.showNameError5 = false;
+        this.showNameError6 = false;
+        this.showNameError7 = false;
+        this.Filters();
     }
 
     onItemSelected2(event: any) {
         const selectedRole = event.value;
         if (selectedRole) {
             this.RoleGroupForm2.patchValue({
-                roleGroupId: selectedRole.id,
-                roleGroupName: selectedRole.name,
+                branchId: selectedRole.id,
+                branchName: selectedRole.name,
             });
         }
     }
@@ -580,6 +603,36 @@ export class UserComponent implements OnInit {
         });
     }
 
+    onPageChange(event: any): void {
+        this.PageIndex = event.page + 1;
+        this.PageSize = event.rows;
+        this.Filters();
+    }
+
+    goToPreviousPage(): void {
+        if (this.PageIndex > 1) {
+            this.PageIndex--;
+            this.Filters();
+        }
+    }
+
+    goToNextPage(): void {
+        const lastPage = Math.ceil(this.totalRecords / this.PageSize);
+        if (this.PageIndex < lastPage) {
+            this.PageIndex++;
+            this.Filters();
+        }
+    }
+    updateCurrentPageReport(): void {
+        const startRecord = (this.PageIndex - 1) * this.PageSize + 1;
+        const endRecord = Math.min(
+            this.PageIndex * this.PageSize,
+            this.totalRecords
+        );
+        this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
+    }
+
+
     async onSubmit() {
         if (this.savingInProgress) {
             return;
@@ -590,7 +643,19 @@ export class UserComponent implements OnInit {
 
         let hasError = false;
 
-        this.checkRolesSelection()
+        if (!this.rolesControl?.value || this.rolesControl.value.length === 0) {
+            this.rolesControl.setErrors({ required: true }); // Đặt lỗi required
+            this.rolesControl.markAsTouched(); // Đánh dấu trường là touched
+            hasError = true;
+        } else {
+            this.rolesControl.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+        }
+
+        if (this.emailControl.invalid && this.emailControl.touched && this.emailControl.value) {
+            this.showNameError6 = true;
+            hasError = true;
+        }
+
 
         if (!formValues.name || formValues.name.length === 0) {
             this.showNameError = true;
@@ -617,9 +682,9 @@ export class UserComponent implements OnInit {
             hasError = true;
         }
 
-        if (formValues.phoneNumber && formValues.phoneNumber.length != 10) {
-            hasError = true;
-          }
+        // if (formValues.phoneNumber && formValues.phoneNumber.length != 10) {
+        //     hasError = true;
+        // }
 
         if (hasError) {
             this.messages = [{
@@ -633,12 +698,12 @@ export class UserComponent implements OnInit {
         }
         try {
             this.savingInProgress = true;
-            const selectedCity = this.cities.find(city => city.id === formValues.cityId)?.name || '';
-            const selectedDistrict = this.districts.find(district => district.id === formValues.districtId)?.name || '';
-            const selectedWard = this.wards.find(ward => ward.id === formValues.wardId)?.name || '';
+            // const selectedCity = this.cities.find(city => city.id === formValues.cityId)?.name || '';
+            // const selectedDistrict = this.districts.find(district => district.id === formValues.districtId)?.name || '';
+            // const selectedWard = this.wards.find(ward => ward.id === formValues.wardId)?.name || '';
 
-            // Tạo chuỗi địa chỉ bằng cách nối các giá trị lại với nhau
-            const address = `${selectedCity} - ${selectedDistrict} - ${selectedWard}`.trim();
+            // // Tạo chuỗi địa chỉ bằng cách nối các giá trị lại với nhau
+            // const address = `${selectedCity} - ${selectedDistrict} - ${selectedWard}`.trim();
 
             const userData = {
                 name: formValues.name,
@@ -648,7 +713,12 @@ export class UserComponent implements OnInit {
                 phoneNumber: formValues.phoneNumber,
                 password: formValues.password,
                 status: true,  // Hoặc giá trị khác nếu cần
-                address: address, // Địa chỉ đã được tạo
+                cityId: formValues.cityId,
+                cityName: this.cities.find(cities => cities.id === formValues.cityId)?.name || '',
+                districtId: formValues.districtId,
+                districtName: this.districts.find(districts => districts.id === formValues.districtId)?.name || '',
+                wardId: formValues.wardId,
+                wardName: this.wards.find(wards => wards.id === formValues.wardId)?.name || '',
                 role: formValues.roles.map(role => role.name) // Lấy tên của các nhóm quyền
             };
 
@@ -679,32 +749,160 @@ export class UserComponent implements OnInit {
         }
     }
 
-    onPageChange(event: any): void {
-        this.PageIndex = event.page + 1;
-        this.PageSize = event.rows;
-        this.Filters();
+    checkUserExistsAndSubmit2() {
+        const formValues = this.RoleGroupForm2.value;
+
+        if (formValues.phoneNumber === this.initialPhoneNumber && formValues.email === this.initialEmail) {
+            // Nếu không thay đổi, gọi hàm onSubmit để tiếp tục
+            this.onUpdateSubmit();
+            return;
+        }
+
+        // Gọi service để kiểm tra sự tồn tại của người dùng
+        this.usersService.checkUserExists(formValues.phoneNumber, formValues.email).subscribe(response => {
+            if (response.data === true) {
+                // Người dùng tồn tại, hiển thị thông báo lỗi
+                // this.messages.add({ severity: 'error', summary: 'Lỗi', detail: 'Số điện thoại hoặc email đã tồn tại!' });
+                this.messages = [{
+                    severity: 'warn',
+                    summary: 'Lỗi',
+                    detail: 'Số điện thoại hoặc email đã tồn tại!',
+                    life: 3000
+                }];
+            } else {
+                // Người dùng không tồn tại, gọi hàm onSubmit để tiếp tục
+                this.onUpdateSubmit();
+            }
+        }, error => {
+            // Xử lý lỗi khi gọi API
+            console.error('Có lỗi xảy ra khi kiểm tra tồn tại người dùng', error);
+        });
     }
 
-    goToPreviousPage(): void {
-        if (this.PageIndex > 1) {
-            this.PageIndex--;
-            this.Filters();
+    async onUpdateSubmit() {
+        if (this.savingInProgress) {
+            return;
         }
-    }
 
-    goToNextPage(): void {
-        const lastPage = Math.ceil(this.totalRecords / this.PageSize);
-        if (this.PageIndex < lastPage) {
-            this.PageIndex++;
+        this.isSubmitting = true;
+        const formValues = this.RoleGroupForm2.value;
+
+        let hasError = false;
+
+        if (!this.rolesControl2?.value || this.rolesControl2.value.length === 0) {
+            this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
+            this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
+            hasError = true;
+        } else {
+            this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+        }
+
+        if (this.emailControl.invalid && this.emailControl.touched && this.emailControl.value) {
+            this.showNameError6 = true;
+            hasError = true;
+        }
+
+
+        if (!formValues.name || formValues.name.length === 0) {
+            this.showNameError = true;
+            hasError = true;
+        }
+
+        if (!formValues.branchId || formValues.branchId.length === 0) {
+            this.showNameError2 = true;
+            hasError = true;
+        }
+
+        if (!formValues.email || formValues.email.length === 0) {
+            this.showNameError3 = true;
+            hasError = true;
+        }
+
+        if (!formValues.password || formValues.password.length === 0) {
+            this.showNameError4 = true;
+            hasError = true;
+        }
+
+        if (!formValues.phoneNumber || formValues.phoneNumber.length === 0) {
+            this.showNameError5 = true;
+            hasError = true;
+        }
+
+        if (hasError) {
+            this.messages = [{
+                severity: 'error',
+                summary: 'Không thể lưu vì:',
+                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                life: 5000
+            }];
+            this.isSubmitting = false;
+            return
+        }
+
+        const userInfo = {
+            id: this.RoleGroupForm2.value.id,
+            name: this.RoleGroupForm2.value.name,
+            phoneNumber: this.RoleGroupForm2.value.phoneNumber,
+            email: this.RoleGroupForm2.value.email,
+            address: this.RoleGroupForm2.value.address,
+            password: this.maskPassword(this.passwordHash),
+            branchId: this.RoleGroupForm2.value.branchId,
+            branchName: this.RoleGroupForm2.value.branchName,
+            cityId: this.RoleGroupForm2.value.cityId,
+            cityName: this.RoleGroupForm2.value.cityName,
+            districtId: this.RoleGroupForm2.value.districtId,
+            districtName: this.RoleGroupForm2.value.districtName,
+            wardId: this.RoleGroupForm2.value.wardId,
+            wardName: this.RoleGroupForm2.value.wardName,
+        };
+
+        const roleNames = this.RoleGroupForm2.value.roles.map((roleId: number) => {
+            const role = this.Roles.find((r: any) => r.value === roleId);
+            return role ? role.label : null;
+        }).filter((roleName: string) => roleName !== null);
+
+        const assignRolesData = {
+            userId: this.RoleGroupForm2.value.id,
+            roleNames: roleNames
+        };
+
+        try {
+            this.savingInProgress = true;
+            const RoleResponse = this.usersService.assignRolesToUser(assignRolesData);
+            const updateResponse = this.usersService.updateUser(userInfo);
+            forkJoin([RoleResponse, updateResponse]).subscribe(
+                ([RoleResponse, updateResponse]) => {
+                    console.log('Cập nhật thông tin người dùng thành công:', RoleResponse);
+                    console.log('Gán nhóm quyền thành công:', updateResponse);
+                    this.messages = [{
+                        severity: 'success',
+                        summary: 'Thành công',
+                        detail: 'Tài khoản đã được cập nhật thành công',
+                        life: 3000
+                    }];
+                    this.RoleGroupForm2.reset();
+                    this.closeDialog2();
+                    this.Filters();
+                },
+                (error) => {
+                    console.error('Lỗi khi cập nhật:', error);
+                    // Xử lý lỗi
+                }
+            );
+
+        } catch (error) {
+            this.messages = [{
+                severity: 'error',
+                summary: 'Không thể lưu vì:',
+                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                life: 3000
+            }];
+            // this.openDialog2(this.employessId2);
+            this.Filters();
+        } finally {
+            this.savingInProgress = false;
             this.Filters();
         }
-    }
-    updateCurrentPageReport(): void {
-        const startRecord = (this.PageIndex - 1) * this.PageSize + 1;
-        const endRecord = Math.min(
-            this.PageIndex * this.PageSize,
-            this.totalRecords
-        );
-        this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
+
     }
 }

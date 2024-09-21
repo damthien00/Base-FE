@@ -8,6 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import { PaginatorModule } from 'primeng/paginator';
 import { UserComponent } from './user.component';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { EditorModule } from 'primeng/editor';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
     MessagesModule,
     ToastModule,
     PaginatorModule,
-    MultiSelectModule
+    MultiSelectModule,
+    EditorModule
   ],
   declarations: [UserComponent],
 })
