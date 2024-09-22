@@ -23,6 +23,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { ChipsModule } from 'primeng/chips';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { MenubarModule } from 'primeng/menubar';
+import { SidebarModule } from 'primeng/sidebar';
 import { MenuModule } from 'primeng/menu';
 
 // import { ToastModule } from 'primeng/toast';
@@ -35,6 +36,7 @@ import { MenuModule } from 'primeng/menu';
         ButtonModule,
         TableModule,
         MenuModule,
+
         CalendarModule,
         ChipsModule,
         FileUploadModule,
