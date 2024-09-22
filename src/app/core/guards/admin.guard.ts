@@ -26,10 +26,10 @@ export class AdminGuard implements CanActivate {
             this.authService.hasRole(this.roles.admin) ||
             this.authService.hasRole(this.roles.master)
         ) {
-            console.log('aaaaaaaaaaaaaaaaa');
             return true;
         } else {
-            console.log('bbbbbbbbbbb');
+            this.authService.setUserCurrent(null);
+            this.authService.setAuthTokenLocalStorage(null);
             this.router.navigate([Page.Login]);
             return false;
         }
