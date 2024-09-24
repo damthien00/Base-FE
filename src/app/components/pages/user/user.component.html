@@ -101,17 +101,17 @@
                         <th style="width: 1%; font-size: 14px;">STT</th>
                         <th style="width: 8%; font-size: 14px;">Tên tài khoản</th>
                         <th style="width: 6%; font-size: 14px;">SĐT</th>
-                        <th style="width: 6%; font-size: 14px;">Địa chỉ</th>
+                        <th style="width: 10%; font-size: 14px;">Địa chỉ</th>
                         <th style="width: 8%; font-size: 14px; text-align: center;">Chi nhánh</th>
                       </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-user let-i="rowIndex">
                       <tr class="custom-table">
                         <td style="font-size: 14px;" (click)="openDialog2(user.id)">
-                          {{((this.pageNumber - 1) * this.pageSize) + (i + 1)}}</td>
+                          {{((this.PageIndex - 1) * this.PageSize) + (i + 1)}}</td>
                         <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.name }}</td>
                         <td style="font-size: 14px; max-width: 110px; overflow: hidden;" (click)="openDialog2(user.id)">{{ user.phoneNumber }}</td>
-                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.address }}</td>
+                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.wardName}}, {{ user.districtName }}, {{ user.cityName }}</td>
                         <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.branchName }}</td>
                     </tr>
                     </ng-template>
@@ -375,7 +375,7 @@
                     <label class="labelip">Nhóm quyền<span class="red-asterisk">*</span></label>
                     <p-multiSelect
                       [style]="{ height: '40px', width: '100%' }"
-                      [options]="Roles"
+                      [options]="Roles2"
                       optionLabel="label"      
                       optionValue="value"
                       [showClear]="true"
@@ -433,7 +433,7 @@
                     "
                   >
                     <div
-                      *ngIf="RoleGroupForm.get('branchId')?.errors?.['required']"
+                      *ngIf="RoleGroupForm2.get('branchId')?.errors?.['required']"
                       class="error-message"
                     >
                       Chi nhánh không được bỏ trống

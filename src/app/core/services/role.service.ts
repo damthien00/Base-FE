@@ -13,10 +13,12 @@ export class RoleService {
   public url = environment.url;
   constructor(private http: HttpClient) { }
 
-  getRoleAll(): Observable<any> {
+  getRoleAll(PageSize: number, PageIndex: number): Observable<any> {
+    let params = new HttpParams()
+      .set('PageSize', PageSize.toString())
+      .set('PageIndex', PageIndex.toString());
     return this.http.get<any>(
-      `${this.url}/api/role/paging`
-    );
+      `${this.url}/api/role/paging`, { params: params });
   }
 
   getFiltersRoles(PageSize: number, PageIndex: number, Name?: string): Observable<any> {
@@ -33,5 +35,10 @@ export class RoleService {
 
   createRoles(userData: any): Observable<any> {
     return this.http.post(`${this.url}/api/role/create`, userData);
+  }
+
+  getGroupRoleById(Id: number): Observable<any> {
+    const url = `${this.url}/api/role/get-by-id?Id=${Id}`;
+    return this.http.get<any>(url);
   }
 }

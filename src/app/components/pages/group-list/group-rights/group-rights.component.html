@@ -80,12 +80,17 @@
                   </ng-template>
                   <ng-template pTemplate="body" let-role let-i="rowIndex">
                     <tr class="custom-table">
-                      <td style="font-size: 14px;">
+                      <td style="font-size: 14px;" (click)="openDialog2(role.id)">
                         {{((this.pageIndex - 1) * this.pageSize) + (i + 1)}}</td>
                       <td>{{ role.name }}</td>
-                      <td>{{ role.description }}</td>
+                      <td>
+                        <span>{{ truncateDescription(role.description, 100, role.showFullDescription) }}</span>
+                        <span *ngIf="role.description?.length > 100" style="cursor: pointer; color: rgb(29, 88, 225);" (click)="toggleDescription(role)">
+                          {{ role.showFullDescription ? 'Thu gọn' : 'Xem thêm' }}
+                        </span>
+                      </td>
                       <td style="text-align: center; cursor: pointer; color: rgb(29, 88, 225);">
-                        <a>Xem chi tiết</a>
+                        <a (click)="openDialog2(role.id)">Xem chi tiết</a>
                       </td>
                     </tr>
                   </ng-template>
@@ -121,19 +126,19 @@
             <form [formGroup]="RoleGroupForm" (ngSubmit)="onSubmit()">
               <div class="row mb-12">
                 <div style="margin-bottom: 20px;" class="col-lg-12">
-                  <label class="labelip">Nhóm quyền<span class="red-asterisk">*</span></label>
-                  <p-multiSelect
-                    [style]="{ height: '40px', width: '100%' }"
-                    [options]="Roles"
-                    optionLabel="name"
-                    [showClear]="true"
-                    placeholder="Chọn nhóm quyền"
-                    [filter]="true"
-                    formControlName="permissionIds"
-                    (onBlur)="checkRolesSelection()"
-                  ></p-multiSelect>
+                  <label class="labelip">Chọn quyền<span class="red-asterisk">*</span></label>
+                  <p-treeSelect 
+                  [options]="permissionsById" 
+                  formControlName="permissions"
+                  class="md:w-20rem w-full" 
+                  containerStyleClass="w-full"
+                  placeholder="Chọn quyền" 
+                  [panelStyle]="{'min-width':'300px'}" 
+                  display="chip"            
+                  selectionMode="checkbox">
+                </p-treeSelect>
                   <div *ngIf="(rolesControl?.hasError('required') && rolesControl?.touched) || showNameError7" class="error-message">
-                    Vui lòng chọn ít nhất một nhóm quyền.
+                    Vui lòng chọn ít nhất một quyền.
                   </div>
                 </div>
                 <div style="margin-bottom: 20px;" class="col-lg-12">
@@ -145,7 +150,7 @@
                       pInputText
                       [style]="{ height: '40px', width: '100%' }"
                       formControlName="name"
-                      placeholder="Nhập tài khoản"
+                      placeholder="Nhập tên nhóm quyền"
                       (input)="onInputChange($event)"
                       required
                     />
@@ -153,26 +158,107 @@
                     *ngIf="
                       (RoleGroupForm.get('name')?.invalid &&
                         (RoleGroupForm.get('name')?.dirty ||
-                          RoleGroupForm.get('name')?.touched)) || showNameError3
+                          RoleGroupForm.get('name')?.touched)) || showNameError
                     "
                     >
                     <div class="error-message" *ngIf="RoleGroupForm.controls['name'].hasError('whitespace')">
-                      {{ getErrorMessage3() }}
-                    </div>
-                    <div *ngIf="(emailControl.invalid && emailControl.touched && emailControl.value) || showNameError6" class="error-message">
-                      Vui lòng nhập đúng định dạng email.
+                      {{ getErrorMessage() }}
                     </div>
                   </div>
                 </div>
                 <div class="col-lg-12">
-                  <label class="labelip"
-                  >Mô tả</label>
+                  <label class="labelip">Mô tả</label>
                   <p-editor formControlName="description" [style]="{ height: '200px' }"></p-editor>      
                 </div>
               </div>
               <div class="row mb-12 mt-5">
                 <div class="col-sm-12 buttonsl">
                     <button pButton pRipple label="Hủy" class="p-button-success buttoncloses" type="button" (click)="closeDialog()"></button>
+                    <button pButton pRipple label="Thêm" class="p-button-success butttonsave" type="submit"></button>
+                </div>
+              </div>
+            </form><!-- End General Form Elements -->
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-background" *ngIf="showDialog2">
+        <div class="dialog-container-customer">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 style="font-weight: 600; font-size: 17px;" class="card-title">Thông tin cơ bản</h5>
+              <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" [style]="{'border-radius': '25%'}" (click)="closeDialog2()"></p-button>
+            </div>
+            <!-- General Form Elements -->
+            <form [formGroup]="RoleGroupForm2" (ngSubmit)="onSubmit()">
+              <div class="row mb-12">
+                <div style="margin-bottom: 20px;" class="col-lg-12">
+                  <label class="labelip">Chọn quyền<span class="red-asterisk">*</span></label>
+                  <!-- <p-treeSelect 
+                    [options]="permissionsById2" 
+                    formControlName="permissions"
+                    class="md:w-20rem w-full" 
+                    containerStyleClass="w-full"
+                    optionLabel="label"
+                    optionValue="value"
+                    [showClear]="true"
+                    placeholder="Chọn quyền"
+                    [filter]="true"
+                    [panelStyle]="{'min-width':'300px'}"     
+                    selectionMode="checkbox">
+                </p-treeSelect> -->
+                <p-multiSelect
+                      [style]="{ height: '40px', width: '100%' }"
+                      [options]="permissionsById2" 
+                      formControlName="permissions"
+                      optionLabel="label"      
+                      optionValue="value"
+                      [showClear]="true"
+                      placeholder="Chọn quyền"
+                      (onBlur)="checkRolesSelection2()">
+                  </p-multiSelect>
+                  <ng-template let-option pTemplate="item" let-index="index">
+                    <div [ngStyle]="{ 'padding-left': option.level * 20 + 'px' }">
+                      {{ option.label }}
+                    </div>
+                  </ng-template>
+                  <div *ngIf="(rolesControl?.hasError('required') && rolesControl?.touched) || showNameError7" class="error-message">
+                    Vui lòng chọn ít nhất một quyền.
+                  </div>
+                </div>
+                <div style="margin-bottom: 20px;" class="col-lg-12">
+                  <label class="labelip"
+                  >Tên nhóm quyền<span class="red-asterisk">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      pInputText
+                      [style]="{ height: '40px', width: '100%' }"
+                      formControlName="name"
+                      placeholder="Nhập tên nhóm quyền"
+                      (input)="onInputChange($event)"
+                      required
+                    />
+                    <div
+                    *ngIf="
+                      (RoleGroupForm.get('name')?.invalid &&
+                        (RoleGroupForm.get('name')?.dirty ||
+                          RoleGroupForm.get('name')?.touched)) || showNameError
+                    "
+                    >
+                    <div class="error-message" *ngIf="RoleGroupForm.controls['name'].hasError('whitespace')">
+                      {{ getErrorMessage() }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <label class="labelip">Mô tả</label>
+                  <p-editor formControlName="description" [style]="{ height: '200px' }"></p-editor>      
+                </div>
+              </div>
+              <div class="row mb-12 mt-5">
+                <div class="col-sm-12 buttonsl">
+                    <button pButton pRipple label="Hủy" class="p-button-success buttoncloses" type="button" (click)="closeDialog2()"></button>
                     <button pButton pRipple label="Thêm" class="p-button-success butttonsave" type="submit"></button>
                 </div>
               </div>
