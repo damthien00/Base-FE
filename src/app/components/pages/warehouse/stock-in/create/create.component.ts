@@ -539,6 +539,8 @@ export class CreateComponent implements OnInit {
                         product.productImeis?.map((imei) => ({
                             ...imei,
                             type: 1,
+                            productId: product.productId,
+                            productVariantId: product.productVariantId,
                         })) || [];
                     return {
                         productId: product.productId,
