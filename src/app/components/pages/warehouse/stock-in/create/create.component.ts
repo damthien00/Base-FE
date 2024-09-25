@@ -1,6 +1,5 @@
 import { StockInService } from './../../../../../core/services/stock-in.service';
 import { FunctionService } from 'src/app/core/utils/function.utils';
-import { NumberFormatPipe } from 'src/app/shared/pipes/numberFormat.pipe';
 import {
     Component,
     ElementRef,

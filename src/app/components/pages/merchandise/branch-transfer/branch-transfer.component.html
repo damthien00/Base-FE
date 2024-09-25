@@ -43,36 +43,11 @@
                                                 (focus)="showProductList()"
                                                 #searchInput
                                             />
-                                            <div
-                                                class="product__list"
-                                                *ngIf="showProducts"
-                                            >
-                                                <div
-                                                    *ngFor="
-                                                        let item of filteredDatas
-                                                    "
-                                                    class="product__item"
-                                                    (click)="
-                                                        addToCart(item, $event)
-                                                    "
-                                                >
-                                                    <div
-                                                        class="product__item-left"
-                                                    >
-                                                        <img
-                                                            *ngIf="
-                                                                item.productImage
-                                                            "
-                                                            [src]="
-                                                                imageUrl +
-                                                                item.productImage
-                                                            "
-                                                            alt="Product Image"
-                                                        />
-                                                        <svg
-                                                            *ngIf="
-                                                                !item.productImage
-                                                            "
+                                            <div class="product__list" *ngIf="showProducts">
+                                                <div *ngFor="let item of filteredDatas" class="product__item" (click)="addToCart(item, $event)">
+                                                    <div class="product__item-left">
+                                                        <img *ngIf="item.productImage"[src]="imageUrl + item.productImage" alt="Product Image"/>
+                                                        <svg *ngIf="!item.productImage"
                                                             viewBox="0 0 24 24"
                                                             fill="none"
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -98,19 +73,13 @@
                                                             ></path>
                                                         </svg>
                                                     </div>
-                                                    <div
-                                                        class="product__item-center"
-                                                    >
-                                                        <h1
-                                                            class="product-name"
-                                                        >
+                                                    <div class="product__item-center">
+                                                        <h1 class="product-name">
                                                             {{
                                                                 item.productName
                                                             }}
                                                         </h1>
-                                                        <span
-                                                            class="product-code"
-                                                        >
+                                                        <span class="product-code">
                                                             <!-- {{
                                                                 item.serialNumbers.join(
                                                                     ", "
@@ -145,6 +114,8 @@
                                             <!-- [(ngModel)]="this.optionsFillerProduct.KeyWord" -->
                                         </span>
                                     </div>
+
+                                   
                                     <div class="col-12 md:col-1">
                                         <div
                                             class="col-md-1"
@@ -423,6 +394,24 @@
                         </ng-template>
                     </p-table>
                 </div>
+
+                <table *ngIf="showImeiTable" class="imei-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Frame Number</th>
+                            <th>Engine Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let data of imeiData">
+                            <td>{{ data.id }}</td>
+                            <td>{{ data.frameNumber }}</td>
+                            <td>{{ data.engineNumber }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
             </div>
             <div class="col-4">
                 <div
@@ -431,26 +420,6 @@
                 >
                     <div class="grid p-fluid">
                         <div class="col-12 md:col-12">
-                            <div class="supplier-select mb-5">
-                                <p-treeSelect
-                                    (onClear)="onClear()"
-                                    optionLabel="label"
-                                    [ngModelOptions]="{ standalone: true }"
-                                    [showClear]="true"
-                                    (onNodeSelect)="onNodeSelect($event)"
-                                    class="md:w-100 w-full"
-                                    containerStyleClass="w-full"
-                                    [(ngModel)]="selectedNodes"
-                                    [options]="treeCategory"
-                                    placeholder="Chọn nhà cung cấp"
-                                    [filter]="true"
-                                    [filterInputAutoFocus]="true"
-                                >
-                                    <ng-template let-node pTemplate="default">
-                                        <span>{{ node.name }}</span>
-                                    </ng-template>
-                                </p-treeSelect>
-                            </div>
 
                             <div class="field grid">
                                 <div class="col-12 mb-2 md:col-6 md:mb-0">
@@ -472,93 +441,31 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                 >
-                                    {{
-                                        stockInReceipt.inventoryStockInDetails
-                                            .length
-                                    }}
+                                <p-dropdown 
+                                    [options]="warrantyOptions" 
+                                    optionLabel="shortenedName" 
+                                    formControlName="warrantyPolicyId"
+                                    [style]="{ height: '40px', width: '30%' }"
+                                    optionValue="id"
+                                    [showClear]="true"
+                                    placeholder="Chọn chính sách bảo hành">
+                              </p-dropdown>
                                 </div>
                             </div>
 
                             <div class="field grid">
-                                <!-- Tổng tiền hàng -->
+                                <!-- Tổng số sản phẩm -->
+
                                 <div class="col-12 mb-2 md:col-5 md:mb-0">
-                                    Tổng tiền hàng:
+                                    Tổng số sản phẩm:
                                 </div>
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                 >
                                     {{
-                                        stockInReceipt.totalPrice | numberFormat
+                                        stockInReceipt.inventoryStockInDetails
+                                            .length
                                     }}
-                                </div>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Giảm giá -->
-                                <div class="col-12 mb-2 md:col-6 md:mb-0">
-                                    Giảm giá:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end input-number-custom"
-                                >
-                                    <p-inputNumber
-                                        inputId="integeronly"
-                                        [(ngModel)]="
-                                            stockInReceipt.totalDiscountAmount
-                                        "
-                                        (ngModelChange)="updatePaymentInfo()"
-                                        (onFocus)="openDiscountModal()"
-                                    />
-                                </div>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Cần trả nhà cung cấp -->
-                                <div class="col-12 mb-2 md:col-5 md:mb-0">
-                                    Cần trả nhà cung cấp:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end total_amount_paid"
-                                >
-                                    {{
-                                        stockInReceipt.totalAmountPaid
-                                            | numberFormat
-                                    }}
-                                </div>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Tiền trả nhà cung cấp -->
-                                <div
-                                    class="col-12 mb-2 md:col-6 md:mb-0 flex align-items-center"
-                                >
-                                    Tiền trả nhà cung cấp:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end input-number-custom input-number-payment"
-                                    style="position: relative"
-                                >
-                                    <p-inputNumber
-                                        inputId="integeronly"
-                                        [(ngModel)]="
-                                            stockInReceipt.customerPayment
-                                        "
-                                        (ngModelChange)="updatePaymentInfo()"
-                                        (onFocus)="
-                                            functionService.handleFocusPrice(
-                                                $event
-                                            )
-                                        "
-                                    />
-
-                                    <span
-                                        *ngIf="stockInReceipt.isValidMoney"
-                                        class="error-message"
-                                        style="position: absolute; top: 48px"
-                                        >{{
-                                            stockInReceipt.isMessageValidMoney
-                                        }}</span
-                                    >
                                 </div>
                             </div>
 

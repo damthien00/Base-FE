@@ -17,6 +17,8 @@ import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { OptionsFilterProductVariant } from 'src/app/core/DTOs/stock-in/optionFilterProductVariant';
 import { StockInService } from 'src/app/core/services/stock-in.service';
+import { WarrantyPolicyService } from 'src/app/core/services/warranty-policy.service';
+import { MerchandiseService } from 'src/app/core/services/merchandise.service';
 
 export interface WarehouseReceipt {
   id?: number;
@@ -53,11 +55,15 @@ export class BranchTransferComponent implements OnInit {
   isValidForm: boolean = true;
   temporaryDiscountRate: number = 0;
   temporaryDiscountUnit: string = 'VND';
+  warrantyOptions: any[] = [];
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
   frameNumber: any;
   engineNumber: any;
+
+  imeiData: any[] = [];
+  showImeiTable: boolean = false;
 
   onBarcode: boolean = false;
   constructor(
@@ -66,6 +72,8 @@ export class BranchTransferComponent implements OnInit {
     private stockInService: StockInService,
     public functionService: FunctionService,
     private messageService: MessageService,
+    private warrantyService: WarrantyPolicyService,
+    private merchandiseService: MerchandiseService,
     private router: Router
   ) {
     this.nodeService.getFiles().then((files) => (this.nodes = files));
@@ -168,6 +176,8 @@ export class BranchTransferComponent implements OnInit {
       discountUnit: 'VND', // Đơn vị của giá trị giảm giá, ví dụ như 'VND' hoặc '%'
       paymentMethod: 'cash', // Phương thức thanh toán mà khách hàng sử dụng (ví dụ: 'cash', 'credit')
     };
+
+    this.loadWarrantyPolicies()
   }
 
   // onProductSearch(event: Event): void {
@@ -179,6 +189,24 @@ export class BranchTransferComponent implements OnInit {
   //     this.optionsFillerProduct.KeyWord = searchTerm;
   //     this.loadProducts();
   // }
+
+  loadWarrantyPolicies() {
+    this.warrantyService.getWarrantyPolicies().subscribe((response: any) => {
+      this.warrantyOptions = response.data.items.map((option: any) => {
+        return {
+          ...option,
+          shortenedName: this.shortenName(option.name, 30) // Giới hạn độ dài tên
+        };
+      });
+    });
+  }
+
+  shortenName(name: string, maxLength: number): string {
+    if (name.length > maxLength) {
+      return name.slice(0, maxLength) + '...'; // Cắt ngắn và thêm ...
+    }
+    return name;
+  }
 
   async onProductSearch(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -231,6 +259,7 @@ export class BranchTransferComponent implements OnInit {
       this.loadProducts();
     }
   }
+
 
   async loadProducts() {
     this.optionsFilterProduct.pageIndex = 1;
@@ -349,6 +378,22 @@ export class BranchTransferComponent implements OnInit {
     // });
   }
 
+  async fetchProductImeiData(productId: number, productVariantId: number) {
+    try {
+      const response = await this.merchandiseService.getProductDetails(productId, productVariantId).toPromise();
+      if (response && response.data) {
+        // Assuming response.data contains an array of IMEI data
+        this.imeiData = response.data;
+        this.showImeiTable = true; // This flag is used to conditionally display the table
+      } else {
+        console.log('No data found');
+      }
+    } catch (error) {
+      console.error('Error fetching product IMEI data', error);
+    }
+  }
+
+
   addToCart(item: any): void {
     console.log(item);
     // Kiểm tra xem sản phẩm đã có trong inventoryStockInDetails hay chưa
@@ -370,8 +415,7 @@ export class BranchTransferComponent implements OnInit {
     if (existingDetail) {
       // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá
       existingDetail.quantity += 1;
-      existingDetail.total =
-        existingDetail.quantity * existingDetail.price;
+      existingDetail.total = existingDetail.quantity * existingDetail.price;
     } else {
       // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
       const newDetail = {
@@ -390,6 +434,8 @@ export class BranchTransferComponent implements OnInit {
       };
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
     }
+
+    this.fetchProductImeiData(item.productId, item.productVariantId);
 
     // Cập nhật lại các giá trị liên quan
     this.updatePaymentInfo();
