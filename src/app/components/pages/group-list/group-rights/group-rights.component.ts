@@ -12,7 +12,7 @@ import { PermissionService } from 'src/app/core/services/permission.service';
   styleUrl: './group-rights.component.scss'
 })
 export class GroupRightsComponent implements OnInit {
-  permissionsById: any[] = [];
+  permissions: any[] = [];
   permissionsById2: any[] = [];
   selectedPermissions: any[] = [];
   roles: any[] = [];
@@ -42,6 +42,7 @@ export class GroupRightsComponent implements OnInit {
   PageSize2: number = 1000;
   showFullDescription: boolean = false;
   selectedPermissionIds: number[] = [];
+  expandedItems: Set<number> = new Set(); 
 
   optionsFilterCommodities: OptionsFilterCommodities = new OptionsFilterCommodities();
 
@@ -60,7 +61,7 @@ export class GroupRightsComponent implements OnInit {
         this.noWhitespaceValidator
       ])],
       description: ['', [Validators.required, this.noWhitespaceValidator]],
-      permissions: [[], Validators.required],
+      permissionIds: [[], Validators.required],
     });
     this.RoleGroupForm2 = this.fb.group({
       id: [''],
@@ -90,7 +91,7 @@ export class GroupRightsComponent implements OnInit {
   truncateDescription(description: string, limit: number, showFull: boolean): string {
     const parser = new DOMParser();
     const doc = parser.parseFromString(description, 'text/html');
-    const plainText = doc.body.textContent || '';
+    const plainText = doc.body.textContent;
 
     if (plainText.length > limit && !showFull) {
       return plainText.substring(0, limit) + '...';
@@ -101,7 +102,7 @@ export class GroupRightsComponent implements OnInit {
 
   getAllFilterRole(): void {
     this.permissionService.getPermissionAll(this.PageSize2, this.PageIndex2).subscribe((response: any) => {
-      this.permissionsById = this.formatPermissions(response.data.items);
+      this.permissions = this.formatPermissions(response.data.items);
     });
   }
 
@@ -110,14 +111,14 @@ export class GroupRightsComponent implements OnInit {
       const roles = response.data.items;
       this.permissionsById2 = [];
       roles.forEach((role: any) => {
-        // Push the parent role without indentation
-        this.permissionsById.push({
-          label: role.displayName,
+        // Add the parent role
+        this.permissionsById2.push({
+          label: role.displayName,  // Parent label
           value: role.id,
-          level: 0 // Level for parent
+          level: 0 // Level of indentation
         });
-        // Recursively flatten and add the child roles
-        this.flattenChildrens(role.childrens, 1); // Start with level 1 for children
+        // Flatten and add the child roles with indentation
+        this.flattenChildrens(role.childrens, 1);
       });
     });
   }
@@ -125,18 +126,16 @@ export class GroupRightsComponent implements OnInit {
   private flattenChildrens(childrens: any[], level: number): void {
     if (!childrens || childrens.length === 0) return;
     childrens.forEach(child => {
-      // Push the child role with a specified level
+      // Add the child role with a level for indentation
       this.permissionsById2.push({
         label: child.displayName,
         value: child.id,
-        level: level // Set the level for children
+        level: level
       });
       // Recursively process deeper child roles
       this.flattenChildrens(child.childrens, level + 1);
     });
   }
-  
-  
   
   formatPermissions(items: any[]): any[] {
     return items.map(item => {
@@ -402,4 +401,6 @@ export class GroupRightsComponent implements OnInit {
       this.savingInProgress = false;
     }
   }
+
+  
 }

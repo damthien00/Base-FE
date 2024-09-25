@@ -128,8 +128,8 @@
                 <div style="margin-bottom: 20px;" class="col-lg-12">
                   <label class="labelip">Chọn quyền<span class="red-asterisk">*</span></label>
                   <p-treeSelect 
-                  [options]="permissionsById" 
-                  formControlName="permissions"
+                  [options]="permissions" 
+                  formControlName="permissionIds"
                   class="md:w-20rem w-full" 
                   containerStyleClass="w-full"
                   placeholder="Chọn quyền" 
@@ -214,14 +214,15 @@
                       optionLabel="label"      
                       optionValue="value"
                       [showClear]="true"
+                      [filter]="true"
                       placeholder="Chọn quyền"
                       (onBlur)="checkRolesSelection2()">
+                      <ng-template let-option pTemplate="item">
+                        <div [ngStyle]="{ 'padding-left': option.level * 20 + 'px' }">
+                          <i class="pi pi-angle-right"></i> {{ option.label }}
+                        </div>
+                      </ng-template>
                   </p-multiSelect>
-                  <ng-template let-option pTemplate="item" let-index="index">
-                    <div [ngStyle]="{ 'padding-left': option.level * 20 + 'px' }">
-                      {{ option.label }}
-                    </div>
-                  </ng-template>
                   <div *ngIf="(rolesControl?.hasError('required') && rolesControl?.touched) || showNameError7" class="error-message">
                     Vui lòng chọn ít nhất một quyền.
                   </div>

@@ -107,6 +107,14 @@ import { RouterModule } from '@angular/router';
                         './group-list/group-rights/group-rights.module'
                     ).then((m) => m.GroupRightsModule),
             },
+            {
+                path: 'merchandise/branch-transfer/create',
+                loadChildren: () =>
+                    import('./merchandise/branch-transfer/branch-transfer.module').then(
+                        (m) => m.BranchTransferModule
+                    ),
+            },
+            
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],
