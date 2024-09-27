@@ -12,3 +12,21 @@
   background-color: #007ad9; /* Color for highlighted items */
   color: white; /* Text color for highlighted items */
 }
+
+
+
+
+.permissions-tree .ui-treenode-connector {
+  display: none;
+}
+.permission-tree {
+  list-style-type: none; /* Xóa dấu bullet */
+}
+
+.permission-item {
+  cursor: pointer;
+}
+
+.permission-item ul {
+  margin-left: 20px;
+}

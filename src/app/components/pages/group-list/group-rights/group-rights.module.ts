@@ -9,6 +9,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { GroupRightsComponent } from './group-rights.component';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { EditorModule } from 'primeng/editor';
+import { PermissionItemComponent } from '../update-role/permission-item/permission-item.component';
 
 @NgModule({
   imports: [
@@ -16,6 +17,7 @@ import { EditorModule } from 'primeng/editor';
       RouterModule.forChild([
         { path: '', component: GroupRightsComponent },
       ]),
+      PermissionItemComponent
     ],
     SharedModule,
     TreeSelectModule,

@@ -121,10 +121,21 @@ import { RouterModule } from '@angular/router';
                         './merchandise/branch-transfer/branch-transfer.module'
                     ).then((m) => m.BranchTransferModule),
             },
+            // tny code 
+            {
+                path: 'role',
+                loadChildren: () =>
+                    import(
+                        './group-list/update-role/update-role.module'
+                    ).then((m) => m.UpdateRoleModule),
+            },
+            // end tny code
+
+
 
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],
     exports: [RouterModule],
 })
-export class PagesRoutingModule {}
+export class PagesRoutingModule { }
