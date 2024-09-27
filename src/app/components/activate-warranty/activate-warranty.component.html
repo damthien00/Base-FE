@@ -8,7 +8,7 @@
                 <span>
                     <i class="pi pi-arrow-left"></i>
                 </span>
-                <span>Quay lại</span>
+                <span [routerLink]="'/warranty-mb'">Quay lại</span>
             </div>
             <div class="title">
                 <h1>KÍCH HOẠT BẢO HÀNH TRỰC TUYẾN</h1>
@@ -101,13 +101,12 @@
                         >
                         <p-dropdown
                             [options]="cities"
-                            [style]="{ height: '40px', width: '100%' }"
+                            [style]="{ width: '100%' }"
                             optionLabel="name"
                             [showClear]="true"
                             placeholder="Chọn Tỉnh/Thành"
-                            optionValue="id"
                             formControlName="cityId"
-                            (onChange)="onCityChange($event.value)"
+                            (onChange)="onCityChange($event, $event.value)"
                             (onClear)="onClearCity()"
                         ></p-dropdown>
                     </div>
@@ -121,12 +120,11 @@
                         >
                         <p-dropdown
                             [options]="districts"
-                            [style]="{ height: '40px', width: '100%' }"
+                            [style]="{ width: '100%' }"
                             optionLabel="name"
                             [showClear]="true"
                             placeholder="Chọn Quận/Huyện"
-                            optionValue="id"
-                            (onChange)="onDistrictChange($event.value)"
+                            (onChange)="onDistrictChange($event, $event.value)"
                             (onClear)="onClearDistrict()"
                             [emptyMessage]="'Vui lòng chọn tỉnh trước!'"
                             formControlName="districtId"
@@ -142,11 +140,10 @@
                         >
                         <p-dropdown
                             [options]="wards"
-                            [style]="{ height: '40px', width: '100%' }"
+                            [style]="{ width: '100%' }"
                             optionLabel="name"
                             [showClear]="true"
                             placeholder="Chọn Xã/Phường"
-                            optionValue="id"
                             (onClear)="onClearWard()"
                             formControlName="wardId"
                             [emptyMessage]="'Vui lòng chọn tỉnh/huyện trước!'"
@@ -166,7 +163,7 @@
                             type="text"
                             formControlName="address"
                             spellcheck="false"
-                            placeholder="Nhập họ tên khách hàng"
+                            placeholder="Nhập chi tiết địa chỉ"
                         />
                     </div>
                 </div>

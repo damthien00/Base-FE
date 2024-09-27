@@ -1,6 +1,6 @@
 import { StockInService } from './../../../../../core/services/stock-in.service';
 import { FunctionService } from 'src/app/core/utils/function.utils';
-import { NumberFormatPipe } from 'src/app/shared/pipes/numberFormat.pipe';
+// import { NumberFormatPipe } from 'src/app/shared/pipes/numberFormat.pipe';
 import {
     Component,
     ElementRef,
@@ -541,6 +541,7 @@ export class CreateComponent implements OnInit {
                             type: 1,
                             productId: product.productId,
                             productVariantId: product.productVariantId,
+                            branchId: 5,
                         })) || [];
                     return {
                         productId: product.productId,
@@ -563,7 +564,7 @@ export class CreateComponent implements OnInit {
                 supplierName: 'string',
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
-                branchId: 6,
+                branchId: 5,
                 branchName: 'string',
                 total: this.stockInReceipt.customerPayment,
                 version: 0,

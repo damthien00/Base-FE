@@ -487,9 +487,7 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                 >
-                                    {{
-                                        stockInReceipt.totalPrice | numberFormat
-                                    }}
+                                    {{ stockInReceipt.totalPrice }}
                                 </div>
                             </div>
 
@@ -520,10 +518,7 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end total_amount_paid"
                                 >
-                                    {{
-                                        stockInReceipt.totalAmountPaid
-                                            | numberFormat
-                                    }}
+                                    {{ stockInReceipt.totalAmountPaid }}
                                 </div>
                             </div>
 
@@ -571,7 +566,6 @@
                                     spellcheck="false"
                                 ></textarea>
                             </div>
-
                             <button
                                 pButton
                                 pRipple

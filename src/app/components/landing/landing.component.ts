@@ -180,10 +180,10 @@ export class LandingComponent implements OnInit {
         this.products = resProducts.data;
 
         // Call API Customers;
-        let resCustomers = await this.customerService.filterCustomers(
-            this.optionsFillerCustomer
-        );
-        this.customers = resCustomers.data;
+        // let resCustomers = await this.customerService.filterCustomers(
+        //     this.optionsFillerCustomer
+        // );
+        // this.customers = resCustomers.data;
         // console.log(this.customers);
     }
 

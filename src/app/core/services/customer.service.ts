@@ -48,21 +48,30 @@ export class CustomerService {
     //     return this.http.post<OptionsFilterCustomer>(`${this.url}/api/customer/filter`, options);
     // }
 
-    filterCustomers(options: OptionsFilterCustomer): Promise<any> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                let response = await this.http
-                    .post<OptionsFilterCustomer>(
-                        `${this.url}/api/customer/filter`,
-                        options
-                    )
-                    .toPromise();
-                resolve(response);
-            } catch (error) {
-                reject(JSON.parse(JSON.stringify(error)));
-            }
-        });
+    filterCustomers(
+        optionsFilterCustomer: OptionsFilterCustomer
+    ): Observable<any> {
+        const { pageSize, pageIndex, nameOrPhoneNumber } =
+            optionsFilterCustomer;
+        let url = `${this.url}/api/customer/get-all?pageSize=${pageSize}&pageIndex=${pageIndex}`;
+        return this.http.get<any>(url);
     }
+
+    // filterCustomers(options: OptionsFilterCustomer): Promise<any> {
+    //     return new Promise(async (resolve, reject) => {
+    //         try {
+    //             let response = await this.http
+    //                 .post<OptionsFilterCustomer>(
+    //                     `${this.url}/api/customer/filter`,
+    //                     options
+    //                 )
+    //                 .toPromise();
+    //             resolve(response);
+    //         } catch (error) {
+    //             reject(JSON.parse(JSON.stringify(error)));
+    //         }
+    //     });
+    // }
 
     getAllCustomerGroups(): Observable<any[]> {
         return this.http.get<any[]>(
