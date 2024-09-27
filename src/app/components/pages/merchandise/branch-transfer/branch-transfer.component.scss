@@ -165,8 +165,8 @@
 
 .variant-item-label{
     font-size:13px;
-    padding: 5px 10px;
-    border-radius:20px;
+    padding: 5px 15px;
+    border-radius: 10px;
     background-color:#2a2a82;
     color: #fff;
     height: fit-content;
@@ -198,3 +198,11 @@
 .product__item-left{
     margin-right: 10px;
 }
+
+.large-checkbox {
+    width: 13px;   /* Adjust width */
+    transform: scale(1.5); /* Scale the checkbox */
+    margin-right: 10px; /* Space between checkbox and label */
+}
+
+

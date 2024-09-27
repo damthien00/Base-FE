@@ -42,7 +42,7 @@ export class GroupRightsComponent implements OnInit {
   PageSize2: number = 1000;
   showFullDescription: boolean = false;
   selectedPermissionIds: number[] = [];
-  expandedItems: Set<number> = new Set(); 
+  expandedItems: Set<number> = new Set();
 
   optionsFilterCommodities: OptionsFilterCommodities = new OptionsFilterCommodities();
 
@@ -72,7 +72,7 @@ export class GroupRightsComponent implements OnInit {
         this.noWhitespaceValidator
       ])],
       description: ['', [Validators.required, this.noWhitespaceValidator]],
-      permissions: ['', Validators.required],
+      permissionIds: [[], Validators.required],
     });
   }
 
@@ -108,39 +108,23 @@ export class GroupRightsComponent implements OnInit {
 
   getAllFilterRole2(): void {
     this.permissionService.getPermissionAll(this.PageSize2, this.PageIndex2).subscribe((response: any) => {
-      const roles = response.data.items;
-      this.permissionsById2 = [];
-      roles.forEach((role: any) => {
-        // Add the parent role
-        this.permissionsById2.push({
-          label: role.displayName,  // Parent label
-          value: role.id,
-          level: 0 // Level of indentation
-        });
-        // Flatten and add the child roles with indentation
-        this.flattenChildrens(role.childrens, 1);
-      });
+      this.permissionsById2 = this.transformToTreeNodes(response.data.items);
+      console.log(this.permissionsById2);
     });
   }
-  
-  private flattenChildrens(childrens: any[], level: number): void {
-    if (!childrens || childrens.length === 0) return;
-    childrens.forEach(child => {
-      // Add the child role with a level for indentation
-      this.permissionsById2.push({
-        label: child.displayName,
-        value: child.id,
-        level: level
-      });
-      // Recursively process deeper child roles
-      this.flattenChildrens(child.childrens, level + 1);
-    });
+
+  transformToTreeNodes(permissions: any[]): any[] {
+    return permissions.map(permission => ({
+      label: permission.name,
+      id: permission.id,
+      children: this.transformToTreeNodes(permission.childrens || [])
+    }));
   }
-  
+
   formatPermissions(items: any[]): any[] {
     return items.map(item => {
       return {
-        label: item.displayName,
+        label: item.name,
         data: item.name,
         id: item.id,
         children: this.formatPermissions(item.childrens)
@@ -251,14 +235,15 @@ export class GroupRightsComponent implements OnInit {
     this.roleService.getGroupRoleById(Id).subscribe(
       (response: any) => {
         this.groupRoleById = response.data;
-        const selectedPermissionIds = this.groupRoleById.permissions.map(permission => permission.id);
         this.showDialog2 = true;
+        this.permissionsById2 = this.transformToTreeNodes2(this.groupRoleById.permissions);
         this.RoleGroupForm2.patchValue({
           id: this.groupRoleById.id,
           name: this.groupRoleById.name,
           description: this.groupRoleById.description,
-          permissions: selectedPermissionIds
+          permissionIds: this.permissionsById2
         });
+        console.log(this.transformToTreeNodes2(this.groupRoleById.permissions));
       },
       error => {
         console.error("Error:", error);
@@ -266,13 +251,23 @@ export class GroupRightsComponent implements OnInit {
     );
   }
 
+  transformToTreeNodes2(permissions: any[]): any[] {
+    return permissions.map(permission => ({
+      label: permission.name,
+      data: permission,
+      id: permission.id,
+      children: permission.childrens && permission.childrens.length > 0 ?
+        this.transformToTreeNodes2(permission.childrens) : []
+    }));
+  }
+
   get rolesControl() {
     return this.RoleGroupForm.get('permissionIds');
   }
 
-  // get rolesControl2() {
-  //   return this.RoleGroupForm2.get('roles');
-  // }
+  get rolesControl2() {
+    return this.RoleGroupForm2.get('permissionIds');
+  }
 
   checkRolesSelection() {
     // Kiểm tra nếu trường chưa có giá trị
@@ -284,15 +279,15 @@ export class GroupRightsComponent implements OnInit {
     }
   }
 
-  // checkRolesSelection2() {
-  //   // Kiểm tra nếu trường chưa có giá trị
-  //   if (!this.rolesControl2?.value || this.rolesControl2.value.length === 0) {
-  //     this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
-  //     this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
-  //   } else {
-  //     this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
-  //   }
-  // }
+  checkRolesSelection2() {
+    // Kiểm tra nếu trường chưa có giá trị
+    if (!this.rolesControl2?.value || this.rolesControl2.value.length === 0) {
+      this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
+      this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
+    } else {
+      this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+    }
+  }
 
   closeDialog() {
     this.showDialog = false;
@@ -402,5 +397,77 @@ export class GroupRightsComponent implements OnInit {
     }
   }
 
-  
+  async onSubmitUpdate() {
+    if (this.savingInProgress) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    const formValue = this.RoleGroupForm2.value;
+
+    let hasError = false;
+
+    if (!this.rolesControl2?.value || this.rolesControl2.value.length === 0) {
+      this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
+      this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
+      hasError = true;
+    } else {
+      this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+    }
+
+
+    if (!formValue.name || formValue.name.length === 0) {
+      this.showNameError = true;
+      hasError = true;
+    }
+
+    if (hasError) {
+      this.messages = [{
+        severity: 'error',
+        summary: 'Không thể lưu vì:',
+        detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+        life: 5000
+      }];
+      this.isSubmitting = false;
+      return
+    }
+    try {
+      this.savingInProgress = true;
+      const permissionIds = formValue.permissionIds.map(permission => permission.id);
+      const payload = {
+        id: this.groupRoleById.id || 0,  // Use existing id if editing, 0 if creating new
+        name: formValue.name,
+        description: formValue.description,
+        permissionIds: permissionIds
+      };
+
+      // Gửi yêu cầu tới API để thêm người dùng
+      this.roleService.saveGroupRole(payload).subscribe(response => {
+        console.log('Nhóm quyền đã được cập nhật thành công', response);
+        this.messages = [{
+          severity: 'success',
+          summary: 'Thành công',
+          detail: 'Nhóm quyền đã được cập nhật thành công',
+          life: 3000
+        }];
+        this.permissionsById2 = [];
+        this.closeDialog2();  // Đóng dialog sau khi thêm thành công
+        this.Filters();
+      }, error => {
+        console.error('Có lỗi xảy ra khi thêm người dùng', error);
+      });
+    } catch (error) {
+      this.messages = [{
+        severity: 'error',
+        summary: 'Không thể lưu vì:',
+        detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+        life: 3000
+      }];
+      // this.filterCustomers();
+    } finally {
+      this.savingInProgress = false;
+    }
+  }
+
+
 }

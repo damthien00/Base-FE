@@ -190,42 +190,24 @@
               <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" [style]="{'border-radius': '25%'}" (click)="closeDialog2()"></p-button>
             </div>
             <!-- General Form Elements -->
-            <form [formGroup]="RoleGroupForm2" (ngSubmit)="onSubmit()">
+            <form [formGroup]="RoleGroupForm2" (ngSubmit)="onSubmitUpdate()">
               <div class="row mb-12">
                 <div style="margin-bottom: 20px;" class="col-lg-12">
                   <label class="labelip">Chọn quyền<span class="red-asterisk">*</span></label>
-                  <!-- <p-treeSelect 
-                    [options]="permissionsById2" 
-                    formControlName="permissions"
+                  <p-treeSelect 
+                    [options]="permissionsById2"
+                    formControlName="permissionIds"
                     class="md:w-20rem w-full" 
                     containerStyleClass="w-full"
-                    optionLabel="label"
-                    optionValue="value"
                     [showClear]="true"
                     placeholder="Chọn quyền"
-                    [filter]="true"
                     [panelStyle]="{'min-width':'300px'}"     
+                    display="chip"            
                     selectionMode="checkbox">
-                </p-treeSelect> -->
-                <p-multiSelect
-                      [style]="{ height: '40px', width: '100%' }"
-                      [options]="permissionsById2" 
-                      formControlName="permissions"
-                      optionLabel="label"      
-                      optionValue="value"
-                      [showClear]="true"
-                      [filter]="true"
-                      placeholder="Chọn quyền"
-                      (onBlur)="checkRolesSelection2()">
-                      <ng-template let-option pTemplate="item">
-                        <div [ngStyle]="{ 'padding-left': option.level * 20 + 'px' }">
-                          <i class="pi pi-angle-right"></i> {{ option.label }}
-                        </div>
-                      </ng-template>
-                  </p-multiSelect>
-                  <div *ngIf="(rolesControl?.hasError('required') && rolesControl?.touched) || showNameError7" class="error-message">
-                    Vui lòng chọn ít nhất một quyền.
-                  </div>
+                </p-treeSelect>
+                <div *ngIf="(rolesControl2?.hasError('required') && rolesControl2?.touched) || showNameError7" class="error-message">
+                  Vui lòng chọn ít nhất một quyền.
+                </div>
                 </div>
                 <div style="margin-bottom: 20px;" class="col-lg-12">
                   <label class="labelip"
@@ -242,12 +224,12 @@
                     />
                     <div
                     *ngIf="
-                      (RoleGroupForm.get('name')?.invalid &&
-                        (RoleGroupForm.get('name')?.dirty ||
-                          RoleGroupForm.get('name')?.touched)) || showNameError
+                      (RoleGroupForm2.get('name')?.invalid &&
+                        (RoleGroupForm2.get('name')?.dirty ||
+                          RoleGroupForm2.get('name')?.touched)) || showNameError
                     "
                     >
-                    <div class="error-message" *ngIf="RoleGroupForm.controls['name'].hasError('whitespace')">
+                    <div class="error-message" *ngIf="RoleGroupForm2.controls['name'].hasError('whitespace')">
                       {{ getErrorMessage() }}
                     </div>
                   </div>

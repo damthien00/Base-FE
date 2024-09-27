@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
     name: 'numberFormat',
 })
-export class NumberFormatPipe implements PipeTransform {
+export class NumberFormatPipe2 implements PipeTransform {
     transform(value: number, ...args: any[]): string {
         if (value === null || value === undefined) {
             return '';
