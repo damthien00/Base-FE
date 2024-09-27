@@ -25,7 +25,10 @@ export class ActivateWarrantyComponent implements OnInit {
         private router: Router
     ) {
         this.createActivateWarranty = this.formBuilder.group({
-            phoneNumber: [null, [Validators.required]],
+            phoneNumber: [
+                null,
+                [Validators.required, Validators.pattern('^\\d{10}$')],
+            ],
             customerName: [null, [Validators.required]],
             cityId: [null],
             districtId: [null],
