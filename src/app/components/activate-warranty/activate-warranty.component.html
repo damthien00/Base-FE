@@ -53,6 +53,12 @@
                             >
                                 Vui lòng nhập số điện thoại
                             </div>
+                            <div
+                                *ngIf="createActivateWarranty.get('phoneNumber')?.errors?.['pattern']"
+                                class="error-message"
+                            >
+                                Số điện thoại phải gồm đúng 10 chữ số
+                            </div>
                         </div>
                     </div>
                 </div>
