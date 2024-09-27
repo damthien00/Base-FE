@@ -13,8 +13,25 @@ export class MerchandiseService {
   public url = environment.url;
   constructor(private http: HttpClient) { }
 
-  getProductDetails(productId: number, productVariantId: number): Observable<any> {
-    const url = `${this.url}/api/product-imei/getbyproductandvariant?ProductId=${productId}&ProductVariantId=${productVariantId}`;
+  getProductDetails(productId: number, productVariantId: number, branchId: number): Observable<any> {
+    let url = `${this.url}/api/inventory-stock-detail-product-imei/get-paging?ProductId=${productId}`;
+
+    if (productVariantId !== null && productVariantId !== undefined) {
+      url += `&ProductVariantId=${productVariantId}`;
+    }
+
+    if (branchId !== null && branchId !== undefined) {
+      url += `&BranchId=${branchId}`;
+    }
+
     return this.http.get<any>(url);
   }
+
+  // getProductDetails(productId: number, productVariantId: number): Observable<any> {
+  //   let params = new HttpParams()
+  //     .set('productId', productId.toString())
+  //     .set('productVariantId', productVariantId.toString());
+  //   return this.http.get<any>(
+  //     `${this.url}/api/product-imei/getbyproductandvariant`, { params: params });
+  // }
 }

@@ -114,8 +114,7 @@
                                             <!-- [(ngModel)]="this.optionsFillerProduct.KeyWord" -->
                                         </span>
                                     </div>
-
-                                   
+                                    
                                     <div class="col-12 md:col-1">
                                         <div
                                             class="col-md-1"
@@ -306,112 +305,19 @@
                                         <label for="" class="mb-2"
                                             >Số khung/ số máy</label
                                         >
-                                        <div
-                                            class="variant-item"
-                                            *ngFor="
-                                                let variant of data.productImeis;
-                                                let i = index
-                                            "
-                                        >
-                                            <span class="variant-item-label"
-                                                >{{ variant.frameNumber }}/{{
-                                                    variant.engineNumber
-                                                }}
-                                                <span
-                                                    class="variant-item-close"
-                                                    (click)="
-                                                        removeImeiItem(data, i)
-                                                    "
-                                                    >x</span
-                                                ></span
-                                            >
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    spellcheck="false"
-                                                    placeholder="Nhập số khung"
-                                                    [(ngModel)]="
-                                                        variant.frameNumber
-                                                    "
-                                                    (blur)="checkValidity()"
-                                                />
-                                            </span>
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    id="email"
-                                                    type="text"
-                                                    spellcheck="false"
-                                                    [(ngModel)]="
-                                                        variant.engineNumber
-                                                    "
-                                                    (blur)="checkValidity()"
-                                                    placeholder="Nhập số máy"
-                                                />
-                                            </span>
-                                            <span
-                                                *ngIf="variant.isValid"
-                                                class="error-message"
-                                                >{{
-                                                    variant.isValidMessage
-                                                }}</span
-                                            >
-                                        </div>
-                                        <div class="variant-item">
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    [(ngModel)]="
-                                                        data.frameNumber
-                                                    "
-                                                    spellcheck="false"
-                                                    placeholder="Nhập và Enter/Số khung"
-                                                    (keydown.enter)="
-                                                        onEnterTest(data)
-                                                    "
-                                                />
-                                            </span>
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    [(ngModel)]="
-                                                        data.engineNumber
-                                                    "
-                                                    spellcheck="false"
-                                                    placeholder="Nhập và Enter/Số máy"
-                                                    (keydown.enter)="
-                                                        onEnterTest(data)
-                                                    "
-                                                />
-                                            </span>
+                                        <div style="display: flex;" *ngFor="let frameEngine of frameEngineData">
+                                            <input type="checkbox" class="large-checkbox" [(ngModel)]="frameEngine.isChecked" />
+                                             <div style="margin: 5px 0;" class="variant-item">
+                                                 <span class="variant-item-label">{{ frameEngine.frameNumber }} / {{ frameEngine.engineNumber }}</span>
+                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                         </ng-template>
-                    </p-table>
+                    </p-table>   
+                 
                 </div>
-
-                <table *ngIf="showImeiTable" class="imei-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Frame Number</th>
-                            <th>Engine Number</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let data of imeiData">
-                            <td>{{ data.id }}</td>
-                            <td>{{ data.frameNumber }}</td>
-                            <td>{{ data.engineNumber }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
             </div>
             <div class="col-4">
                 <div
@@ -441,15 +347,10 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                 >
-                                <p-dropdown 
-                                    [options]="warrantyOptions" 
-                                    optionLabel="shortenedName" 
-                                    formControlName="warrantyPolicyId"
-                                    [style]="{ height: '40px', width: '30%' }"
-                                    optionValue="id"
-                                    [showClear]="true"
-                                    placeholder="Chọn chính sách bảo hành">
-                              </p-dropdown>
+                                    {{
+                                        stockInReceipt.inventoryStockInDetails
+                                            .length
+                                    }}
                                 </div>
                             </div>
 
@@ -459,15 +360,19 @@
                                 <div class="col-12 mb-2 md:col-5 md:mb-0">
                                     Tổng số sản phẩm:
                                 </div>
-                                <div
-                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
-                                >
-                                    {{
-                                        stockInReceipt.inventoryStockInDetails
-                                            .length
-                                    }}
+                                <div class="col-12 mb-2 md:col-7 ">
+                                    <p-dropdown 
+                                        [options]="warrantyOptions" 
+                                        optionLabel="shortenedName" 
+                                        formControlName="warrantyPolicyId"
+                                        [style]="{ height: '40px', width: '100%' }"
+                                        optionValue="id"
+                                        [showClear]="true"
+                                        placeholder="Chọn chính sách bảo hành">
+                                    </p-dropdown>
                                 </div>
                             </div>
+
 
                             <div class="field">
                                 <!-- Ghi chú -->

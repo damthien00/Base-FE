@@ -63,6 +63,7 @@ export class BranchTransferComponent implements OnInit {
   engineNumber: any;
 
   imeiData: any[] = [];
+  frameEngineData: any[] = [];
   showImeiTable: boolean = false;
 
   onBarcode: boolean = false;
@@ -284,6 +285,7 @@ export class BranchTransferComponent implements OnInit {
               '-' +
               (itemVariant.valuePropeties2 || ''),
             productType: item.productType,
+            warrantyPolicyId: item.warrantyPolicyId,
             quantity: item.productType === 1 ? 0 : 1,
             productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
             price: itemVariant.price,
@@ -306,6 +308,7 @@ export class BranchTransferComponent implements OnInit {
               : null,
           productName: item.name,
           productType: item.productType,
+          warrantyPolicyId: item.warrantyPolicyId,
           quantity: item.productType === 1 ? 0 : 1,
           productCode: item.code || '', // Đảm bảo mã sản phẩm
           price: item.sellingPrice,
@@ -378,16 +381,11 @@ export class BranchTransferComponent implements OnInit {
     // });
   }
 
-  async fetchProductImeiData(productId: number, productVariantId: number) {
+  async fetchProductImeiData(productId: number, productVariantId: number, branchId: number) {
     try {
-      const response = await this.merchandiseService.getProductDetails(productId, productVariantId).toPromise();
-      if (response && response.data) {
-        // Assuming response.data contains an array of IMEI data
-        this.imeiData = response.data;
-        this.showImeiTable = true; // This flag is used to conditionally display the table
-      } else {
-        console.log('No data found');
-      }
+      const response = await this.merchandiseService.getProductDetails(productId, productVariantId, branchId).toPromise();
+      const items = response.data.items;
+      this.frameEngineData = items;
     } catch (error) {
       console.error('Error fetching product IMEI data', error);
     }
@@ -415,7 +413,8 @@ export class BranchTransferComponent implements OnInit {
     if (existingDetail) {
       // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá
       existingDetail.quantity += 1;
-      existingDetail.total = existingDetail.quantity * existingDetail.price;
+      existingDetail.total =
+        existingDetail.quantity * existingDetail.price;
     } else {
       // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
       const newDetail = {
@@ -423,6 +422,7 @@ export class BranchTransferComponent implements OnInit {
         productImage: item.productImage,
         productName: item.productName,
         productVariantId: item.productVariantId,
+        warrantyPolicyId: item.warrantyPolicyId,
         productType: item.productType,
         quantity: item.productType === 1 ? 0 : 1,
         productCode: item.productCode ? '' : '',
@@ -433,9 +433,8 @@ export class BranchTransferComponent implements OnInit {
         engineNumber: '',
       };
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
+      this.fetchProductImeiData(item.productId, item.productVariantId, item.warrantyPolicyId);
     }
-
-    this.fetchProductImeiData(item.productId, item.productVariantId);
 
     // Cập nhật lại các giá trị liên quan
     this.updatePaymentInfo();

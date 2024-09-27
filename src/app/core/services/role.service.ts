@@ -37,6 +37,10 @@ export class RoleService {
     return this.http.post(`${this.url}/api/role/create`, userData);
   }
 
+  saveGroupRole(payload: any): Observable<any> {
+    return this.http.put(`${this.url}/api/role/edit`, payload);
+  }
+
   getGroupRoleById(Id: number): Observable<any> {
     const url = `${this.url}/api/role/get-by-id?Id=${Id}`;
     return this.http.get<any>(url);

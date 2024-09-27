@@ -1,5 +1,6 @@
 import { StockInService } from './../../../../../core/services/stock-in.service';
 import { FunctionService } from 'src/app/core/utils/function.utils';
+import { NumberFormatPipe } from 'src/app/shared/pipes/numberFormat.pipe';
 import {
     Component,
     ElementRef,
@@ -538,8 +539,6 @@ export class CreateComponent implements OnInit {
                         product.productImeis?.map((imei) => ({
                             ...imei,
                             type: 1,
-                            productId: product.productId,
-                            productVariantId: product.productVariantId,
                         })) || [];
                     return {
                         productId: product.productId,
