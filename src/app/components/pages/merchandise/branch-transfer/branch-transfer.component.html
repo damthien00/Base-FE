@@ -4,7 +4,7 @@
     <div class="col-12">
         <p-toolbar styleClass="mb-2">
             <div class="">
-                <h3>Tạo phiếu nhập kho</h3>
+                <h3>Tạo phiếu chuyển hàng</h3>
                 <p-breadcrumb
                     [model]="items"
                     [home]="{ icon: 'pi pi-home' }"
@@ -145,6 +145,7 @@
                                             <!-- [(ngModel)]="this.optionsFillerProduct.KeyWord" -->
                                         </span>
                                     </div>
+                                    
                                     <div class="col-12 md:col-1">
                                         <div
                                             class="col-md-1"
@@ -320,7 +321,7 @@
                                     </div>
                                 </td>
                                 <td style="width: 12.5%; text-align: center">
-                                    {{ data.total }}
+                                    {{ data.total | numberFormat }}
                                 </td>
                                 <td style="width: 7%; text-align: center">
                                     <i
@@ -335,93 +336,18 @@
                                         <label for="" class="mb-2"
                                             >Số khung/ số máy</label
                                         >
-                                        <div
-                                            class="variant-item"
-                                            *ngFor="
-                                                let variant of data.productImeis;
-                                                let i = index
-                                            "
-                                        >
-                                            <span class="variant-item-label"
-                                                >{{ variant.frameNumber }}/{{
-                                                    variant.engineNumber
-                                                }}
-                                                <span
-                                                    class="variant-item-close"
-                                                    (click)="
-                                                        removeImeiItem(data, i)
-                                                    "
-                                                    >x</span
-                                                ></span
-                                            >
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    spellcheck="false"
-                                                    placeholder="Nhập số khung"
-                                                    [(ngModel)]="
-                                                        variant.frameNumber
-                                                    "
-                                                    (blur)="checkValidity()"
-                                                />
-                                            </span>
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    id="email"
-                                                    type="text"
-                                                    spellcheck="false"
-                                                    [(ngModel)]="
-                                                        variant.engineNumber
-                                                    "
-                                                    (blur)="checkValidity()"
-                                                    placeholder="Nhập số máy"
-                                                />
-                                            </span>
-                                            <span
-                                                *ngIf="variant.isValid"
-                                                class="error-message"
-                                                >{{
-                                                    variant.isValidMessage
-                                                }}</span
-                                            >
-                                        </div>
-                                        <div class="variant-item">
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    [(ngModel)]="
-                                                        data.frameNumber
-                                                    "
-                                                    spellcheck="false"
-                                                    placeholder="Nhập và Enter/Số khung"
-                                                    (keydown.enter)="
-                                                        onEnterTest(data)
-                                                    "
-                                                />
-                                            </span>
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    [(ngModel)]="
-                                                        data.engineNumber
-                                                    "
-                                                    spellcheck="false"
-                                                    placeholder="Nhập và Enter/Số máy"
-                                                    (keydown.enter)="
-                                                        onEnterTest(data)
-                                                    "
-                                                />
-                                            </span>
+                                        <div style="display: flex;" *ngFor="let frameEngine of frameEngineData">
+                                            <input type="checkbox" class="large-checkbox" [(ngModel)]="frameEngine.isChecked" />
+                                             <div style="margin: 5px 0;" class="variant-item">
+                                                 <span class="variant-item-label">{{ frameEngine.frameNumber }} / {{ frameEngine.engineNumber }}</span>
+                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                         </ng-template>
-                    </p-table>
+                    </p-table>   
+                 
                 </div>
             </div>
             <div class="col-4">
@@ -431,27 +357,6 @@
                 >
                     <div class="grid p-fluid">
                         <div class="col-12 md:col-12">
-                            <div class="supplier-select mb-5">
-                                <p-treeSelect
-                                    (onClear)="onClear()"
-                                    optionLabel="label"
-                                    [ngModelOptions]="{ standalone: true }"
-                                    [showClear]="true"
-                                    (onNodeSelect)="onNodeSelect($event)"
-                                    class="md:w-100 w-full"
-                                    containerStyleClass="w-full"
-                                    [(ngModel)]="selectedNodes"
-                                    [options]="treeCategory"
-                                    placeholder="Chọn nhà cung cấp"
-                                    [filter]="true"
-                                    [filterInputAutoFocus]="true"
-                                >
-                                    <ng-template let-node pTemplate="default">
-                                        <span>{{ node.name }}</span>
-                                    </ng-template>
-                                </p-treeSelect>
-                            </div>
-
                             <div class="field grid">
                                 <div class="col-12 mb-2 md:col-6 md:mb-0">
                                     Nhân viên: Bùi Thị Bảo Anh
@@ -472,90 +377,41 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                 >
-                                    {{
-                                        stockInReceipt.inventoryStockInDetails
-                                            .length
-                                    }}
-                                </div>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Tổng tiền hàng -->
-                                <div class="col-12 mb-2 md:col-5 md:mb-0">
-                                    Tổng tiền hàng:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
-                                >
-                                    {{ stockInReceipt.totalPrice }}
-                                </div>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Giảm giá -->
-                                <div class="col-12 mb-2 md:col-6 md:mb-0">
-                                    Giảm giá:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end input-number-custom"
-                                >
-                                    <p-inputNumber
-                                        inputId="integeronly"
-                                        [(ngModel)]="
-                                            stockInReceipt.totalDiscountAmount
-                                        "
-                                        (ngModelChange)="updatePaymentInfo()"
-                                        (onFocus)="openDiscountModal()"
-                                    />
-                                </div>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Cần trả nhà cung cấp -->
-                                <div class="col-12 mb-2 md:col-5 md:mb-0">
-                                    Cần trả nhà cung cấp:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end total_amount_paid"
-                                >
-                                    {{ stockInReceipt.totalAmountPaid }}
-                                </div>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Tiền trả nhà cung cấp -->
-                                <div
-                                    class="col-12 mb-2 md:col-6 md:mb-0 flex align-items-center"
-                                >
-                                    Tiền trả nhà cung cấp:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end input-number-custom input-number-payment"
-                                    style="position: relative"
-                                >
-                                    <p-inputNumber
-                                        inputId="integeronly"
-                                        [(ngModel)]="
-                                            stockInReceipt.customerPayment
-                                        "
-                                        (ngModelChange)="updatePaymentInfo()"
-                                        (onFocus)="
-                                            functionService.handleFocusPrice(
-                                                $event
-                                            )
-                                        "
-                                    />
-
-                                    <span
-                                        *ngIf="stockInReceipt.isValidMoney"
-                                        class="error-message"
-                                        style="position: absolute; top: 48px"
-                                        >{{
-                                            stockInReceipt.isMessageValidMoney
-                                        }}</span
+                                    <p-dropdown
+                                        [options]="warrantyOptions"
+                                        optionLabel="shortenedName"
+                                        formControlName="warrantyPolicyId"
+                                        [style]="{
+                                            height: '40px',
+                                            width: '30%'
+                                        }"
+                                        optionValue="id"
+                                        [showClear]="true"
+                                        placeholder="Chọn chính sách bảo hành"
                                     >
+                                    </p-dropdown>
                                 </div>
                             </div>
+
+                            <div class="field grid">
+                                <!-- Tổng số sản phẩm -->
+
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Tổng số sản phẩm:
+                                </div>
+                                <div class="col-12 mb-2 md:col-7 ">
+                                    <p-dropdown 
+                                        [options]="warrantyOptions" 
+                                        optionLabel="shortenedName" 
+                                        formControlName="warrantyPolicyId"
+                                        [style]="{ height: '40px', width: '100%' }"
+                                        optionValue="id"
+                                        [showClear]="true"
+                                        placeholder="Chọn chính sách bảo hành">
+                                    </p-dropdown>
+                                </div>
+                            </div>
+
 
                             <div class="field">
                                 <!-- Ghi chú -->
@@ -566,7 +422,6 @@
                                     spellcheck="false"
                                 ></textarea>
                             </div>
-
                             <button
                                 pButton
                                 pRipple

@@ -1,0 +1,14 @@
+/* Add custom styles for the multi-select options */
+.p-multiselect .p-multiselect-item {
+  transition: background-color 0.3s ease;
+}
+
+.p-multiselect .p-multiselect-item:hover {
+  background-color: #f0f0f0; /* Change background color on hover */
+}
+
+/* Style for the selected items */
+.p-multiselect .p-multiselect-item.p-highlight {
+  background-color: #007ad9; /* Color for highlighted items */
+  color: white; /* Text color for highlighted items */
+}

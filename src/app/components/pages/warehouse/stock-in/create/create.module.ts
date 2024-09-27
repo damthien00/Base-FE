@@ -7,6 +7,6 @@ import { NumberFormatPipe } from 'src/app/shared/pipes/numberFormat.pipe';
 
 @NgModule({
     imports: [CommonModule, SharedModule, CreateRoutingModule],
-    declarations: [CreateComponent, NumberFormatPipe],
+    declarations: [CreateComponent, NumberFormatPipe]
 })
 export class CreateModule {}

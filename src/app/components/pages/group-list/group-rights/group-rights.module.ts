@@ -7,8 +7,8 @@ import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
 import { PaginatorModule } from 'primeng/paginator';
 import { GroupRightsComponent } from './group-rights.component';
-
-
+import { MultiSelectModule } from 'primeng/multiselect';
+import { EditorModule } from 'primeng/editor';
 
 @NgModule({
   imports: [
@@ -22,7 +22,9 @@ import { GroupRightsComponent } from './group-rights.component';
     InputSwitchModule,
     MessagesModule,
     ToastModule,
-    PaginatorModule
+    PaginatorModule,
+    MultiSelectModule,
+    EditorModule
   ],
   declarations: [GroupRightsComponent],
 })

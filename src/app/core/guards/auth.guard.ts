@@ -35,18 +35,23 @@ export class AuthGuard implements CanActivate {
                             return true;
                         } else {
                             this.authService.setUserCurrent(null);
+                            this.authService.setAuthTokenLocalStorage(null);
+
                             this.router.navigate([Page.Login]);
                             return false;
                         }
                     }),
                     catchError(() => {
                         this.authService.setUserCurrent(null);
+                        this.authService.setAuthTokenLocalStorage(null);
                         this.router.navigate([Page.Login]);
                         return of(false);
                     })
                 );
             } else {
                 this.authService.setUserCurrent(null);
+                this.authService.setAuthTokenLocalStorage(null);
+
                 this.router.navigate([Page.Login]);
                 return of(false);
             }

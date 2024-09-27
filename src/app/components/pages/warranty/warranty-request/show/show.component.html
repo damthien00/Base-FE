@@ -12,7 +12,7 @@
                 <button
                     pButton
                     pRipple
-                    [routerLink]="['/products/create']"
+                    [routerLink]="['/pages/warranty/warranty-request/create']"
                     icon="pi pi-plus"
                     label="Tạo yêu cầu bảo hành"
                 ></button>
@@ -39,6 +39,8 @@
                 currentPageReportTemplate="{first} - {last} trong tổng {totalRecords} sản phẩm"
                 [(selection)]="selectedProducts"
                 selectionMode="multiple"
+                (onRowExpand)="onRowExpand($event)"
+                (onRowCollapse)="onRowCollapse($event)"
                 [rowHover]="true"
                 dataKey="id"
             >

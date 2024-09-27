@@ -62,6 +62,13 @@ import { RouterModule } from '@angular/router';
                     ),
             },
             {
+                path: 'warranty/warranty-request/create',
+                loadChildren: () =>
+                    import(
+                        './warranty/warranty-request/create/create.module'
+                    ).then((m) => m.CreateModule),
+            },
+            {
                 path: 'warranty/warranty-policy',
                 loadChildren: () =>
                     import('./warranty/warranty-policy/show/show.module').then(
@@ -107,6 +114,14 @@ import { RouterModule } from '@angular/router';
                         './group-list/group-rights/group-rights.module'
                     ).then((m) => m.GroupRightsModule),
             },
+            {
+                path: 'merchandise/branch-transfer/create',
+                loadChildren: () =>
+                    import(
+                        './merchandise/branch-transfer/branch-transfer.module'
+                    ).then((m) => m.BranchTransferModule),
+            },
+
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],
