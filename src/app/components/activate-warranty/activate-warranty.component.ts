@@ -3,6 +3,7 @@ import { ProductImeiService } from './../../core/services/product-imei.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { WarrantyService } from 'src/app/core/services/warranty.service';
+import { Router } from '@angular/router';
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
     query: string;
@@ -20,7 +21,8 @@ export class ActivateWarrantyComponent implements OnInit {
         private productImeiService: ProductImeiService,
         private addressService: AddressService,
         private formBuilder: FormBuilder,
-        private warrantyService: WarrantyService
+        private warrantyService: WarrantyService,
+        private router: Router
     ) {
         this.createActivateWarranty = this.formBuilder.group({
             phoneNumber: [null, [Validators.required]],
@@ -75,8 +77,18 @@ export class ActivateWarrantyComponent implements OnInit {
                             console.log(product);
 
                             if (product) {
-                                this.productListSelected.push(product);
-                                console.log(this.productListSelected);
+                                const isProductExists =
+                                    this.productListSelected.some(
+                                        (p) => p.id === product.id // So sánh theo ID hoặc một thuộc tính duy nhất của sản phẩm
+                                    );
+
+                                if (!isProductExists) {
+                                    this.productListSelected.push(product);
+                                } else {
+                                    console.log(
+                                        'Product already exists in the list'
+                                    );
+                                }
                             } else {
                                 console.error('No product found');
                             }
@@ -99,15 +111,18 @@ export class ActivateWarrantyComponent implements OnInit {
         this.addressService
             .getCitiesByIdCountry(countryId)
             .subscribe((cities) => {
+                console.log(cities.data);
                 this.cities = cities.data;
-                //console.log(cities)
             });
+
+        console.log(countryId);
     }
 
     getDistrictsByCity(cityId: number) {
         this.addressService
             .getDistrictsByIdCity(cityId)
             .subscribe((districts) => {
+                console.log(districts.data);
                 this.districts = districts.data;
             });
     }
@@ -127,18 +142,19 @@ export class ActivateWarrantyComponent implements OnInit {
         this.wards = [];
     }
 
-    onCityChange(cityId: number) {
-        this.selectedCityId = cityId;
-        this.getDistrictsByCity(cityId);
+    onCityChange(event: any, cityId: number) {
+        this.selectedCityId = event.value.id;
+        this.getDistrictsByCity(event.value.id);
         this.districts = [];
         this.wards = [];
         this.createActivateWarranty.get('wardId')?.setValue(null);
         this.createActivateWarranty.get('districtId')?.setValue(null);
     }
 
-    onDistrictChange(districtId: number) {
-        this.selectedDistrictId = districtId;
-        this.getWardsByDistrict(districtId);
+    onDistrictChange(event: any, districtId: number) {
+        console.log(event);
+        this.selectedDistrictId = event.value.id;
+        this.getWardsByDistrict(event.value.id);
         this.wards = [];
         this.createActivateWarranty.get('wardId')?.setValue(null);
     }
@@ -159,43 +175,47 @@ export class ActivateWarrantyComponent implements OnInit {
         if (this.createActivateWarranty.valid) {
             console.log(this.createActivateWarranty.value);
             console.log(this.productListSelected);
-
-            const warrantyRequests = this.productListSelected.map(
-                (product) => {}
-            );
-
             const formData = {
-                code: '', // Nếu có mã, hãy gán giá trị cho code
-                customer: [
-                    {
-                        customerName:
-                            this.createActivateWarranty.value.customerName,
-                        phoneNumber:
-                            this.createActivateWarranty.value.phoneNumber,
-                        wardId: this.createActivateWarranty.value.wardId,
-                    },
-                ],
-                product: [
-                    {
-                        // productId: product.id, // Sử dụng productVariant.id thay vì phoneNumber
-                        // productVariantId: product.productVariant.id,
-                        // productName: product.productVariant.productName,
-                        // inventoryStockDetailProductImeiId: product.id,
-                        // expirationDate: '2024-09-24T14:32:17.511Z',
-                    },
-                ],
+                code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần
+                customerName:
+                    this.createActivateWarranty.value.customerName || 'string',
+                phoneNumber:
+                    this.createActivateWarranty.value.phoneNumber || 'string',
+                wardName: this.createActivateWarranty.value.wardId.name || 0,
+                districtName:
+                    this.createActivateWarranty.value.districtId.name || 0,
+                cityName: this.createActivateWarranty.value.cityId.name || 0,
+                customer: {
+                    name:
+                        this.createActivateWarranty.value.customerName ||
+                        'string',
+                    phoneNumber:
+                        this.createActivateWarranty.value.phoneNumber ||
+                        'string',
+                    wardId: this.createActivateWarranty.value.wardId.id || 0,
+                    wardName:
+                        this.createActivateWarranty.value.wardId.name || 0,
+                    districtId:
+                        this.createActivateWarranty.value.districtId.id || 0,
+                    districtName:
+                        this.createActivateWarranty.value.districtId.name || 0,
+                    cityId: this.createActivateWarranty.value.cityId.id || 0,
+                    cityName:
+                        this.createActivateWarranty.value.cityId.name || 0,
+                },
+                warrantyProducts: this.productListSelected.map((product) => ({
+                    productId: product.productId,
+                    productVariantId: product.productVariantId,
+                    // warrantyId: 0, // Giá trị mẫu, thay thế nếu cần
+                    productName: product.productVariant.productName,
+                    inventoryStockDetailProductImeiId: product.id,
+                    expirationDate: '2024-09-25T03:46:03.105Z', // Giá trị mẫu, thay thế nếu cần
+                })),
             };
 
             this.warrantyService.createWarranty(formData).subscribe(
                 (response) => {
-                    // this.messageService.add({
-                    //     severity: 'success',
-                    //     summary: 'Thành công',
-                    //     detail: 'Thêm phiếu kho thành công',
-                    // });
-                    // setTimeout(() => {
-                    //     this.router.navigate(['/pages/warehouse/stock-in']);
-                    // }, 1000); // Thời gian trễ 2 giây
+                    this.router.navigate([`/activate-success/${response}`]);
                 },
                 (error) => {
                     // Xử lý khi lỗi

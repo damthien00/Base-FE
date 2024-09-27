@@ -64,7 +64,7 @@ import { AdminGuard } from './core/guards/admin.guard';
                         ).then((m) => m.ActivateWarrantyModule),
                 },
                 {
-                    path: 'activate-success',
+                    path: 'activate-success/:id',
                     loadChildren: () =>
                         import(
                             'src/app/components/activate-success/activate-success.module'

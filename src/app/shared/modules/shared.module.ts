@@ -25,6 +25,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { MenubarModule } from 'primeng/menubar';
 import { SidebarModule } from 'primeng/sidebar';
 import { MenuModule } from 'primeng/menu';
+import { InputMaskModule } from 'primeng/inputmask';
 
 // import { ToastModule } from 'primeng/toast';
 
@@ -36,7 +37,7 @@ import { MenuModule } from 'primeng/menu';
         ButtonModule,
         TableModule,
         MenuModule,
-
+        InputMaskModule,
         CalendarModule,
         ChipsModule,
         FileUploadModule,
@@ -52,7 +53,6 @@ import { MenuModule } from 'primeng/menu';
         PaginatorModule,
         InputTextareaModule,
         DropdownModule,
-
         RadioButtonModule,
         InputNumberModule,
         DialogModule,
@@ -62,6 +62,7 @@ import { MenuModule } from 'primeng/menu';
     exports: [
         CommonModule,
         FormsModule,
+        InputMaskModule,
         MenubarModule,
         MenuModule,
         ReactiveFormsModule,

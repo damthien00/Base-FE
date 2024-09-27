@@ -19,10 +19,11 @@ export interface Customer {
     representative?: Representative;
 }
 
-
-export class OptionsFilterCustomer{
-    pageSize: number | null = 30;
+export class OptionsFilterCustomer {
+    pageSize: number | null = 100;
     pageIndex: number | null = 1;
+
+    nameOrPhoneNumber: string | null = null;
     // sortOrder: string | null = "desc";
     // KeyWord: string  | null = null;
     // CategoryId: number | null = null;

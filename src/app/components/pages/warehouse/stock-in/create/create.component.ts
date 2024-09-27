@@ -540,6 +540,7 @@ export class CreateComponent implements OnInit {
                             type: 1,
                             productId: product.productId,
                             productVariantId: product.productVariantId,
+                            branchId: 5,
                         })) || [];
                     return {
                         productId: product.productId,
@@ -562,7 +563,7 @@ export class CreateComponent implements OnInit {
                 supplierName: 'string',
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
-                branchId: 6,
+                branchId: 5,
                 branchName: 'string',
                 total: this.stockInReceipt.customerPayment,
                 version: 0,
