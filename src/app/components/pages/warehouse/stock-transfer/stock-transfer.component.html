@@ -1,181 +1,81 @@
-<div class="grid">
-    <div class="col-12">
-        <p-toolbar styleClass="mb-2">
-            <div class="">
-                <h3>Danh sách chuyển hàng</h3>
-                <p-breadcrumb
-                    [model]="items"
-                    [home]="{ icon: 'pi pi-home' }"
-                ></p-breadcrumb>
-            </div>
-            <ng-template pTemplate="right">
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-plus"
-                    label="Chuyển hàng"
-                    [routerLink]="['/pages/merchandise/branch-transfer/create']"
-                ></button>
-            </ng-template>
-        </p-toolbar>
-        <div class="card">
-            <p-table
-                #dt
-                [value]=""
-                responsiveLayout="scroll"
-                [rows]="10"
-                [paginator]="true"
-                [rowsPerPageOptions]="[10, 20, 30]"
-                [showCurrentPageReport]="true"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                selectionMode="multiple"
-                [rowHover]="true"
-                dataKey="id"
-            >
-                <!-- [(selection)]="selectedProducts" -->
-                <ng-template pTemplate="caption">
-                    <div
-                        class="flex flex-column gap-3 align-items-end md:flex-row md:"
-                    >
-                        <div class="flex flex-column">
-                            <label
-                                for="email1"
-                                class="block text-900 text-large font-weight mb-2"
-                                >Tìm kiếm mã chuyển hàng:</label
-                            >
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search"></i>
-                                <input
-                                    pInputText
-                                    type="text"
-                                    placeholder="Tìm theo mã chuyển hàng"
-                                    style="width: 350px"
-                                    class="sm:"
-                                />
-                                <!-- [(ngModel)]="
-                                        this.optionsFillerProduct.KeyWord
-                                    " -->
-                            </span>
-                        </div>
-                        <div class="flex flex-column">
-                            <label
-                                for="email1"
-                                class="block text-900 text-large font-weight mb-2"
-                                >Chọn chi nhánh:</label
-                            >
-                            <p-dropdown
-                                [options]="this.optionsStatus"
-                                [(ngModel)]="this.statusFilter"
-                                optionLabel="name"
-                                [showClear]="true"
-                                placeholder="Chọn chi nhánh"
-                            >
-                            </p-dropdown>
-                        </div>
-                        <div class="flex flex-column">
-                            <label
-                                for="email1"
-                                class="block text-900 text-large font-weight mb-2"
-                                >Trạng thái:</label
-                            >
-                            <p-dropdown
-                                [options]="this.optionsStatus"
-                                [(ngModel)]="this.statusFilter"
-                                optionLabel="name"
-                                [showClear]="true"
-                                placeholder="Trạng thái"
-                            >
-                            </p-dropdown>
-                        </div>
-                        <div class="flex flex-column">
-                            <label
-                                for="email1"
-                                class="block text-900 text-large font-weight mb-2"
-                                >Ngày tạo:</label
-                            >
-                            <p-calendar
-                                [showIcon]="true"
-                                placeholder="Chọn khoẳng thời gian"
-                                inputId="icon"
-                            ></p-calendar>
-                        </div>
-                        <button
-                            pButton
-                            pRipple
-                            label="Lọc"
-                            (click)="EvenFilter()"
-                        ></button>
-                        <!-- <button pButton pRipple label="Lọc"></button> -->
-                        <!-- (click)="EvenFilter()" -->
-                    </div>
-                </ng-template>
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 3rem">
-                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                        </th>
-                        <th>Mã chuyển hàng</th>
-                        <th>Người tạo</th>
-                        <th>Ngày tạo</th>
-                        <th>Từ chi nhánh</th>
-                        <th>Đến chi nhánh</th>
-                        <th>Trạng thái</th>
-                        <th>Số sản phẩm</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-category>
-                    <tr>
-                        <td>
-                            <p-tableCheckbox
-                                [value]="category"
-                            ></p-tableCheckbox>
-                        </td>
-                        <td style="width: 5%; min-width: 10rem">
-                            <span class="p-column-title">Id</span>
-                            {{ category.id }}
-                        </td>
-                        <td style="width: 23%; min-width: 10rem">
-                            <span class="p-column-title">Name</span>
-                            {{ category.name }}
-                        </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">ParentName</span>
-                            {{ category.parentName }}
-                        </td>
-                        <td style="width: 14%; min-width: 8rem">
-                            <span class="p-column-title">Level</span>
-                            {{ category.level }}
-                        </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">CreateName</span>
-                            <!-- {{ product.category }} -->
-                        </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Status</span>
-                            {{ category.status }}
-                        </td>
-
-                        <td>
-                            <div class="flex">
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-pencil"
-                                    class="p-button-rounded p-button-success mr-2"
-                                    (click)="editProduct(product)"
-                                ></button>
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-trash"
-                                    class="p-button-rounded p-button-warning"
-                                    (click)="deleteProduct(product)"
-                                ></button>
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <div>
+          <h3>Quản lý tài khoản</h3>
+          <nav>
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
+              <li class="breadcrumb-item">Quản lý</li>
+              <li class="breadcrumb-item active">Quản lý tài khoản</li>
+            </ol>
+          </nav>
+        </div>
+    
+        <div class="btn-add-wrapper">
+          <button
+          pButton
+          pRipple
+          label="Thêm mới"
+          style="height: 40px; width: 130px; border-radius: 10px;"
+         
+        ></button>
         </div>
     </div>
-</div>
+
+    <section class="section k-list-table">
+        <div class="row">
+            <div class="col-lg-12">
+              <div class="card-body">
+                <div style="margin-top: 15px" class="card">
+                  <p-table
+                    [value]="ladigns"
+                    [rows]="this.PageSize"
+                    [totalRecords]="totalRecords"
+                    [paginator]="false"
+                    (onPage)="onPageChange($event)"
+                    [style]="{ width: '100%' }"
+                    styleClass="p-datatable-striped"
+                  >
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="width: 1%; font-size: 14px;">STT</th>
+                        <th style="width: 8%; font-size: 14px;">Tên tài khoản</th>
+                        <th style="width: 6%; font-size: 14px;">SĐT</th>
+                        <th style="width: 10%; font-size: 14px;">Địa chỉ</th>
+                        <th style="width: 8%; font-size: 14px; text-align: center;">Chi nhánh</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-user let-i="rowIndex">
+                      <tr class="custom-table">
+                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">
+                          {{((this.PageIndex - 1) * this.PageSize) + (i + 1)}}</td>
+                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.name }}</td>
+                        <td style="font-size: 14px; max-width: 110px; overflow: hidden;" (click)="openDialog2(user.id)">{{ user.phoneNumber }}</td>
+                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.wardName}}, {{ user.districtName }}, {{ user.cityName }}</td>
+                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.branchName }}</td>
+                    </tr>
+                    </ng-template>
+                  </p-table>
+                  <div class="paging-bot dg-fix">
+                    <div class="paging-info">
+                      <div [innerHTML]="currentPageReport"></div>
+                    </div>
+                    <p-paginator
+                            [rows]="this.PageSize"
+                            (onPageChange)="onPageChange($event)"
+                            [totalRecords]="totalRecords > 0 ? totalRecords : 1"
+                            [rowsPerPageOptions]="[10, 20, 30]"
+                            [first]="
+                              (this.PageIndex - 1) *
+                              this.PageSize
+                            "
+                          ></p-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </section>
+
+
+</main>

@@ -264,26 +264,27 @@
                                         class="flex flex-column align-items-center justify-content-center"
                                         style="position: relative"
                                     >
-                                        <p-inputNumber
-                                            *ngIf="data.productType === 0"
-                                            [(ngModel)]="data.quantity"
-                                            (onFocus)="
-                                                functionService.handleFocusPrice(
-                                                    $event
-                                                )
-                                            "
-                                            (ngModelChange)="updateTotal(data)"
-                                            buttonLayout="horizontal"
-                                            (onFocus)="
-                                                functionService.handleFocusPrice(
-                                                    $event
-                                                )
-                                            "
-                                            inputId="horizontal"
-                                            spinnerMode="horizontal"
-                                            [min]="1"
-                                            [step]="1"
-                                        />
+
+                                    <p-inputNumber
+                                    *ngIf="data.productType === 0"
+                                    [(ngModel)]="data.quantity"
+                                    (onFocus)="
+                                        functionService.handleFocusPrice(
+                                            $event
+                                        )
+                                    "
+                                    (ngModelChange)="updateTotal(data)"
+                                    buttonLayout="horizontal"
+                                    (onFocus)="
+                                        functionService.handleFocusPrice(
+                                            $event
+                                        )
+                                    "
+                                    inputId="horizontal"
+                                    spinnerMode="horizontal"
+                                    [min]="1"
+                                    [step]="1"
+                                />
                                         <span
                                             *ngIf="data.productType === 1"
                                             style="
@@ -303,7 +304,7 @@
                                                 data.productType === 1
                                             "
                                             class="error-message"
-                                            >{{ data.isValidMessage }}</span
+                                            >{{ data.isValidMessage2 }}</span
                                         >
 
                                         <span
@@ -316,7 +317,7 @@
                                                 data.productType != 1
                                             "
                                             class="error-message"
-                                            >{{ data.isValidMessage }}</span
+                                            >{{ data.isValidMessage2 }}</span
                                         >
                                     </div>
                                 </td>
@@ -333,15 +334,16 @@
                             <tr *ngIf="data && data.productType == 1">
                                 <td colspan="8" class="p-3 border-none">
                                     <div class="flex flex-column">
-                                        <label for="" class="mb-2"
-                                            >Số khung/ số máy</label
-                                        >
-                                        <div style="display: flex;" *ngFor="let frameEngine of frameEngineData">
-                                            <input type="checkbox" class="large-checkbox" [(ngModel)]="frameEngine.isChecked" />
+                                        <label for="" class="mb-2">Số khung/số máy</label>
+                                        <div style="display: flex;" *ngFor="let frameEngine of data.frameEngineData">
+                                            <input type="checkbox" class="large-checkbox" [(ngModel)]="frameEngine.isChecked" (change)="updateQuantity(data)"/>
                                              <div style="margin: 5px 0;" class="variant-item">
                                                  <span class="variant-item-label">{{ frameEngine.frameNumber }} / {{ frameEngine.engineNumber }}</span>
                                              </div>
                                         </div>
+                                        <span *ngIf="data.isValid" class="error-message" style="color: red;">
+                                            {{ data.isValidMessage }}
+                                        </span>
                                     </div>
                                 </td>
                             </tr>
@@ -374,22 +376,10 @@
                                 <div class="col-12 mb-2 md:col-5 md:mb-0">
                                     Tổng số sản phẩm:
                                 </div>
-                                <div
-                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
-                                >
-                                    <p-dropdown
-                                        [options]="warrantyOptions"
-                                        optionLabel="shortenedName"
-                                        formControlName="warrantyPolicyId"
-                                        [style]="{
-                                            height: '40px',
-                                            width: '30%'
-                                        }"
-                                        optionValue="id"
-                                        [showClear]="true"
-                                        placeholder="Chọn chính sách bảo hành"
-                                    >
-                                    </p-dropdown>
+                                <div class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end">
+                                    {{
+                                        stockInReceipt.inventoryStockInDetails.length
+                                    }}
                                 </div>
                             </div>
 
@@ -397,17 +387,17 @@
                                 <!-- Tổng số sản phẩm -->
 
                                 <div class="col-12 mb-2 md:col-5 md:mb-0">
-                                    Tổng số sản phẩm:
+                                    Chuyển tới chi nhánh:
                                 </div>
                                 <div class="col-12 mb-2 md:col-7 ">
-                                    <p-dropdown 
-                                        [options]="warrantyOptions" 
+                                    <p-dropdown
+                                        [options]="branch" 
                                         optionLabel="shortenedName" 
-                                        formControlName="warrantyPolicyId"
+                                        [(ngModel)]="selectedBranch"
                                         [style]="{ height: '40px', width: '100%' }"
                                         optionValue="id"
                                         [showClear]="true"
-                                        placeholder="Chọn chính sách bảo hành">
+                                        placeholder="Chọn chi nhánh">
                                     </p-dropdown>
                                 </div>
                             </div>

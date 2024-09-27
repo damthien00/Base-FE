@@ -18,6 +18,8 @@ import { OptionsFilterProductVariant } from 'src/app/core/DTOs/stock-in/optionFi
 import { StockInService } from 'src/app/core/services/stock-in.service';
 import { WarrantyPolicyService } from 'src/app/core/services/warranty-policy.service';
 import { MerchandiseService } from 'src/app/core/services/merchandise.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { BranchService } from 'src/app/core/services/branch.service';
 
 export interface WarehouseReceipt {
   id?: number;
@@ -46,7 +48,7 @@ export class BranchTransferComponent implements OnInit {
   nodes!: any[];
   selectedNodes: any;
   treeCategory: any[] = [];
-  warrantyOptions: any[] = [];
+  branch: any[] = [];
   activeBarcode: boolean = false;
   stockInReceipt: any;
   filteredDatas: any;
@@ -55,6 +57,8 @@ export class BranchTransferComponent implements OnInit {
   isValidForm: boolean = true;
   temporaryDiscountRate: number = 0;
   temporaryDiscountUnit: string = 'VND';
+  public userCurrent: any;
+  selectedBranch: any;
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
@@ -73,9 +77,15 @@ export class BranchTransferComponent implements OnInit {
     private messageService: MessageService,
     private warrantyService: WarrantyPolicyService,
     private merchandiseService: MerchandiseService,
+    private authService: AuthService,
+    private branchService: BranchService,
     private router: Router
   ) {
     this.nodeService.getFiles().then((files) => (this.nodes = files));
+
+    this.authService.userCurrent.subscribe((user) => {
+      this.userCurrent = user;
+    });
   }
 
   ngOnInit() {
@@ -179,19 +189,9 @@ export class BranchTransferComponent implements OnInit {
     this.loadWarrantyPolicies()
   }
 
-  // onProductSearch(event: Event): void {
-  //     const input = event.target as HTMLInputElement;
-  //     const searchTerm = input.value.toLowerCase();
-
-  //     // Lọc dữ liệu dựa trên từ khóa tìm kiếm
-
-  //     this.optionsFillerProduct.KeyWord = searchTerm;
-  //     this.loadProducts();
-  // }
-
   loadWarrantyPolicies() {
-    this.warrantyService.getWarrantyPolicies().subscribe((response: any) => {
-      this.warrantyOptions = response.data.items.map((option: any) => {
+    this.branchService.getBranchsAll().subscribe((response: any) => {
+      this.branch = response.data.items.map((option: any) => {
         return {
           ...option,
           shortenedName: this.shortenName(option.name, 30) // Giới hạn độ dài tên
@@ -383,12 +383,18 @@ export class BranchTransferComponent implements OnInit {
     try {
       const response = await this.merchandiseService.getProductDetails(productId, productVariantId, branchId).toPromise();
       const items = response.data.items;
-      this.frameEngineData = items;
+
+      // Find the product in the cart and add its frame/engine data
+      const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
+        (detail) => detail.productId === productId && detail.productVariantId === productVariantId
+      );
+      if (productInCart) {
+        productInCart.frameEngineData = items; // Store the frame/engine data specific to this product
+      }
     } catch (error) {
       console.error('Error fetching product IMEI data', error);
     }
   }
-
 
   addToCart(item: any): void {
     console.log(item);
@@ -429,9 +435,13 @@ export class BranchTransferComponent implements OnInit {
         total: item.productType === 1 ? 0 : item.price * 1,
         frameNumber: '',
         engineNumber: '',
+        branchId: this.userCurrent?.branchId,
+        branchName: this.userCurrent?.branchName,
+        frameEngineData: []
       };
+
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
-      this.fetchProductImeiData(item.productId, item.productVariantId, item.warrantyPolicyId);
+      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId);
     }
 
     // Cập nhật lại các giá trị liên quan
@@ -547,84 +557,86 @@ export class BranchTransferComponent implements OnInit {
     this.updatePaymentInfo();
   }
 
+  updateQuantity(data: any) {
+    // Calculate the number of selected checkboxes
+    const checkedCount = data.frameEngineData.filter((frame: any) => frame.isChecked).length;
+
+    // Update the quantity based on the selected checkboxes
+    data.quantity = checkedCount;
+
+    // Check if no checkboxes are selected and the quantity is 0 or less
+    if (data.quantity <= 0) {
+      data.isValid = true;
+      data.isValidMessage = 'Vui lòng chọn ít nhất một Số khung/Số máy';
+      data.isValidMessage2 = 'Số lượng > 0';
+    } else {
+      data.isValid = false;
+      data.isValidMessage = '';
+      data.isValidMessage2 = '';
+    }
+  }
+
   onSubmit() {
+    let hasError = false;
+
     this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
       if (product.quantity == 0) {
         product.isValid = true;
-        product.isValidMessage = 'Số lượng > 0';
+        product.isValidMessage = 'Vui lòng chọn ít nhất một Số khung/Số máy';
+        product.isValidMessage2 = 'Số lượng > 0';
+        hasError = true;
       } else {
         product.isValid = false;
         delete product.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-      }
-
-      if (product.productImeis) {
-        product.productImeis.forEach((imei) => {
-          if (!imei.frameNumber || !imei.engineNumber) {
-            imei.isValid = true;
-            if (!imei.frameNumber && !imei.engineNumber) {
-              imei.isValidMessage =
-                'Vui lòng nhập số khung và số máy';
-            } else if (!imei.frameNumber) {
-              imei.isValidMessage = 'Vui lòng nhập số khung';
-            } else if (!imei.engineNumber) {
-              imei.isValidMessage = 'Vui lòng nhập số máy';
-            }
-          } else {
-            imei.isValid = false;
-            delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-          }
-        });
+        delete product.isValidMessage2; // Loại bỏ isValidMessage nếu không còn lỗi
       }
     });
+
+    if (hasError) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Không thể lưu vì:',
+        detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+      });
+      return; // Prevents calling the actual onSubmit logic
+    }
     this.checkValidity();
     if (this.isValidForm) {
-      const products = this.stockInReceipt.inventoryStockInDetails.map(
-        (product) => {
-          const productImeis =
-            product.productImeis?.map((imei) => ({
-              ...imei,
-              type: 1,
-            })) || [];
-          return {
-            productId: product.productId,
-            productVariantId: product.productVariantId,
-            productName: product.productName,
-            productCode: product.productCode,
-            productImage: product.productImage,
-            unit: product.unit,
-            price: product.price,
-            quantity: product.quantity,
-            totail: product.total,
-            code: 'string',
-            inventoryStockDetailProductImeis: productImeis,
-          };
-        }
-      );
+      const inventoryStockDetailProductImeiIds = this.stockInReceipt.inventoryStockInDetails
+        .filter(product => product.productType === 1) // Only include products with productType === 1
+        .flatMap(product =>
+          product.frameEngineData
+            .filter(frameEngine => frameEngine.isChecked) // Only take selected frame/engine
+            .map(frameEngine => frameEngine.id) // Get the id of the selected frame/engine
+        );
+
+      const selectedBranch = this.branch.find(option => option.id === this.selectedBranch);
+      const toBranchId = selectedBranch ? selectedBranch.id : 0; // Replace with actual logic if needed
+      const toBranchName = selectedBranch ? selectedBranch.name : 'string';
 
       const formData = {
-        supplierId: 1,
-        supplierName: 'string',
-        subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
-        totalDiscount: this.stockInReceipt.totalDiscountAmount,
-        branchId: 6,
-        branchName: 'string',
-        total: this.stockInReceipt.customerPayment,
-        version: 0,
-        code: 'string',
-        note: this.stockInReceipt.note,
-        inventoryStockInDetails: products,
+        fromBranchId: this.userCurrent?.branchId, // Get fromBranchId from the current user
+        fromBranchName: this.userCurrent?.branchName, // Get fromBranchName from the current user
+        toBranchId: toBranchId,
+        toBranchName: toBranchName,
+        totalCount: this.stockInReceipt.inventoryStockInDetails.length, // Number of items
+        note: this.stockInReceipt.note || '',
+        isDeleted: 0,
+        iAccepted: 'waiting',
+        recipientNote: 'string',
+        inventoryStockDetailProductImeiIds: inventoryStockDetailProductImeiIds
       };
 
-      this.productService.createStockIn(formData).subscribe(
+      this.merchandiseService.createladingIn(formData).subscribe(
         (response) => {
           this.messageService.add({
             severity: 'success',
             summary: 'Thành công',
-            detail: 'Thêm phiếu kho thành công',
+            detail: 'Thêm phiếu chuyển hàng thành công',
           });
 
           setTimeout(() => {
-            this.router.navigate(['/pages/warehouse/stock-in']);
+            this.router.navigate(['/pages/stock-transfer']);
           }, 1000); // Thời gian trễ 2 giây
         },
         (error) => {
