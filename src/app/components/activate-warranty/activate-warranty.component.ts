@@ -29,7 +29,15 @@ export class ActivateWarrantyComponent implements OnInit {
                 null,
                 [Validators.required, Validators.pattern('^\\d{10}$')],
             ],
-            customerName: [null, [Validators.required]],
+            customerName: [
+                null,
+                [
+                    Validators.required,
+                    Validators.minLength(6),
+                    Validators.maxLength(100),
+                ],
+            ],
+
             cityId: [null],
             districtId: [null],
             wardId: [null],
@@ -182,12 +190,18 @@ export class ActivateWarrantyComponent implements OnInit {
                 code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần
                 customerName:
                     this.createActivateWarranty.value.customerName || 'string',
+                branchId: this.productListSelected[0]?.branchId
+                    ? this.productListSelected[0]?.branchId
+                    : 5,
+                branchName: this.productListSelected[0]?.branchName
+                    ? this.productListSelected[0]?.branchName
+                    : '',
                 phoneNumber:
                     this.createActivateWarranty.value.phoneNumber || 'string',
-                wardName: this.createActivateWarranty.value.wardId.name || 0,
+                wardName: this.createActivateWarranty.value.wardId?.name || '',
                 districtName:
-                    this.createActivateWarranty.value.districtId.name || 0,
-                cityName: this.createActivateWarranty.value.cityId.name || 0,
+                    this.createActivateWarranty.value.districtId?.name || '',
+                cityName: this.createActivateWarranty.value.cityId?.name || '',
                 customer: {
                     name:
                         this.createActivateWarranty.value.customerName ||
@@ -195,29 +209,49 @@ export class ActivateWarrantyComponent implements OnInit {
                     phoneNumber:
                         this.createActivateWarranty.value.phoneNumber ||
                         'string',
-                    wardId: this.createActivateWarranty.value.wardId.id || 0,
-                    wardName:
-                        this.createActivateWarranty.value.wardId.name || 0,
+                    wardId: this.createActivateWarranty.value.wardId?.id,
+                    wardName: this.createActivateWarranty.value.wardId?.name,
                     districtId:
-                        this.createActivateWarranty.value.districtId.id || 0,
+                        this.createActivateWarranty.value.districtId?.id,
                     districtName:
-                        this.createActivateWarranty.value.districtId.name || 0,
-                    cityId: this.createActivateWarranty.value.cityId.id || 0,
-                    cityName:
-                        this.createActivateWarranty.value.cityId.name || 0,
+                        this.createActivateWarranty.value.districtId?.name,
+                    cityId: this.createActivateWarranty.value.cityId?.id,
+                    cityName: this.createActivateWarranty.value.cityId?.name,
+                    addressDetail: this.createActivateWarranty.value.address,
                 },
                 warrantyProducts: this.productListSelected.map((product) => ({
                     productId: product.productId,
                     productVariantId: product.productVariantId,
+
                     // warrantyId: 0, // Giá trị mẫu, thay thế nếu cần
                     productName: product.productVariant.productName,
                     inventoryStockDetailProductImeiId: product.id,
-                    expirationDate: '2024-09-25T03:46:03.105Z', // Giá trị mẫu, thay thế nếu cần
+                    expirationDate: this.calculateExpirationDate(
+                        product.term,
+                        product.termType
+                    ),
                 })),
             };
-
             this.warrantyService.createWarranty(formData).subscribe(
                 (response) => {
+                    const formData1 = {
+                        inventoryStockDetailProductImeiIds:
+                            this.productListSelected.map(
+                                (product) => product.id
+                            ),
+                    };
+
+                    this.warrantyService.updatePurchased(formData1).subscribe(
+                        (response) => {},
+                        (error) => {
+                            // Xử lý khi lỗi
+                            console.error(
+                                'Error creating inventoryStockIn:',
+                                error
+                            );
+                        }
+                    );
+
                     this.router.navigate([`/activate-success/${response}`]);
                 },
                 (error) => {
@@ -228,7 +262,42 @@ export class ActivateWarrantyComponent implements OnInit {
         } else {
             // Nếu form không hợp lệ, có thể hiển thị thông báo lỗi
             console.log('Form is invalid');
-            alert('Vui lòng điền đầy đủ thông tin trước khi gửi.');
+            this.createActivateWarranty.markAllAsTouched();
         }
+    }
+    removeProduct(index: number) {
+        this.productListSelected.splice(index, 1); // Xóa sản phẩm khỏi danh sách
+    }
+    calculateExpirationDate(term: number, termType: number): string {
+        const currentDate = new Date();
+
+        // Lấy thời gian hiện tại theo múi giờ Việt Nam
+        const vietnamTime = new Date(
+            currentDate.toLocaleString('en-US', {
+                timeZone: 'Asia/Ho_Chi_Minh',
+            })
+        );
+
+        switch (termType) {
+            case 1: // Ngày
+                vietnamTime.setDate(vietnamTime.getDate() + term);
+                break;
+            case 2: // Tuần
+                vietnamTime.setDate(vietnamTime.getDate() + term * 7);
+                break;
+            case 3: // Tháng
+                vietnamTime.setMonth(vietnamTime.getMonth() + term);
+                break;
+            case 4: // Quý (3 tháng)
+                vietnamTime.setMonth(vietnamTime.getMonth() + term * 3);
+                break;
+            case 5: // Năm
+                vietnamTime.setFullYear(vietnamTime.getFullYear() + term);
+                break;
+            default:
+                throw new Error('Invalid termType');
+        }
+
+        return vietnamTime.toISOString(); // Trả về định dạng ISO
     }
 }

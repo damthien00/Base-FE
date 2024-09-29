@@ -27,6 +27,15 @@ export class WarrantyService {
             .pipe(catchError(this.handleError));
     }
 
+    updatePurchased(data: any): Observable<any> {
+        return this.http
+            .put<any>(
+                `${this.url}/api/inventory-stock-detail-product-imei/update-is-purchased`,
+                data
+            )
+            .pipe(catchError(this.handleError));
+    }
+
     createWarrantyClaim(data: any): Observable<any> {
         return this.http
             .post<any>(`${this.url}/api/warranty-claim/create`, data)

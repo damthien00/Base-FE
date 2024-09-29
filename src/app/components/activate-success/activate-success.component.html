@@ -52,9 +52,21 @@
                     <div
                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                     >
-                        {{ warrantyById?.wardName }},
-                        {{ warrantyById?.districtName }},
-                        {{ warrantyById?.cityName }}
+                        <ng-container
+                            *ngIf="
+                                warrantyById?.wardName ||
+                                    warrantyById?.customer.addressDetail ||
+                                    warrantyById?.districtName ||
+                                    warrantyById?.cityName;
+                                else noInfo
+                            "
+                        >
+                            {{ warrantyById?.customer?.addressDetail }},
+                            {{ warrantyById?.wardName }},
+                            {{ warrantyById?.districtName }},
+                            {{ warrantyById?.cityName }}
+                        </ng-container>
+                        <ng-template #noInfo> Chưa có thông tin </ng-template>
                     </div>
                 </div>
             </div>
@@ -65,7 +77,7 @@
                     <tr>
                         <th>Mã SP</th>
                         <th>Thông tin sản phẩm</th>
-                        <th>Bảo hành</th>
+                        <th>Hạn bảo hành</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
@@ -73,7 +85,15 @@
                         <td>{{ product?.productId }}</td>
                         <td>
                             <div class="flex flex-column">
-                                <span> {{ product?.productName }}</span>
+                                <span>
+                                    {{ product?.product.name }}
+                                    {{
+                                        product?.productVariant.valuePropeties1
+                                    }}
+                                    {{
+                                        product?.productVariant.valuePropeties2
+                                    }}</span
+                                >
                                 <span style="font-size: 13px"
                                     ><strong>Số khung:</strong>
                                     {{
@@ -90,7 +110,12 @@
                                 >
                             </div>
                         </td>
-                        <td>24 tháng</td>
+                        <td>
+                            {{
+                                product.expirationDate
+                                    | date : "dd/MM/yyyy HH:mm:ss"
+                            }}
+                        </td>
                     </tr>
                 </ng-template>
             </p-table>

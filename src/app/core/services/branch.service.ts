@@ -21,9 +21,7 @@ export class BranchService {
     }
 
     getBranchsAll(): Observable<any> {
-        return this.http.get<any>(
-            `${this.url}/api/branch/paging`
-        );
+        return this.http.get<any>(`${this.url}/api/branch/paging`);
     }
 
     createBranch(data: any): Observable<any> {

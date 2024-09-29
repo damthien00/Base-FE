@@ -18,7 +18,7 @@ import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { OptionsFilterBranch } from 'src/app/core/DTOs/branch/optionsFilterBranchs';
 import { CustomerService } from 'src/app/core/services/customer.service';
-import { OptionsFilterCustomer } from 'src/app/core/models/customer';
+import { OptionsFilterCustomer } from 'src/app/core/DTOs/customer/optionsFilterCustomers';
 import { dA } from '@fullcalendar/core/internal-common';
 
 export interface WarehouseReceipt {
@@ -62,27 +62,22 @@ export class CreateComponent implements OnInit {
     optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
     frameNumber: any;
     engineNumber: any;
-
     onBarcode: boolean = false;
-
     productList: any;
-
     items1: any[] | undefined;
-
     selectedItem: any;
-
     suggestions: any[] | undefined;
-
     branchs: any[];
     customers: any[];
-
     selectedBranchId: any;
     listCart: any[] = [];
     warrantyId: any;
     note: any = '';
-    warrantyIds: number[] = [];
-
+    warrantyInfos: any[] = [];
+    fileName: string = 'No file chosen';
     value: string | undefined;
+
+    keyWord: any;
     constructor(
         private nodeService: NodeService,
         private productService: ProductService,
@@ -100,8 +95,8 @@ export class CreateComponent implements OnInit {
     ngOnInit() {
         this.items = [
             { label: 'Kho hàng' },
-            { label: 'Nhập kho', route: '/inputtext' },
-            { label: 'Tạo phiếu nhập kho', route: '/inputtext' },
+            { label: 'Bảo hành', route: '/inputtext' },
+            { label: 'Tạo phiếu bảo hành', route: '/inputtext' },
         ];
         this.stockInReceipt = {
             supplierId: '',
@@ -141,15 +136,17 @@ export class CreateComponent implements OnInit {
 
     loadCustomers() {
         this.customerService
-            .filterCustomers(this.optionsFilterCustomer)
+            .getCustomers(this.optionsFilterCustomer)
             .subscribe((data) => {
                 console.log(data);
-                this.customers = data.data;
+                this.customers = data.data.items;
             });
     }
 
     search(event: AutoCompleteCompleteEvent) {
-        this.customers = this.customers.map((item) => item);
+        console.log(event);
+        this.optionsFilterCustomer.Keyword = event.query;
+        this.loadCustomers();
     }
 
     async onProductSearch(event: Event) {
@@ -189,7 +186,7 @@ export class CreateComponent implements OnInit {
                 //         this.optionsFillerProduct
                 //     );
                 // this.filteredDatas = response.data;
-                this.loadProducts();
+                // this.loadProducts();
             } finally {
             }
         }
@@ -200,72 +197,72 @@ export class CreateComponent implements OnInit {
             this.showProducts = false;
         } else {
             this.showProducts = true;
-            this.loadProducts();
+            // this.loadProducts();
         }
     }
 
-    async loadProducts() {
-        this.optionsFilterProduct.pageIndex = 1;
-        this.optionsFilterProduct.pageSize = 10;
-        let response = await this.productService.FilterProduct(
-            this.optionsFilterProduct
-        );
+    // async loadProducts() {
+    //     this.optionsFilterProduct.pageIndex = 1;
+    //     this.optionsFilterProduct.pageSize = 10;
+    //     let response = await this.productService.FilterProduct(
+    //         this.optionsFilterProduct
+    //     );
 
-        let listP = [];
+    //     let listP = [];
 
-        response.data.forEach((item: any) => {
-            if (item.productVariants && item.productVariants.length > 0) {
-                item.productVariants.forEach((itemVariant) => {
-                    listP.push({
-                        productId: item.id,
-                        productImage: itemVariant.linkImage, // Lấy hình ảnh từ itemVariant
-                        productVariantId: itemVariant.id,
-                        productName:
-                            item.name +
-                            '-' +
-                            (itemVariant.valuePropeties1 || '') +
-                            '-' +
-                            (itemVariant.valuePropeties2 || ''),
-                        productType: item.productType,
-                        quantity: item.productType === 1 ? 0 : 1,
-                        productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
-                        price: itemVariant.price,
-                        unit: item.unitName,
-                        mass: itemVariant.sellCounts
-                            ? itemVariant.sellCounts
-                            : 0,
-                        total:
-                            item.productType === 1 ? 0 : itemVariant.price * 1,
-                        frameNumber: '',
-                        engineNumber: '',
-                    });
-                });
-            } else {
-                listP.push({
-                    productId: item.id,
-                    productImage:
-                        item.productImages && item.productImages.length > 0
-                            ? item.productImages[0].link
-                            : null,
-                    productName: item.name,
-                    productType: item.productType,
-                    quantity: item.productType === 1 ? 0 : 1,
-                    productCode: item.code || '', // Đảm bảo mã sản phẩm
-                    price: item.sellingPrice,
-                    unit: item.unitName,
-                    mass: item.mass,
-                    total: item.productType === 1 ? 0 : item.sellingPrice * 1,
-                    frameNumber: '',
-                    engineNumber: '',
-                });
-            }
-        });
-        console.log(listP);
+    //     response.data.forEach((item: any) => {
+    //         if (item.productVariants && item.productVariants.length > 0) {
+    //             item.productVariants.forEach((itemVariant) => {
+    //                 listP.push({
+    //                     productId: item.id,
+    //                     productImage: itemVariant.linkImage, // Lấy hình ảnh từ itemVariant
+    //                     productVariantId: itemVariant.id,
+    //                     productName:
+    //                         item.name +
+    //                         '-' +
+    //                         (itemVariant.valuePropeties1 || '') +
+    //                         '-' +
+    //                         (itemVariant.valuePropeties2 || ''),
+    //                     productType: item.productType,
+    //                     quantity: item.productType === 1 ? 0 : 1,
+    //                     productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
+    //                     price: itemVariant.price,
+    //                     unit: item.unitName,
+    //                     mass: itemVariant.sellCounts
+    //                         ? itemVariant.sellCounts
+    //                         : 0,
+    //                     total:
+    //                         item.productType === 1 ? 0 : itemVariant.price * 1,
+    //                     frameNumber: '',
+    //                     engineNumber: '',
+    //                 });
+    //             });
+    //         } else {
+    //             listP.push({
+    //                 productId: item.id,
+    //                 productImage:
+    //                     item.productImages && item.productImages.length > 0
+    //                         ? item.productImages[0].link
+    //                         : null,
+    //                 productName: item.name,
+    //                 productType: item.productType,
+    //                 quantity: item.productType === 1 ? 0 : 1,
+    //                 productCode: item.code || '', // Đảm bảo mã sản phẩm
+    //                 price: item.sellingPrice,
+    //                 unit: item.unitName,
+    //                 mass: item.mass,
+    //                 total: item.productType === 1 ? 0 : item.sellingPrice * 1,
+    //                 frameNumber: '',
+    //                 engineNumber: '',
+    //             });
+    //         }
+    //     });
+    //     console.log(listP);
 
-        this.filteredDatas = listP;
+    //     this.filteredDatas = listP;
 
-        // console.log(this.filteredDatas);
-    }
+    //     // console.log(this.filteredDatas);
+    // }
 
     @HostListener('document:click', ['$event'])
     onClickOutside(event: MouseEvent) {
@@ -302,15 +299,37 @@ export class CreateComponent implements OnInit {
     }
 
     addToCart(item: any): void {
-        this.listCart.push({ ...item, returnDate: new Date() });
-        console.log(this.listCart);
+        console.log(item);
+
+        const productExists = this.listCart.some(
+            (cartItem) =>
+                cartItem.inventoryStockDetailProductImeiId ===
+                item.inventoryStockDetailProductImeiId
+            // &&
+            //        cartItem.f === item.serialNumber && // Điều kiện 1
+            //  cartItem.warrantyCode === item.warrantyCode    // Điều kiện 2
+        );
+
+        if (!productExists) {
+            this.listCart.push({ ...item, returnDate: null });
+        } else {
+            console.log('Sản phẩm đã có trong giỏ hàng');
+            this.messageService.add({
+                severity: 'warn', // Mức độ của thông báo (success, info, warn, error)
+                summary: 'Thông báo', // Tiêu đề của thông báo
+                detail: 'Sản phẩm đã có trong giỏ hàng', // Nội dung của thông báo
+            });
+        }
         this.showProducts = false;
         this.searchInput.nativeElement.value = '';
     }
 
     removeProduct(index: number) {
-        this.stockInReceipt.inventoryStockInDetails.splice(index, 1);
-        console.log(this.stockInReceipt);
+        // Kiểm tra nếu index hợp lệ
+        if (index > -1 && index < this.listCart.length) {
+            // Xóa sản phẩm tại index
+            this.listCart.splice(index, 1);
+        }
     }
 
     onCustomerSelect(event: any) {
@@ -322,12 +341,54 @@ export class CreateComponent implements OnInit {
                 this.productList = data.data.items[0].warrantyProducts;
                 console.log(this.productList);
             });
+
+        this.listCart = [];
     }
 
     onSubmit() {
-        // Log selected item and branch for debugging
-        console.log(this.selectedItem);
-        console.log(this.selectedBranchId);
+        // Kiểm tra tính hợp lệ của tên khách hàng
+        if (!this.selectedItem || !this.selectedItem.name) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Tên khách hàng là bắt buộc.',
+            });
+            return;
+        }
+
+        // Kiểm tra tính hợp lệ của sản phẩm
+        if (this.listCart.length === 0) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Phải có ít nhất một sản phẩm trong danh sách yêu cầu.',
+            });
+            return;
+        }
+        if (!this.selectedBranchId || !this.selectedBranchId.name) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Vui lòng chọn chi nhánh.',
+            });
+            return;
+        }
+        console.log(this.listCart);
+
+        for (const item of this.listCart) {
+            if (!item.returnDate) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Lỗi',
+                    detail: `Sản phẩm "${item.product.name}${
+                        '-' + item.productVariant?.valuePropeties1
+                    }${
+                        '-' + item.productVariant?.valuePropeties2
+                    }" phải có ngày trả.`,
+                });
+                return;
+            }
+        }
         const formData = new FormData();
         formData.append('Code', '');
         formData.append('CustomerId', this.selectedItem.id.toString());
@@ -343,19 +404,25 @@ export class CreateComponent implements OnInit {
             }
         }
 
-        this.warrantyIds = this.listCart.map((item) => {
-            console.log(item);
-            return item.warrantyId;
+        this.warrantyInfos = this.listCart.map((item) => {
+            return {
+                id: item.warrantyId,
+                dueDate: item.returnDate, // Giả sử thuộc tính `dueDate` có trong `item`
+            };
         });
-
-        // Chuyển đổi từng warrantyId thành chuỗi trước khi thêm vào FormData
-        this.warrantyIds.forEach((id) => {
-            formData.append('WarrantyIds', id.toString());
-        });
+        const warrantyInfosJson = JSON.stringify(this.warrantyInfos);
+        formData.append('WarrantyInfos', warrantyInfosJson);
 
         this.warrantyService.createWarrantyClaim(formData).subscribe(
             (item) => {
-                console.log('Success:', item);
+                this.messageService.add({
+                    severity: 'success', // Mức độ của thông báo (success, info, warn, error)
+                    summary: 'Thành công', // Tiêu đề của thông báo
+                    detail: 'Tạo phiếu bảo hành thành công', // Nội dung của thông báo
+                });
+                setTimeout(() => {
+                    this.router.navigate(['/pages/warranty/warranty-request']);
+                }, 1000); // Thời gian trễ 2 giây
             },
             (error) => {
                 console.error('Error:', error);
@@ -492,53 +559,35 @@ export class CreateComponent implements OnInit {
     }
 
     onImageSelected(event: any): void {
-        const maxFileSize = 3 * 1024 * 1024;
-        const maxAllowedImages = 9;
-        this.files = event.target.files;
-        // const files: FileList = event.target.files;
+        const files = event.target.files;
+        const maxFileCount = 5; // Tối đa 5 file
+        const allowedExtensions = /(\.jpeg|\.jpg|\.png|\.gif|\.bmp)$/i; // Các định dạng được phép
+        const maxSize = 3 * 1024 * 1024; // 3MB
 
-        // console.log(files);
+        if (files.length > maxFileCount) {
+            alert(`Vui lòng chỉ chọn tối đa ${maxFileCount} file.`);
+            return;
+        }
 
-        // if (files.length > 0) {
-        //     // this.showNameError = false;
-        // }
-        // const totalImages = this.base64_FileImages?.length + files.length;
-        // if (totalImages > maxAllowedImages) {
-        //     // this.messages = [
-        //     //     {
-        //     //         severity: 'warn',
-        //     //         summary: 'Số lượng ảnh vượt quá giới hạn',
-        //     //         detail: `Chỉ được phép tải lên tối đa ${maxAllowedImages} ảnh`,
-        //     //         life: 3000,
-        //     //     },
-        //     // ];
-        //     return;
-        // }
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
 
-        // for (let i = 0; i < files.length; i++) {
-        //     const file = files[i];
-        //     if (file.size > maxFileSize) {
-        //         // this.messages = [
-        //         //     {
-        //         //         severity: 'warn',
-        //         //         summary: 'Ảnh > 3MB',
-        //         //         detail: 'Ảnh tải lên không được lớn hơn 3MB',
-        //         //         life: 3000,
-        //         //     },
-        //         // ];
-        //         return;
-        //     }
+            // Kiểm tra kích thước file
+            if (file.size > maxSize) {
+                alert(`File "${file.name}" vượt quá kích thước tối đa 3MB.`);
+                return;
+            }
 
-        //     const reader = new FileReader();
-        //     reader.onload = () => {
-        //         const base64String = reader.result as string;
-        //         this.base64_FileImages.push({ file, preview: base64String });
-        //         // (
-        //         //    this.c
-        //         // ).push(this.fb.control(base64String.split(',')[1]));
-        //     };
-        //     reader.readAsDataURL(file);
-        // }
-        // this.imageInput.nativeElement.value = '';
+            // Kiểm tra định dạng file
+            if (!allowedExtensions.exec(file.name)) {
+                alert(
+                    `File "${file.name}" không phải định dạng cho phép (jpeg, jpg, png, gif, bmp).`
+                );
+                return;
+            }
+        }
+
+        // Nếu tất cả đều hợp lệ, lưu lại file
+        this.files = files;
     }
 }
