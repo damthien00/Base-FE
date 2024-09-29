@@ -43,6 +43,7 @@ export class CreateComponent implements OnInit {
     datas: any;
     nodes!: any[];
     selectedNodes: any;
+    isSubmitting: boolean = false;
     treeCategory: any[] = [];
     activeBarcode: boolean = false;
     stockInReceipt: any;
@@ -442,6 +443,8 @@ export class CreateComponent implements OnInit {
     }
 
     onSubmit() {
+        if (this.isSubmitting) return; // Nếu đang gửi, không làm gì cả
+        this.isSubmitting = true; // Đặt biến trạng thái thành true
         this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
             if (product.quantity == 0) {
                 product.isValid = true;
@@ -536,6 +539,7 @@ export class CreateComponent implements OnInit {
             );
         } else {
             console.log('Form is invalid, please correct the errors.');
+            this.isSubmitting = false;
         }
     }
 

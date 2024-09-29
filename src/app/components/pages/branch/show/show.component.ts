@@ -29,9 +29,11 @@ export class ShowComponent implements OnInit {
     }
 
     loadBranchs() {
-        console.log(this.keySearch);
         if (this.keySearch) {
             this.optionsFilterBranch.name = this.keySearch;
+        }
+        if (this.keySearch == '') {
+            this.optionsFilterBranch.name = null;
         }
         this.branchService
             .getBranchs(this.optionsFilterBranch)

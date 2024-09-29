@@ -15,7 +15,8 @@ export class ProductImeiService {
     ): Observable<any> {
         let params = new HttpParams()
             .set('FrameNumber', FrameNumber.toString())
-            .set('EngineNumber', EngineNumber.toString());
+            .set('EngineNumber', EngineNumber.toString())
+            .set('IsPurchased', 0);
         return this.http.get<any>(`${this.url}/api/product-imei/get-by-emei`, {
             params: params,
         });

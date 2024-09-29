@@ -13,9 +13,11 @@ import { environment } from 'src/environments/environment';
 })
 export class AppTopBarComponent {
     items!: MenuItem[];
+
     tieredItems: MenuItem[] = [];
     @ViewChild('menubutton') menuButton!: ElementRef;
     @ViewChild('topbarmenubutton') topbarMenuButton!: ElementRef;
+
     @ViewChild('topbarmenu') menu!: ElementRef;
     items1: MenuItem[] | undefined;
     public userCurrent: any;
