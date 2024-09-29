@@ -485,7 +485,7 @@ export class CreateComponent implements OnInit {
                             productVariantId: product.productVariantId
                                 ? product.productVariantId
                                 : 1,
-                            branchId: 5,
+                            branchId: this.userCurrent.branchId,
                         })) || [];
                     return {
                         productId: product.productId,
