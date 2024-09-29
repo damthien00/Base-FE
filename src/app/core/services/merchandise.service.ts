@@ -63,11 +63,9 @@ export class MerchandiseService {
     return this.http.get<any>(`${this.url}/api/bill-of-lading/paging`, { params: params });
   }
 
-  // getProductDetails(productId: number, productVariantId: number): Observable<any> {
-  //   let params = new HttpParams()
-  //     .set('productId', productId.toString())
-  //     .set('productVariantId', productVariantId.toString());
-  //   return this.http.get<any>(
-  //     `${this.url}/api/product-imei/getbyproductandvariant`, { params: params });
-  // }
+  getBillOfLadingById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.url}/api/bill-of-lading/get-by-id?Id=${id}`);
+  }
+
+ 
 }

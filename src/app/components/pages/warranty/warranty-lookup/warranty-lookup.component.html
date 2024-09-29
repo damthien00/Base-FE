@@ -1,0 +1,109 @@
+
+<form [formGroup]="phoneNumberForm" (ngSubmit)="checkWarranty()">
+    <div class="activate-warranty">
+        <div class="banner">
+            <img src="assets/image/banner/banner.png" alt="" />
+        </div>
+        <div class="container">
+            <div class="back">
+                <span>
+                    <i class="pi pi-arrow-left"></i>
+                </span>
+                <span [routerLink]="'/dashboard'">Quay lại</span>
+            </div>
+            <div class="title">
+                <h1>TRA CỨU BẢO HÀNH TRỰC TUYẾN</h1>
+                <p>
+                    Tra cứu tình trạng yêu cầu bảo hành, sửa chữa bảo hành
+                </p>
+            </div>
+
+            <div class="form grid p-fluid">
+                <div class="col-12 md:col-12 py-1">
+                    <div class="field mb-0">
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="name1"
+                            >Nhập thông tin<span class="red-asterisk"
+                                >*</span
+                            ></label
+                        >
+                        <input
+                            pInputText
+                            id="name1"
+                            type="text"
+                            formControlName="phoneNumber"
+                            spellcheck="false"
+                            placeholder="Nhập số máy hoặc số điện thoại"
+                        />
+
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button
+                style="width: 180px; height: 35px; margin: 0 100px;"
+                pButton
+                pRipple
+                severity="secondary"
+                type="submit"
+                label="Kiểm tra"
+                class="p-button-danger flex-1"
+                ></button>
+            </div>
+            <div class="mt-5">
+                <div *ngIf="customer">
+                    <label>THÔNG TIN KHÁCH HÀNG</label>
+                    <div style="display: flex;">
+                        <div class="info-user">
+                            <p>Họ tên khách hàng: </p>
+                            <p>Số điện thoại: </p>
+                            <p>Địa chỉ: </p>
+                        </div>
+                        <div class="info-user-detail">
+                            <p> {{ customer.name }}</p>
+                            <p> {{ customer.phoneNumber }} </p>
+                            <p>{{ customer.wardName }}, {{ customer.districtname }}, {{ customer.cityName }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5">
+                <div *ngIf="customer">
+                    <label>THÔNG TIN BẢO HÀNH</label>
+                    <div class="warranty-info">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Thông tin sản phẩm</th>
+                              <th>Bảo hành</th>
+                              <th>Ngày hết hạn</th>
+                            </tr>
+                           </thead>
+                          <tbody>
+                            <tr *ngFor="let product of warrantyProducts">
+                              <td>
+                                <div>
+                                  <strong>{{ product.product.name }}</strong>
+                                  <p>Số khung: {{ product.inventoryStockDetailProductImei.frameNumber }}</p>
+                                  <p>Số máy: {{ product.inventoryStockDetailProductImei.engineNumber }}</p>
+                                </div>
+                              </td>
+                              <td>{{ product.warrantyPeriod }} tháng</td>
+                              <td>{{ product.expirationDate | date: 'dd/MM/yyyy' }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>                  
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+            <h1>THÔNG TIN CHUNG</h1>
+            <h1 class="name-company">CÔNG TY TNHH TMDV & XNK TIẾN LINH</h1>
+            <span>Địa chỉ: Mễ Hạ, Yên Phú, Yên Mỹ, Hưng Yên</span>
+            <span>Email: tienlinhgroups&#64;gmail.com</span>
+            <span>SĐT:0961462860</span>
+        </footer>
+    </div>
+</form>

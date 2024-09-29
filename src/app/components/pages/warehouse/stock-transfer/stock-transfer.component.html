@@ -17,7 +17,7 @@
           pRipple
           label="Thêm mới"
           style="height: 40px; width: 130px; border-radius: 10px;"
-         
+          [routerLink]="['/pages/merchandise/branch-transfer/create']"
         ></button>
         </div>
     </div>
@@ -36,23 +36,105 @@
                     [style]="{ width: '100%' }"
                     styleClass="p-datatable-striped"
                   >
+                    <ng-template pTemplate="caption">
+                        <div
+                            class="flex flex-column gap-3 align-items-end md:flex-row md:"
+                        >
+                            <div class="flex flex-column">
+                                <label
+                                    for="email1"
+                                    class="block text-900 text-large font-weight mb-2"
+                                    >Tìm kiếm mã chuyển hàng:</label
+                                >
+                                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input
+                                        pInputText
+                                        type="text"
+                                        placeholder="Tìm theo mã chuyển hàng"
+                                        style="width: 350px"
+                                        class="sm:"
+                                    />
+                                    <!-- [(ngModel)]="
+                                            this.optionsFillerProduct.KeyWord
+                                        " -->
+                                </span>
+                            </div>
+                            <div class="flex flex-column">
+                                <label
+                                    for="email1"
+                                    class="block text-900 text-large font-weight mb-2"
+                                    >Chọn chi nhánh:</label
+                                >
+                                <p-dropdown
+                                    [options]="this.optionsStatus"
+                                    [(ngModel)]="this.statusFilter"
+                                    optionLabel="name"
+                                    [showClear]="true"
+                                    placeholder="Chọn chi nhánh"
+                                >
+                                </p-dropdown>
+                            </div>
+                            <div class="flex flex-column">
+                                <label
+                                    for="email1"
+                                    class="block text-900 text-large font-weight mb-2"
+                                    >Trạng thái:</label
+                                >
+                                <p-dropdown
+                                    [options]="this.optionsStatus"
+                                    [(ngModel)]="this.statusFilter"
+                                    optionLabel="name"
+                                    [showClear]="true"
+                                    placeholder="Trạng thái"
+                                >
+                                </p-dropdown>
+                            </div>
+                            <div class="flex flex-column">
+                                <label
+                                    for="email1"
+                                    class="block text-900 text-large font-weight mb-2"
+                                    >Ngày tạo:</label
+                                >
+                                <p-calendar
+                                    [showIcon]="true"
+                                    placeholder="Chọn khoẳng thời gian"
+                                    inputId="icon"
+                                ></p-calendar>
+                            </div>
+                            <button
+                                pButton
+                                pRipple
+                                label="Lọc"
+                                (click)="EvenFilter()"
+                            ></button>
+                            <!-- <button pButton pRipple label="Lọc"></button> -->
+                            <!-- (click)="EvenFilter()" -->
+                        </div>
+                    </ng-template>
+
                     <ng-template pTemplate="header">
                       <tr>
                         <th style="width: 1%; font-size: 14px;">STT</th>
-                        <th style="width: 8%; font-size: 14px;">Tên tài khoản</th>
-                        <th style="width: 6%; font-size: 14px;">SĐT</th>
-                        <th style="width: 10%; font-size: 14px;">Địa chỉ</th>
-                        <th style="width: 8%; font-size: 14px; text-align: center;">Chi nhánh</th>
+                        <th style="width: 8%; font-size: 14px;">Mã chuyển hàng</th>
+                        <th style="width: 12%; font-size: 14px;">Người tạo</th>
+                        <th style="width: 12%; font-size: 14px;">Từ chi nhánh</th>
+                        <th style="width: 12%; font-size: 14px; text-align: center;">Đến chi nhánh</th>
+                        <th style="width: 6%; font-size: 14px; text-align: center;">Trạng thái</th>
+                        <th style="width: 5%; font-size: 14px; text-align: center;">Số sản phẩm</th>
                       </tr>
                     </ng-template>
+
                     <ng-template pTemplate="body" let-user let-i="rowIndex">
                       <tr class="custom-table">
-                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">
-                          {{((this.PageIndex - 1) * this.PageSize) + (i + 1)}}</td>
-                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.name }}</td>
-                        <td style="font-size: 14px; max-width: 110px; overflow: hidden;" (click)="openDialog2(user.id)">{{ user.phoneNumber }}</td>
-                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.wardName}}, {{ user.districtName }}, {{ user.cityName }}</td>
-                        <td style="font-size: 14px;" (click)="openDialog2(user.id)">{{ user.branchName }}</td>
+                        <td style="font-size: 14px;"  [routerLink]="['/pages/merchandise/branch-receiving', user.id]">
+                          {{user.id}}</td>
+                        <td style="font-size: 14px;">{{ user.code }}</td>
+                        <td style="font-size: 14px;">{{ user.userName }}</td>
+                        <td style="font-size: 14px; max-width: 110px; overflow: hidden;">{{ user.fromBranchName }}</td>
+                        <td style="font-size: 14px; max-width: 110px; overflow: hidden;">{{ user.toBranchName }}</td>
+                        <td style="font-size: 14px;">{{ user.iAccepted}}</td>
+                        <td style="font-size: 14px;">{{ user.totalCount }}</td>
                     </tr>
                     </ng-template>
                   </p-table>

@@ -121,7 +121,13 @@ import { RouterModule } from '@angular/router';
                         './merchandise/branch-transfer/branch-transfer.module'
                     ).then((m) => m.BranchTransferModule),
             },
-            // tny code 
+            {
+                path: 'merchandise/branch-receiving/:id',
+                loadChildren: () =>
+                    import(
+                        './merchandise/branch-receiving/branch-receiving.module'
+                    ).then((m) => m.BranchReceivingModule),
+            },
             {
                 path: 'role',
                 loadChildren: () =>
