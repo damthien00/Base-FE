@@ -64,6 +64,14 @@ import { AdminGuard } from './core/guards/admin.guard';
                         ).then((m) => m.ActivateWarrantyModule),
                 },
                 {
+                    path: 'warranty-lookup',
+                    loadChildren: () =>
+                        import(
+                            'src/app/components/pages/warranty/warranty-lookup/warranty-lookup.module'
+                        ).then((m) => m.WarrantyLookupModule),
+                },
+                // tny code 
+                {
                     path: 'activate-success/:id',
                     loadChildren: () =>
                         import(

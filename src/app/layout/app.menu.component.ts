@@ -117,6 +117,11 @@ export class AppMenuComponent implements OnInit {
                                 icon: 'pi pi-fw pi-file',
                                 routerLink: ['/pages/warranty/warranty-policy'],
                             },
+                            {
+                                label: 'Tra cứu bảo hành',
+                                icon: 'pi pi-fw pi-file',
+                                routerLink: ['/warranty-lookup'],
+                            },
                         ],
                     },
                 ],

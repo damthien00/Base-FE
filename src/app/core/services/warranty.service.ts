@@ -52,4 +52,8 @@ export class WarrantyService {
         console.error('An error occurred:', error);
         return throwError('Something bad happened; please try again later.');
     }
+
+    getWarrantyByPhoneNumber(phoneNumber: string): Observable<any> {
+        return this.http.get(`${this.url}/api/warranty/paging?PhoneNumber=${phoneNumber}`);
+      }
 }
