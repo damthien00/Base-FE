@@ -61,6 +61,13 @@
                                                 class="product__list"
                                                 *ngIf="showProducts"
                                             >
+                                                <span
+                                                    *ngIf="
+                                                        productList.length == 0
+                                                    "
+                                                    >Vui lòng chọn khách
+                                                    hàng</span
+                                                >
                                                 <div
                                                     *ngFor="
                                                         let item of productList
@@ -77,7 +84,8 @@
                                                             class="product-name"
                                                         >
                                                             {{
-                                                                item.productName
+                                                                item.product
+                                                                    .name
                                                             }}-{{
                                                                 item
                                                                     .productVariant
@@ -192,10 +200,10 @@
                                 <td style="width: 7%">
                                     {{ data.product.sku }}
                                 </td>
-                                <td style="width: 12.5%; text-align: center">
+                                <td style="width: 12.5%; text-align: left">
                                     <div class="flex flex-column">
                                         <span>
-                                            {{ data.productName }}-{{
+                                            {{ data.product.name }}-{{
                                                 data.productVariant
                                                     .valuePropeties1
                                             }}
@@ -225,116 +233,21 @@
                                 <td style="width: 9%; text-align: center">
                                     {{ warrantyId }}
                                 </td>
-                                <td style="width: 13.5%; text-align: center">
-                                    1
-                                </td>
+                                <td style="width: 7%; text-align: center">1</td>
                                 <td style="width: 22.5%; text-align: center">
-                                    <p-inputMask
+                                    <input
+                                        type="datetime-local"
+                                        id="datetime-picker"
                                         [(ngModel)]="data.returnDate"
-                                        mask="99/99/9999"
-                                        [style]="{
-                                            'text-align': 'right',
-                                        }"
-                                        placeholder="99/99/9999"
-                                        slotChar="mm/dd/yyyy"
+                                        placeholder="Chọn ngày giờ"
                                     />
                                 </td>
-                                <td style="width: 7%; text-align: center">
+                                <td style="width: 1%; text-align: center">
                                     <i
+                                        style="color: red"
                                         class="pi pi-trash"
                                         (click)="removeProduct(i)"
                                     ></i>
-                                </td>
-                            </tr>
-                            <tr *ngIf="data && data.productType == 1">
-                                <td colspan="8" class="p-3 border-none">
-                                    <div class="flex flex-column">
-                                        <label for="" class="mb-2"
-                                            >Số khung/ số máy</label
-                                        >
-                                        <div
-                                            class="variant-item"
-                                            *ngFor="
-                                                let variant of data.productImeis;
-                                                let i = index
-                                            "
-                                        >
-                                            <span class="variant-item-label"
-                                                >{{ variant.frameNumber }}/{{
-                                                    variant.engineNumber
-                                                }}
-                                                <span
-                                                    class="variant-item-close"
-                                                    (click)="
-                                                        removeImeiItem(data, i)
-                                                    "
-                                                    >x</span
-                                                ></span
-                                            >
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    spellcheck="false"
-                                                    placeholder="Nhập số khung"
-                                                    [(ngModel)]="
-                                                        variant.frameNumber
-                                                    "
-                                                    (blur)="checkValidity()"
-                                                />
-                                            </span>
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    id="email"
-                                                    type="text"
-                                                    spellcheck="false"
-                                                    [(ngModel)]="
-                                                        variant.engineNumber
-                                                    "
-                                                    (blur)="checkValidity()"
-                                                    placeholder="Nhập số máy"
-                                                />
-                                            </span>
-                                            <span
-                                                *ngIf="variant.isValid"
-                                                class="error-message"
-                                                >{{
-                                                    variant.isValidMessage
-                                                }}</span
-                                            >
-                                        </div>
-                                        <div class="variant-item">
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    [(ngModel)]="
-                                                        data.frameNumber
-                                                    "
-                                                    spellcheck="false"
-                                                    placeholder="Nhập và Enter/Số khung"
-                                                    (keydown.enter)="
-                                                        onEnterTest(data)
-                                                    "
-                                                />
-                                            </span>
-                                            <span class="variant-item-input">
-                                                <input
-                                                    pInputText
-                                                    type="text"
-                                                    [(ngModel)]="
-                                                        data.engineNumber
-                                                    "
-                                                    spellcheck="false"
-                                                    placeholder="Nhập và Enter/Số máy"
-                                                    (keydown.enter)="
-                                                        onEnterTest(data)
-                                                    "
-                                                />
-                                            </span>
-                                        </div>
-                                    </div>
                                 </td>
                             </tr>
                         </ng-template>
@@ -342,60 +255,101 @@
                 </div>
             </div>
             <div class="col-4">
-                <div
-                    class="card"
-                    style="position: sticky; top: 97px; min-height: 525px"
-                >
+                <div class="card" style="position: sticky; top: 97px">
                     <div class="grid p-fluid">
-                        <div class="col-12 md:col-12">
-                            <label class="mb-2" style="font-weight: 600"
-                                >Thông tin phiếu yêu cầu</label
-                            >
-                            <div class="supplier-select mb-3">
-                                <label class="mb-2">Chi nhánh</label>
-                                <p-dropdown
-                                    [options]="branchs"
-                                    [style]="{ width: '100%' }"
-                                    optionLabel="name"
-                                    [showClear]="true"
-                                    placeholder="Chọn chi nhánh"
-                                    (onClear)="onClearBranch()"
-                                    [emptyMessage]="'Vui lòng chọn chi nhánh'"
-                                    [(ngModel)]="selectedBranchId"
-                                    name="districtId"
-                                ></p-dropdown>
-                            </div>
-
-                            <div class="field grid">
-                                <!-- Tổng số sản phẩm -->
-
-                                <div class="col-12 mb-2 md:col-5 md:mb-0">
-                                    Số lượng sản phẩm:
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
+                        <div
+                            class="col-12 md:col-12 flex flex-column"
+                            style="height: 100%"
+                        >
+                            <div style="flex: 1">
+                                <label class="mb-2" style="font-weight: 600"
+                                    >Thông tin phiếu yêu cầu</label
                                 >
-                                    {{ listCart.length }}
+                                <div class="supplier-select mb-3">
+                                    <label class="mb-2">Chi nhánh</label>
+                                    <p-dropdown
+                                        [options]="branchs"
+                                        [style]="{ width: '100%' }"
+                                        optionLabel="name"
+                                        [showClear]="true"
+                                        placeholder="Chọn chi nhánh"
+                                        (onClear)="onClearBranch()"
+                                        [emptyMessage]="
+                                            'Vui lòng chọn chi nhánh'
+                                        "
+                                        [(ngModel)]="selectedBranchId"
+                                        name="districtId"
+                                    ></p-dropdown>
+                                </div>
+
+                                <div class="field grid">
+                                    <!-- Tổng số sản phẩm -->
+
+                                    <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                        Số lượng sản phẩm:
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
+                                    >
+                                        {{ listCart.length }}
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <!-- Ghi chú -->
+                                    <label htmlFor="email1">Ghi chú</label>
+                                    <textarea
+                                        [(ngModel)]="note"
+                                        pInputTextarea
+                                        spellcheck="false"
+                                    ></textarea>
+                                </div>
+
+                                <div class="field mb-4">
+                                    <!-- <input
+                                        type="file"
+                                        #imageInput
+                                        id="imageUploadInput"
+                                        (change)="onImageSelected($event)"
+                                        accept="image/*"
+                                        multiple
+                                    /> -->
+
+                                    <input
+                                        type="file"
+                                        id="actual-btn"
+                                        hidden
+                                        #imageInput
+                                        accept="image/*"
+                                        multiple
+                                        (change)="onImageSelected($event)"
+                                    />
+
+                                    <!-- our custom upload button -->
+                                    <div class="input-input-wrap">
+                                        <label
+                                            for="actual-btn"
+                                            class="custom-file-upload"
+                                            >Choose File</label
+                                        >
+                                        <!-- name of file chosen -->
+                                        <span id="file-chosen"
+                                            >{{ files?.length || 0 }} đã
+                                            chọn</span
+                                        >
+                                    </div>
+                                    <label
+                                        class="mb-2"
+                                        style="
+                                            font-weight: 400;
+                                            font-size: 13px;
+                                        "
+                                    >
+                                        Tải tối đa 5 file: .jpeg .bmp .png .gif
+                                        .jpg dung lượng tối đa 3MB</label
+                                    >
                                 </div>
                             </div>
-
-                            <div class="field">
-                                <!-- Ghi chú -->
-                                <label htmlFor="email1">Ghi chú</label>
-                                <textarea
-                                    [(ngModel)]="note"
-                                    pInputTextarea
-                                    spellcheck="false"
-                                ></textarea>
-                            </div>
-                            <input
-                                type="file"
-                                #imageInput
-                                id="imageUploadInput"
-                                (change)="onImageSelected($event)"
-                                accept="image/*"
-                                multiple
-                            />
                             <button
                                 pButton
                                 pRipple

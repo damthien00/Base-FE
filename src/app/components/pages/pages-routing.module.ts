@@ -68,11 +68,20 @@ import { RouterModule } from '@angular/router';
                         './warranty/warranty-request/create/create.module'
                     ).then((m) => m.CreateModule),
             },
+
             {
                 path: 'warranty/warranty-policy',
                 loadChildren: () =>
                     import('./warranty/warranty-policy/show/show.module').then(
                         (m) => m.ShowModule
+                    ),
+            },
+
+            {
+                path: 'vv',
+                loadChildren: () =>
+                    import('./my-module/my-module.module').then(
+                        (m) => m.MyModuleModule
                     ),
             },
 

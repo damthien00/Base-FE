@@ -19,10 +19,7 @@ export class ActivateSuccessComponent implements OnInit {
         this.warrantyService
             .getWarrantyById(this.warrantyId)
             .subscribe((data) => {
-                console.log(data.data.items);
-
                 this.warrantyById = data.data.items[0];
-                console.log(this.warrantyById);
             });
     }
 

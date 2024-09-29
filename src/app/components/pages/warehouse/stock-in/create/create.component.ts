@@ -15,6 +15,7 @@ import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { OptionsFilterProductVariant } from 'src/app/core/DTOs/stock-in/optionFilterProductVariant';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 export interface WarehouseReceipt {
     id?: number;
@@ -55,6 +56,7 @@ export class CreateComponent implements OnInit {
     optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
     frameNumber: any;
     engineNumber: any;
+    public userCurrent: any;
 
     onBarcode: boolean = false;
     constructor(
@@ -63,9 +65,14 @@ export class CreateComponent implements OnInit {
         private stockInService: StockInService,
         public functionService: FunctionService,
         private messageService: MessageService,
+        private authService: AuthService,
         private router: Router
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+            console.log(this.userCurrent);
+        });
     }
 
     ngOnInit() {
@@ -73,73 +80,6 @@ export class CreateComponent implements OnInit {
             { label: 'Kho hàng' },
             { label: 'Nhập kho', route: '/inputtext' },
             { label: 'Tạo phiếu nhập kho', route: '/inputtext' },
-        ];
-        this.datas = [
-            {
-                id: 1,
-                productImage:
-                    'http://static.sieuthimaynongnghiep.vn/w500/Uploaded/2018_06_20/p1177l4018slide_QQVH.jpg',
-                productName: 'Máy Cắt Cỏ',
-                inputValue: '',
-                serialNumbers: ['SK212/SM18'],
-                purchasePrice: null,
-                unit: 'Cái',
-                price: 1200000,
-                inventory: 5,
-                totalPrice: 6000000,
-            },
-            {
-                id: 2,
-                productImage:
-                    'http://static.sieuthimaynongnghiep.vn/w500/Uploaded/2018_06_20/p1177l4018slide_QQVH.jpg',
-                productName: 'Máy Phun Thuốc',
-                serialNumbers: [],
-                purchasePrice: null,
-                inputValue: '',
-                unit: 'Bộ',
-                price: 800000,
-                inventory: 7,
-                totalPrice: 5600000,
-            },
-            {
-                id: 3,
-                productImage:
-                    'http://static.sieuthimaynongnghiep.vn/w500/Uploaded/2018_06_20/p1177l4018slide_QQVH.jpg',
-                productName: 'Máy Xới Đất',
-                serialNumbers: ['SK314/SM28', 'SK315/SM29'],
-                purchasePrice: null,
-                inputValue: [],
-                unit: 'Cái',
-                inventory: 3,
-                price: 1500000,
-                totalPrice: 4500000,
-            },
-            {
-                id: 4,
-                productImage:
-                    'http://static.sieuthimaynongnghiep.vn/w500/Uploaded/2018_06_20/p1177l4018slide_QQVH.jpg',
-                productName: 'Máy Bơm Nước',
-                serialNumbers: [],
-                purchasePrice: null,
-                inputValue: '',
-                unit: 'Cái',
-                inventory: 2,
-                price: 950000,
-                totalPrice: 1900000,
-            },
-            {
-                id: 5,
-                productImage:
-                    'http://static.sieuthimaynongnghiep.vn/w500/Uploaded/2018_06_20/p1177l4018slide_QQVH.jpg',
-                productName: 'Máy Nghiền Bột',
-                serialNumbers: [],
-                purchasePrice: null,
-                inputValue: '',
-                unit: 'Cái',
-                inventory: 8,
-                price: 2500000,
-                totalPrice: 20000000,
-            },
         ];
         this.stockInReceipt = {
             supplierId: '',
@@ -539,12 +479,16 @@ export class CreateComponent implements OnInit {
                             ...imei,
                             type: 1,
                             productId: product.productId,
-                            productVariantId: product.productVariantId,
+                            productVariantId: product.productVariantId
+                                ? product.productVariantId
+                                : 1,
                             branchId: 5,
                         })) || [];
                     return {
                         productId: product.productId,
-                        productVariantId: product.productVariantId,
+                        productVariantId: product.productVariantId
+                            ? product.productVariantId
+                            : 1,
                         productName: product.productName,
                         productCode: product.productCode,
                         productImage: product.productImage,
@@ -557,18 +501,19 @@ export class CreateComponent implements OnInit {
                     };
                 }
             );
-
+            console.log(this.userCurrent.branchId);
             const formData = {
                 supplierId: 1,
                 supplierName: 'string',
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
-                branchId: 5,
-                branchName: 'string',
+                branchId: this.userCurrent.branchId,
+                branchName: this.userCurrent.branchName,
                 total: this.stockInReceipt.customerPayment,
                 version: 0,
                 code: 'string',
                 note: this.stockInReceipt.note,
+                createName: this.userCurrent.name,
                 inventoryStockInDetails: products,
             };
 

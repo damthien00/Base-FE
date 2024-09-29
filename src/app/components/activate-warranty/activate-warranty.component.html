@@ -95,6 +95,19 @@
                             >
                                 Vui lòng nhập họ tên khách hàng
                             </div>
+                            <div
+                                *ngIf="createActivateWarranty.get('customerName')?.errors?.['minlength']"
+                                class="error-message"
+                            >
+                                Họ tên khách hàng phải có ít nhất 6 ký tự
+                            </div>
+
+                            <div
+                                *ngIf="createActivateWarranty.get('customerName')?.errors?.['maxlength']"
+                                class="error-message"
+                            >
+                                Họ tên khách hàng không được vượt quá 100 ký tự
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -231,9 +244,7 @@
                             <td>
                                 <div class="flex flex-column">
                                     <span class="mb-1"
-                                        >{{
-                                            item.productVariant.productName
-                                        }}-{{
+                                        >{{ item.product.name }}-{{
                                             item.productVariant.valuePropeties1
                                         }}-{{
                                             item.productVariant.valuePropeties2
@@ -249,9 +260,16 @@
                                     >
                                 </div>
                             </td>
-                            <td>24 tháng</td>
                             <td>
-                                <span>
+                                <span>{{ item.term }} </span>
+                                <span *ngIf="item.termType === 1">ngày</span>
+                                <span *ngIf="item.termType === 2">tuần</span>
+                                <span *ngIf="item.termType === 3">tháng</span>
+                                <span *ngIf="item.termType === 4">quý</span>
+                                <span *ngIf="item.termType === 5">năm</span>
+                            </td>
+                            <td>
+                                <span (click)="removeProduct()">
                                     <i
                                         style="color: red"
                                         class="pi pi-trash"
@@ -269,6 +287,7 @@
                     severity="secondary"
                     type="button"
                     label="Hủy"
+                    [routerLink]="'/warranty-mb'"
                     class="p-button-danger flex-1"
                 ></button>
                 <button

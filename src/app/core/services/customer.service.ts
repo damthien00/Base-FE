@@ -1,4 +1,4 @@
-import { OptionsFilterCustomer } from 'src/app/core/models/customer';
+import { OptionsFilterCustomer } from 'src/app/core/DTOs/customer/optionsFilterCustomers';
 import { Customer } from 'src/app/core/models/customer';
 import {
     HttpClient,
@@ -48,14 +48,32 @@ export class CustomerService {
     //     return this.http.post<OptionsFilterCustomer>(`${this.url}/api/customer/filter`, options);
     // }
 
-    filterCustomers(
+    getCustomers(
         optionsFilterCustomer: OptionsFilterCustomer
     ): Observable<any> {
-        const { pageSize, pageIndex, nameOrPhoneNumber } =
+        const { pageSize, pageIndex, name, phoneNumber, Keyword } =
             optionsFilterCustomer;
-        let url = `${this.url}/api/customer/get-all?pageSize=${pageSize}&pageIndex=${pageIndex}`;
+        let url = `${this.url}/api/customer/paging?pageSize=${pageSize}&pageIndex=${pageIndex}`;
+        if (name) {
+            url += `&name=${name}`;
+        }
+        if (phoneNumber) {
+            url += `&phoneNumber=${phoneNumber}`;
+        }
+        if (Keyword) {
+            url += `&Keyword=${Keyword}`;
+        }
         return this.http.get<any>(url);
     }
+
+    // filterCustomers(
+    //     optionsFilterCustomer: OptionsFilterCustomer
+    // ): Observable<any> {
+    //     const { pageSize, pageIndex, nameOrPhoneNumber } =
+    //         optionsFilterCustomer;
+    //     let url = `${this.url}/api/customer/get-all?pageSize=${pageSize}&pageIndex=${pageIndex}`;
+    //     return this.http.get<any>(url);
+    // }
 
     // filterCustomers(options: OptionsFilterCustomer): Promise<any> {
     //     return new Promise(async (resolve, reject) => {
