@@ -226,10 +226,14 @@ export class ActivateWarrantyComponent implements OnInit {
                     // warrantyId: 0, // Giá trị mẫu, thay thế nếu cần
                     productName: product.productVariant.productName,
                     inventoryStockDetailProductImeiId: product.id,
-                    expirationDate: this.calculateExpirationDate(
-                        product.term,
-                        product.termType
-                    ),
+                    expirationDate: product.term
+                        ? this.calculateExpirationDate(
+                              product.term,
+                              product.termType
+                          ) // Nếu có bảo hành
+                        : new Date(
+                              new Date().getTime() + 7 * 60 * 60 * 1000
+                          ).toISOString(),
                 })),
             };
             this.warrantyService.createWarranty(formData).subscribe(
@@ -297,7 +301,7 @@ export class ActivateWarrantyComponent implements OnInit {
             default:
                 throw new Error('Invalid termType');
         }
-
-        return vietnamTime.toISOString(); // Trả về định dạng ISO
+        vietnamTime.setHours(vietnamTime.getHours() + 7);
+        return vietnamTime.toISOString();
     }
 }
