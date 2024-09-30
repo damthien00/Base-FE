@@ -51,8 +51,9 @@ i {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 12px;
+    padding: 12px 12px;
     border-top: 1px solid #ccc;
+    height: 270px;
 }
 
 .footer h1 {
@@ -75,7 +76,12 @@ label {
     color: #E24343;
 }
 
-.info-user, .info-user-detail{
+.info-user {
+    width: 200px;
+    margin: 10px 5px;
+}
+
+.info-user-detail {
     margin: 10px 5px;
 }
 

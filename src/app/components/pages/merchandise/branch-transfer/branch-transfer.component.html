@@ -6,7 +6,7 @@
             <div class="">
                 <h3>Tạo phiếu chuyển hàng</h3>
                 <p-breadcrumb
-                    [model]="items"
+                    [model]="items1"
                     [home]="{ icon: 'pi pi-home' }"
                 ></p-breadcrumb>
             </div>
@@ -331,10 +331,9 @@
                                     ></i>
                                 </td>
                             </tr>
-                            <tr *ngIf="data && data.productType == 1">
+                            <tr *ngIf="data.productType == 1 && this.items.length > 0">
                                 <td colspan="8" class="p-3 border-none">
                                     <div class="flex flex-column">
-                                        <label for="" class="mb-2">Số khung/số máy</label>
                                         <div style="display: flex;" *ngFor="let frameEngine of data.frameEngineData">
                                             <input type="checkbox" class="large-checkbox" [(ngModel)]="frameEngine.isChecked" (change)="updateQuantity(data)"/>
                                              <div style="margin: 5px 0;" class="variant-item">

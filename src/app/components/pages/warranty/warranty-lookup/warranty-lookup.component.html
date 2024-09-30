@@ -1,5 +1,5 @@
 
-<form [formGroup]="phoneNumberForm" (ngSubmit)="checkWarranty()">
+<form [formGroup]="phoneNumberForm" (ngSubmit)="checkWarranty2()">
     <div class="activate-warranty">
         <div class="banner">
             <img src="assets/image/banner/banner.png" alt="" />
@@ -32,7 +32,7 @@
                             pInputText
                             id="name1"
                             type="text"
-                            formControlName="phoneNumber"
+                            formControlName="inputData"
                             spellcheck="false"
                             placeholder="Nhập số máy hoặc số điện thoại"
                         />
@@ -69,7 +69,7 @@
                 </div>
             </div>
             <div class="mt-5">
-                <div *ngIf="customer">
+                <div *ngIf="warrantyData && warrantyData.length > 0">
                     <label>THÔNG TIN BẢO HÀNH</label>
                     <div class="warranty-info">
                         <table>
@@ -81,7 +81,7 @@
                             </tr>
                            </thead>
                           <tbody>
-                            <tr *ngFor="let product of warrantyProducts">
+                            <tr *ngFor="let product of warrantyData">
                               <td>
                                 <div>
                                   <strong>{{ product.product.name }}</strong>
@@ -96,6 +96,9 @@
                         </table>
                     </div>                  
                 </div>
+            </div>
+            <div class="mt-5" *ngIf="isChecked && warrantyData && warrantyData.length === 0">
+                <label>Không tìm thấy thông tin bảo hành cho số máy đã nhập.</label>
             </div>
         </div>
         <footer class="footer">
