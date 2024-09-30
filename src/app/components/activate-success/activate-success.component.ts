@@ -15,12 +15,13 @@ export class ActivateSuccessComponent implements OnInit {
     warrantyById: any;
     warrantyId: number | null = null;
     ngOnInit() {
-        this.warrantyId = Number(this.route.snapshot.paramMap.get('id'));
-        this.warrantyService
-            .getWarrantyById(this.warrantyId)
-            .subscribe((data) => {
-                this.warrantyById = data.data.items[0];
-            });
+        // Lấy dữ liệu từ local storage
+        const warrantiesData = localStorage.getItem('lastCreatedWarranties');
+        if (warrantiesData) {
+            this.warrantyById = JSON.parse(warrantiesData);
+            console.log(this.warrantyById);
+            localStorage.removeItem('lastCreatedWarranties');
+        }
     }
 
     getWarrantyById() {}

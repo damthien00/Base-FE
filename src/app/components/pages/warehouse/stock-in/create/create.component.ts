@@ -504,7 +504,6 @@ export class CreateComponent implements OnInit {
                     };
                 }
             );
-            console.log(this.userCurrent.branchId);
             const formData = {
                 supplierId: 1,
                 supplierName: 'string',

@@ -26,7 +26,7 @@
                     <div
                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                     >
-                        {{ warrantyById?.customerName }}
+                        {{ warrantyById?.customer?.name }}
                     </div>
                 </div>
                 <div class="field grid">
@@ -39,7 +39,7 @@
                     <div
                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                     >
-                        {{ warrantyById?.phoneNumber }}
+                        {{ warrantyById?.customer?.phoneNumber }}
                     </div>
                 </div>
                 <div class="field grid">
@@ -54,17 +54,17 @@
                     >
                         <ng-container
                             *ngIf="
-                                warrantyById?.wardName ||
+                                warrantyById?.customer?.wardName ||
                                     warrantyById?.customer.addressDetail ||
-                                    warrantyById?.districtName ||
-                                    warrantyById?.cityName;
+                                    warrantyById?.customer?.districtName ||
+                                    warrantyById?.customer?.cityName;
                                 else noInfo
                             "
                         >
                             {{ warrantyById?.customer?.addressDetail }},
-                            {{ warrantyById?.wardName }},
-                            {{ warrantyById?.districtName }},
-                            {{ warrantyById?.cityName }}
+                            {{ warrantyById?.customer?.wardName }},
+                            {{ warrantyById?.customer?.districtName }},
+                            {{ warrantyById?.customer?.cityName }}
                         </ng-container>
                         <ng-template #noInfo> Chưa có thông tin </ng-template>
                     </div>
@@ -86,27 +86,17 @@
                         <td>
                             <div class="flex flex-column">
                                 <span>
-                                    {{ product?.product.name }}
-                                    {{
-                                        product?.productVariant.valuePropeties1
-                                    }}
-                                    {{
-                                        product?.productVariant.valuePropeties2
-                                    }}</span
+                                    {{ product?.productName }}
+                                    {{ product?.value1 }}
+                                    {{ product?.value2 }}</span
                                 >
                                 <span style="font-size: 13px"
                                     ><strong>Số khung:</strong>
-                                    {{
-                                        product?.inventoryStockDetailProductImei
-                                            .frameNumber
-                                    }}</span
+                                    {{ product?.sk }}</span
                                 >
                                 <span style="font-size: 13px"
                                     ><strong>Số máy:</strong>
-                                    {{
-                                        product?.inventoryStockDetailProductImei
-                                            .engineNumber
-                                    }}</span
+                                    {{ product?.sm }}</span
                                 >
                             </div>
                         </td>

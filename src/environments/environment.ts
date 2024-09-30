@@ -1,4 +1,4 @@
-const url = 'https://localhost:44339';
+const url = 'http://103.153.69.217:5059';
 export const environment = {
     production: false,
     url: `${url}`,

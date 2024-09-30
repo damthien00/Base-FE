@@ -143,7 +143,7 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Kích hoạt bảo hành',
                         icon: 'pi pi-fw pi-map-marker',
-                        routerLink: ['/activate-warranty'],
+                        routerLink: ['/warranty-mb'],
                     },
                 ],
             },
@@ -157,7 +157,9 @@ export class AppMenuComponent implements OnInit {
                             {
                                 label: 'Nhóm quyền',
                                 icon: 'pi pi-fw pi-circle',
-                                routerLink: ['/pages/group-right/show-group-right']
+                                routerLink: [
+                                    '/pages/group-right/show-group-right',
+                                ],
                             },
                             {
                                 label: 'Quản lý tài khoản',

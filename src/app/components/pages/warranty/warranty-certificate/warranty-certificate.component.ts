@@ -140,6 +140,15 @@ export class WarrantyCertificateComponent implements OnInit {
     }
 
     loadWarranty() {
+        if (this.optionsFilterWarranty.CustomerKeyword === '') {
+            this.optionsFilterWarranty.CustomerKeyword = null;
+        }
+        if (this.optionsFilterWarranty.Imei === '') {
+            this.optionsFilterWarranty.Imei = null;
+        }
+        if (this.optionsFilterWarranty.ProductName === '') {
+            this.optionsFilterWarranty.ProductName = null;
+        }
         this.optionsFilterWarranty.pageIndex = this.pageNumber;
         this.optionsFilterWarranty.pageSize = this.pageSize;
         this.warrantyService

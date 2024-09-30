@@ -195,7 +195,7 @@ export class ActivateWarrantyComponent implements OnInit {
                         this.createActivateWarranty.value.customerName ||
                         'string',
                     branchId: product.branchId || 5,
-                    branchName: product.branchName || '',
+                    branchName: product.branchName || 'Chi nhánh Khoái Châu',
                     phoneNumber:
                         this.createActivateWarranty.value.phoneNumber ||
                         'string',
@@ -231,6 +231,10 @@ export class ActivateWarrantyComponent implements OnInit {
                             productId: product.productId,
                             productVariantId: product.productVariantId,
                             productName: product.productVariant.productName,
+                            value1: product.productVariant.valuePropeties1,
+                            value2: product.productVariant.valuePropeties2,
+                            sk: product.frameNumber,
+                            sm: product.engineNumber,
                             inventoryStockDetailProductImeiId: product.id,
                             expirationDate: product.term
                                 ? this.calculateExpirationDate(
@@ -243,7 +247,10 @@ export class ActivateWarrantyComponent implements OnInit {
                         },
                     ],
                 };
-
+                localStorage.setItem(
+                    'lastCreatedWarranties',
+                    JSON.stringify(formData)
+                );
                 // Gọi API tạo bảo hành cho từng sản phẩm
                 return this.warrantyService.createWarranty(formData);
             });
