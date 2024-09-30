@@ -43,7 +43,7 @@ export interface WarehouseReceipt {
 export class BranchTransferComponent implements OnInit {
   imageUrl: string = environment.imageUrl;
   @ViewChild('searchInput') searchInput!: ElementRef;
-  items: MenuItem[] | undefined;
+  items1: MenuItem[] | undefined;
   datas: any;
   nodes!: any[];
   selectedNodes: any;
@@ -59,6 +59,8 @@ export class BranchTransferComponent implements OnInit {
   temporaryDiscountUnit: string = 'VND';
   public userCurrent: any;
   selectedBranch: any;
+  items!: any[];
+  
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
@@ -89,7 +91,7 @@ export class BranchTransferComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.items = [
+    this.items1 = [
       { label: 'Kho hàng' },
       { label: 'Chuyển hàng', route: '/inputtext' },
       { label: 'Tạo phiếu chuyển hàng', route: '/inputtext' },
@@ -191,14 +193,17 @@ export class BranchTransferComponent implements OnInit {
 
   loadWarrantyPolicies() {
     this.branchService.getBranchsAll().subscribe((response: any) => {
-      this.branch = response.data.items.map((option: any) => {
-        return {
-          ...option,
-          shortenedName: this.shortenName(option.name, 30) // Giới hạn độ dài tên
-        };
-      });
+      this.branch = response.data.items
+        .filter((option: any) => option.id !== this.userCurrent?.branchId) // Filter out the current branch
+        .map((option: any) => {
+          return {
+            ...option,
+            shortenedName: this.shortenName(option.name, 30) // Giới hạn độ dài tên
+          };
+        });
     });
   }
+
 
   shortenName(name: string, maxLength: number): string {
     if (name.length > maxLength) {
@@ -382,14 +387,14 @@ export class BranchTransferComponent implements OnInit {
   async fetchProductImeiData(productId: number, productVariantId: number, branchId: number) {
     try {
       const response = await this.merchandiseService.getProductDetails(productId, productVariantId, branchId).toPromise();
-      const items = response.data.items;
+      this.items = response.data.items;
 
       // Find the product in the cart and add its frame/engine data
       const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
         (detail) => detail.productId === productId && detail.productVariantId === productVariantId
       );
       if (productInCart) {
-        productInCart.frameEngineData = items; // Store the frame/engine data specific to this product
+        productInCart.frameEngineData = this.items; // Store the frame/engine data specific to this product
       }
     } catch (error) {
       console.error('Error fetching product IMEI data', error);

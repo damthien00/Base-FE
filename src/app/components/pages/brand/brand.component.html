@@ -60,8 +60,8 @@
                     <th >Tên thương hiệu</th>
                     <th >Người tạo</th>
                     <th >Trạng thái</th>
-                    <th >Ẩn/Hiện</th>
-                    <th style="width: 10%;">Thao tác</th>
+                    <th style="width: 15%;">Ẩn/Hiện</th>
+                    <th style="width: 8%;">Thao tác</th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-brand>
@@ -88,13 +88,6 @@
                                 icon="pi pi-pencil"
                                 class="p-button-rounded p-button-success mr-2"
                                 (click)="openDialog2(brand.id)"
-                            ></button>
-                            <button
-                                pButton
-                                pRipple
-                                icon="pi pi-trash"
-                                class="p-button-rounded p-button-warning"
-                                (click)="deleteProduct(product)"
                             ></button>
                         </div>
                     </td>

@@ -61,6 +61,7 @@ export class BranchReceivingComponent {
   public userCurrent: any;
   selectedBranch: any;
   ladingId!: number;
+  recipientNote!: string;
   displayConfirmation: boolean = false; 
 
   displayDiscountModal = false;
@@ -68,7 +69,7 @@ export class BranchReceivingComponent {
   frameNumber: any;
   engineNumber: any;
   public url = environment.url;
-  ladingData: any;
+  ladingData: any = {};
   groupedByProductId: any[] = [];
   groupedByProductVariantId: any[] = [];
 
@@ -255,21 +256,23 @@ export class BranchReceivingComponent {
     const variantMap = new Map();
   
     items.forEach(item => {
-      const key = item.productVariantId;
-      if (variantMap.has(key)) {
-        const existingItem = variantMap.get(key);
-        existingItem.quantity += 1; // Tăng số lượng
-        existingItem.totalPriceVariant = existingItem.productVariantPrice * existingItem.quantity
-        existingItem.frameNumbers.push(item.frameNumber); // Thêm frameNumber vào danh sách
-        existingItem.engineNumbers.push(item.engineNumber); // Thêm engineNumber vào danh sách
-      } else {
-        variantMap.set(key, {
-          ...item,
-          quantity: 1,
-          totalPriceVariant: item.productVariantPrice,
-          frameNumbers: [item.frameNumber], // Khởi tạo danh sách frameNumber
-          engineNumbers: [item.engineNumber], // Khởi tạo danh sách engineNumber
-        });
+      if (item.productVariantName) {
+        const key = item.productVariantId;
+        if (variantMap.has(key)) {
+          const existingItem = variantMap.get(key);
+          existingItem.quantity += 1; // Tăng số lượng
+          existingItem.totalPriceVariant = existingItem.productVariantPrice * existingItem.quantity
+          existingItem.frameNumbers.push(item.frameNumber); // Thêm frameNumber vào danh sách
+          existingItem.engineNumbers.push(item.engineNumber); // Thêm engineNumber vào danh sách
+        } else {
+          variantMap.set(key, {
+            ...item,
+            quantity: 1,
+            totalPriceVariant: item.productVariantPrice,
+            frameNumbers: [item.frameNumber], // Khởi tạo danh sách frameNumber
+            engineNumbers: [item.engineNumber], // Khởi tạo danh sách engineNumber
+          });
+        }
       }
     });
   
@@ -306,7 +309,7 @@ export class BranchReceivingComponent {
     const updateLadingData = {
       id: this.ladingId,
       iAccepted: this.ladingData.iAccepted,
-      recipientNote: this.ladingData.note
+      recipientNote: this.recipientNote
     };
 
     // Tạo dữ liệu cho API /api/inventory-stock-detail-product-imei/update-branch

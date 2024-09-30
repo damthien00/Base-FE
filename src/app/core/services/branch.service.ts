@@ -20,8 +20,8 @@ export class BranchService {
         return this.http.get<any>(url);
     }
 
-    getBranchsAll(): Observable<any> {
-        return this.http.get<any>(`${this.url}/api/branch/paging`);
+    getBranchsAll(PageSize: number = 1000): Observable<any> {
+        return this.http.get<any>(`${this.url}/api/branch/paging?pageSize=${PageSize}`);
     }
 
     createBranch(data: any): Observable<any> {
