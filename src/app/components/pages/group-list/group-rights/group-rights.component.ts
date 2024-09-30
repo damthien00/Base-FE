@@ -48,6 +48,7 @@ export class GroupRightsComponent implements OnInit {
     showFullDescription: boolean = false;
     selectedPermissionIds: number[] = [];
     expandedItems: Set<number> = new Set();
+	permissionsTree:any=[];
 
     optionsFilterCommodities: OptionsFilterCommodities =
         new OptionsFilterCommodities();
@@ -89,7 +90,9 @@ export class GroupRightsComponent implements OnInit {
                 '',
                 [Validators.required, this.noWhitespaceValidator],
             ],
-            permissionIds: [[], Validators.required],
+            // permissionIds: [[], Validators.required],
+            // selectedPermissionIds: [[], Validators.required],
+
         });
     }
 
@@ -125,6 +128,7 @@ export class GroupRightsComponent implements OnInit {
             .getPermissionAll(this.PageSize2, this.PageIndex2)
             .subscribe((response: any) => {
                 this.permissions = this.formatPermissions(response.data.items);
+				this.permissionsTree=response.data.items;
             });
     }
 
@@ -260,6 +264,7 @@ export class GroupRightsComponent implements OnInit {
     }
 
     openDialog2(Id: number): void {
+		this.selectedPermissionIds=[];
         this.groupRoleId = Id;
         this.getAllFilterRole2();
         this.roleService.getGroupRoleById(Id).subscribe(
@@ -275,9 +280,11 @@ export class GroupRightsComponent implements OnInit {
                     description: this.groupRoleById.description,
                     permissionIds: this.permissionsById2,
                 });
-                console.log(
-                    this.transformToTreeNodes2(this.groupRoleById.permissions)
-                );
+                // console.log(
+                //     this.transformToTreeNodes2(this.groupRoleById.permissions)
+                // );
+				this.getPermissionIds(response.data.permissions);
+
             },
             (error) => {
                 console.error('Error:', error);
@@ -303,6 +310,8 @@ export class GroupRightsComponent implements OnInit {
 
     get rolesControl2() {
         return this.RoleGroupForm2.get('permissionIds');
+        // return this.RoleGroupForm2.get('selectedPermissionIds');
+
     }
 
     checkRolesSelection() {
@@ -315,18 +324,18 @@ export class GroupRightsComponent implements OnInit {
         }
     }
 
-    checkRolesSelection2() {
-        // Kiểm tra nếu trường chưa có giá trị
-        if (
-            !this.rolesControl2?.value ||
-            this.rolesControl2.value.length === 0
-        ) {
-            this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
-            this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
-        } else {
-            this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
-        }
-    }
+    // checkRolesSelection2() {
+    //     // Kiểm tra nếu trường chưa có giá trị
+    //     if (
+    //         !this.rolesControl2?.value ||
+    //         this.rolesControl2.value.length === 0
+    //     ) {
+    //         this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
+    //         this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
+    //     } else {
+    //         this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+    //     }
+    // }
 
     closeDialog() {
         this.showDialog = false;
@@ -456,16 +465,16 @@ export class GroupRightsComponent implements OnInit {
 
         let hasError = false;
 
-        if (
-            !this.rolesControl2?.value ||
-            this.rolesControl2.value.length === 0
-        ) {
-            this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
-            this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
-            hasError = true;
-        } else {
-            this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
-        }
+        // if (
+        //     !this.rolesControl2?.value ||
+        //     this.rolesControl2.value.length === 0
+        // ) {
+        //     this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
+        //     this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
+        //     hasError = true;
+        // } else {
+        //     this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
+        // }
 
         if (!formValue.name || formValue.name.length === 0) {
             this.showNameError = true;
@@ -486,9 +495,11 @@ export class GroupRightsComponent implements OnInit {
         }
         try {
             this.savingInProgress = true;
-            const permissionIds = formValue.permissionIds.map(
-                (permission) => permission.id
-            );
+            // const permissionIds = formValue.permissionIds.map(
+            //     (permission) => permission.id
+            // );
+			const permissionIds=this.selectedPermissionIds;
+
             const payload = {
                 id: this.groupRoleById.id || 0, // Use existing id if editing, 0 if creating new
                 name: formValue.name,
@@ -533,4 +544,14 @@ export class GroupRightsComponent implements OnInit {
             this.savingInProgress = false;
         }
     }
+
+
+	getPermissionIds(permissions: any[]) {
+		permissions.forEach(permission => {
+			this.selectedPermissionIds.push(permission.id);
+			if (permission.childrens && permission.childrens.length > 0) {
+				this.getPermissionIds(permission.childrens);
+			}
+		});
+	}
 }
