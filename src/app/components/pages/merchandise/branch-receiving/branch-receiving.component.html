@@ -473,6 +473,8 @@
                                 pRipple
                                 icon="pi pi-check"
                                 label="Nhận hàng"
+                                pButton type="button"
+                                [disabled]="isAccept"
                                 (click)="showConfirmDialog()"
                             ></button>
                         </div>

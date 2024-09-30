@@ -73,6 +73,19 @@ export class StockTransferComponent implements OnInit {
             );
     }
 
+    getStatus(iAccepted: string): string {
+        switch (iAccepted) {
+            case 'waiting':
+                return 'Đang chuyển';
+            case 'accept':
+                return 'Chuyển thành công';
+            case 'reject':
+                return 'Hủy chuyển hàng';
+            default:
+                return 'Trạng thái không xác định';
+        }
+    }
+
     clickButtonFilter() {
         if (this.selectedFromBranchName) {
 

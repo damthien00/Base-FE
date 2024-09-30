@@ -76,6 +76,7 @@ export class BranchReceivingComponent {
   imeiData: any[] = [];
   frameEngineData: any[] = [];
   filteredDatas: any[] = [];
+  isAccept: boolean = false;
 
   onBarcode: boolean = false;
   constructor(
@@ -218,6 +219,7 @@ export class BranchReceivingComponent {
       .subscribe((response: any) => {
         if (response && response.data) {
           this.ladingData = response.data; // Gán dữ liệu vào biến `ladingData`
+          this.isAccept = this.ladingData.iAccepted === 'accept';
           this.groupedByProductId = this.groupItemsByProductId(response.data.inventoryStockDetailProductImeis);
           this.groupedByProductVariantId = this.groupItemsByProductVariantId(response.data.inventoryStockDetailProductImeis);
         }
@@ -328,10 +330,11 @@ export class BranchReceivingComponent {
             severity: 'success',
             summary: '',
             detail: 'Cập nhật thành công',
+            life: 3000,
           });
           setTimeout(() => {
             this.router.navigate(['/pages/stock-transfer']);
-          }, 1000);
+          }, 3000);
 
           // Chỉ gọi API thứ hai nếu người dùng nhấn "Xác nhận" (callSecondApi = true)
           if (callSecondApi) {
@@ -342,11 +345,12 @@ export class BranchReceivingComponent {
                   this.messageService.add({
                     severity: 'success',
                     summary: '',
-                    detail: 'Cập nhật thành công',
+                    detail: 'Nhận hàng thành công',
+                    life: 3000
                   });
                   setTimeout(() => {
                     this.router.navigate(['/pages/stock-transfer']);
-                  }, 1000);
+                  }, 3000);
                   this.hideConfirmDialog(); // Ẩn dialog sau khi cập nhật thành công
                 },
                 (error2) => {
