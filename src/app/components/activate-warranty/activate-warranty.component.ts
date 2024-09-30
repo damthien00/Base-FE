@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { WarrantyService } from 'src/app/core/services/warranty.service';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
     query: string;
@@ -186,69 +187,81 @@ export class ActivateWarrantyComponent implements OnInit {
         if (this.createActivateWarranty.valid) {
             console.log(this.createActivateWarranty.value);
             console.log(this.productListSelected);
-            const formData = {
-                code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần
-                customerName:
-                    this.createActivateWarranty.value.customerName || 'string',
-                branchId: this.productListSelected[0]?.branchId
-                    ? this.productListSelected[0]?.branchId
-                    : 5,
-                branchName: this.productListSelected[0]?.branchName
-                    ? this.productListSelected[0]?.branchName
-                    : '',
-                phoneNumber:
-                    this.createActivateWarranty.value.phoneNumber || 'string',
-                wardName: this.createActivateWarranty.value.wardId?.name || '',
-                districtName:
-                    this.createActivateWarranty.value.districtId?.name || '',
-                cityName: this.createActivateWarranty.value.cityId?.name || '',
-                customer: {
-                    name:
+
+            const observables = this.productListSelected.map((product) => {
+                const formData = {
+                    code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần
+                    customerName:
                         this.createActivateWarranty.value.customerName ||
                         'string',
+                    branchId: product.branchId || 5,
+                    branchName: product.branchName || '',
                     phoneNumber:
                         this.createActivateWarranty.value.phoneNumber ||
                         'string',
-                    wardId: this.createActivateWarranty.value.wardId?.id,
-                    wardName: this.createActivateWarranty.value.wardId?.name,
-                    districtId:
-                        this.createActivateWarranty.value.districtId?.id,
+                    wardName:
+                        this.createActivateWarranty.value.wardId?.name || '',
                     districtName:
-                        this.createActivateWarranty.value.districtId?.name,
-                    cityId: this.createActivateWarranty.value.cityId?.id,
-                    cityName: this.createActivateWarranty.value.cityId?.name,
-                    addressDetail: this.createActivateWarranty.value.address,
-                },
-                warrantyProducts: this.productListSelected.map((product) => ({
-                    productId: product.productId,
-                    productVariantId: product.productVariantId,
+                        this.createActivateWarranty.value.districtId?.name ||
+                        '',
+                    cityName:
+                        this.createActivateWarranty.value.cityId?.name || '',
+                    customer: {
+                        name:
+                            this.createActivateWarranty.value.customerName ||
+                            'string',
+                        phoneNumber:
+                            this.createActivateWarranty.value.phoneNumber ||
+                            'string',
+                        wardId: this.createActivateWarranty.value.wardId?.id,
+                        wardName:
+                            this.createActivateWarranty.value.wardId?.name,
+                        districtId:
+                            this.createActivateWarranty.value.districtId?.id,
+                        districtName:
+                            this.createActivateWarranty.value.districtId?.name,
+                        cityId: this.createActivateWarranty.value.cityId?.id,
+                        cityName:
+                            this.createActivateWarranty.value.cityId?.name,
+                        addressDetail:
+                            this.createActivateWarranty.value.address,
+                    },
+                    warrantyProducts: [
+                        {
+                            productId: product.productId,
+                            productVariantId: product.productVariantId,
+                            productName: product.productVariant.productName,
+                            inventoryStockDetailProductImeiId: product.id,
+                            expirationDate: product.term
+                                ? this.calculateExpirationDate(
+                                      product.term,
+                                      product.termType
+                                  )
+                                : new Date(
+                                      new Date().getTime() + 7 * 60 * 60 * 1000
+                                  ).toISOString(),
+                        },
+                    ],
+                };
 
-                    // warrantyId: 0, // Giá trị mẫu, thay thế nếu cần
-                    productName: product.productVariant.productName,
-                    inventoryStockDetailProductImeiId: product.id,
-                    expirationDate: product.term
-                        ? this.calculateExpirationDate(
-                              product.term,
-                              product.termType
-                          ) // Nếu có bảo hành
-                        : new Date(
-                              new Date().getTime() + 7 * 60 * 60 * 1000
-                          ).toISOString(),
-                })),
-            };
-            this.warrantyService.createWarranty(formData).subscribe(
-                (response) => {
+                // Gọi API tạo bảo hành cho từng sản phẩm
+                return this.warrantyService.createWarranty(formData);
+            });
+
+            // Gọi tất cả các yêu cầu tạo bảo hành
+            forkJoin(observables).subscribe(
+                (responses) => {
+                    const inventoryStockDetailProductImeiIds =
+                        this.productListSelected.map((product) => product.id);
                     const formData1 = {
-                        inventoryStockDetailProductImeiIds:
-                            this.productListSelected.map(
-                                (product) => product.id
-                            ),
+                        inventoryStockDetailProductImeiIds,
                     };
 
                     this.warrantyService.updatePurchased(formData1).subscribe(
-                        (response) => {},
+                        (response) => {
+                            // Xử lý thành công
+                        },
                         (error) => {
-                            // Xử lý khi lỗi
                             console.error(
                                 'Error creating inventoryStockIn:',
                                 error
@@ -256,19 +269,19 @@ export class ActivateWarrantyComponent implements OnInit {
                         }
                     );
 
-                    this.router.navigate([`/activate-success/${response}`]);
+                    // Điều hướng tới trang thành công
+                    this.router.navigate(['/activate-success']);
                 },
                 (error) => {
-                    // Xử lý khi lỗi
-                    console.error('Error creating inventoryStockIn:', error);
+                    console.error('Error creating warranties:', error);
                 }
             );
         } else {
-            // Nếu form không hợp lệ, có thể hiển thị thông báo lỗi
             console.log('Form is invalid');
             this.createActivateWarranty.markAllAsTouched();
         }
     }
+
     removeProduct(index: number) {
         this.productListSelected.splice(index, 1); // Xóa sản phẩm khỏi danh sách
     }

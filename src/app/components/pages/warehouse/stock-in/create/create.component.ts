@@ -128,7 +128,7 @@ export class CreateComponent implements OnInit {
             this.optionsFilterProduct.Barcode = searchTerm.toLowerCase();
             try {
                 const response =
-                    await this.stockInReceipt.FilterProductVariants(
+                    await this.productService.FilterProductVariants(
                         this.optionsFilterProduct
                     );
                 if (response.data.length > 0) {

@@ -2,14 +2,30 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
-// import { OptionsFilterWarranty } from '../DTOs/Warranty/optionsFilterWarrantys';
-
+import { OptionsFilterWarranty } from '../DTOs/warranty/optionFilterWarranty';
 @Injectable({
     providedIn: 'root',
 })
 export class WarrantyService {
     constructor(private http: HttpClient) {}
     public url = environment.url;
+
+    getWarranties(options: OptionsFilterWarranty): Observable<any> {
+        console.log(options);
+
+        let url = `${this.url}/api/warranty/paging?pageSize=${options.pageSize}&pageIndex=${options.pageIndex}`;
+        if (options.CustomerKeyword) {
+            url += `&customerKeyword=${options.CustomerKeyword}`;
+        }
+        if (options.Imei) {
+            url += `&imei=${options.Imei}`;
+        }
+        if (options.ProductName) {
+            url += `&productName=${options.ProductName}`;
+        }
+
+        return this.http.get<any>(url);
+    }
 
     getWarrantyById(id: number): Observable<any> {
         let url = `${this.url}/api/warranty/paging?id=${id}`;
@@ -42,18 +58,14 @@ export class WarrantyService {
             .pipe(catchError(this.handleError));
     }
 
-    // updateWarranty(data: any): Observable<any> {
-    //     return this.http
-    //         .put<any>(`${this.url}/api/Warranty/update`, data)
-    //         .pipe(catchError(this.handleError));
-    // }
-
     private handleError(error: HttpErrorResponse): Observable<any> {
         console.error('An error occurred:', error);
         return throwError('Something bad happened; please try again later.');
     }
 
     getWarrantyByPhoneNumber(phoneNumber: string): Observable<any> {
-        return this.http.get(`${this.url}/api/warranty/paging?PhoneNumber=${phoneNumber}`);
-      }
+        return this.http.get(
+            `${this.url}/api/warranty/paging?PhoneNumber=${phoneNumber}`
+        );
+    }
 }

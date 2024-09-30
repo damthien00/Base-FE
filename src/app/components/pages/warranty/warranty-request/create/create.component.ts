@@ -416,13 +416,13 @@ export class CreateComponent implements OnInit {
         this.warrantyService.createWarrantyClaim(formData).subscribe(
             (item) => {
                 this.messageService.add({
-                    severity: 'success', // Mức độ của thông báo (success, info, warn, error)
-                    summary: 'Thành công', // Tiêu đề của thông báo
-                    detail: 'Tạo phiếu bảo hành thành công', // Nội dung của thông báo
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: 'Tạo phiếu bảo hành thành công',
                 });
                 setTimeout(() => {
                     this.router.navigate(['/pages/warranty/warranty-request']);
-                }, 1000); // Thời gian trễ 2 giây
+                }, 1000);
             },
             (error) => {
                 console.error('Error:', error);
@@ -565,7 +565,12 @@ export class CreateComponent implements OnInit {
         const maxSize = 3 * 1024 * 1024; // 3MB
 
         if (files.length > maxFileCount) {
-            alert(`Vui lòng chỉ chọn tối đa ${maxFileCount} file.`);
+            this.messageService.add({
+                severity: 'success', // Mức độ của thông báo (success, info, warn, error)
+                summary: 'Thành công', // Tiêu đề của thông báo
+                detail: `Vui lòng chỉ chọn tối đa ${maxFileCount} file.`, // Nội dung của thông báo
+            });
+            // alert();
             return;
         }
 
@@ -574,20 +579,23 @@ export class CreateComponent implements OnInit {
 
             // Kiểm tra kích thước file
             if (file.size > maxSize) {
-                alert(`File "${file.name}" vượt quá kích thước tối đa 3MB.`);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: `File "${file.name}" vượt quá kích thước tối đa 3MB.`,
+                });
                 return;
             }
 
-            // Kiểm tra định dạng file
             if (!allowedExtensions.exec(file.name)) {
-                alert(
-                    `File "${file.name}" không phải định dạng cho phép (jpeg, jpg, png, gif, bmp).`
-                );
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: `File "${file.name}" không phải định dạng cho phép (jpeg, jpg, png, gif, bmp).`,
+                });
                 return;
             }
         }
-
-        // Nếu tất cả đều hợp lệ, lưu lại file
         this.files = files;
     }
 }
