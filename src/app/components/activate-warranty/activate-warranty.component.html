@@ -4,11 +4,11 @@
             <img src="assets/image/banner/banner.png" alt="" />
         </div>
         <div class="container">
-            <div class="back">
+            <div class="back" [routerLink]="'/warranty-mb'">
                 <span>
                     <i class="pi pi-arrow-left"></i>
                 </span>
-                <span [routerLink]="'/warranty-mb'">Quay lại</span>
+                <span>Quay lại</span>
             </div>
             <div class="title">
                 <h1>KÍCH HOẠT BẢO HÀNH TRỰC TUYẾN</h1>
@@ -261,6 +261,7 @@
                                 </div>
                             </td>
                             <td>
+                                <span *ngIf="!item.term">Không bảo hành </span>
                                 <span>{{ item.term }} </span>
                                 <span *ngIf="item.termType === 1">ngày</span>
                                 <span *ngIf="item.termType === 2">tuần</span>
