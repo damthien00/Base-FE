@@ -129,7 +129,7 @@
                         <td style="font-size: 14px;"  [routerLink]="['/pages/merchandise/branch-receiving', user.id]">
                           {{user.id}}</td>
                         <td style="font-size: 14px;">{{ user.code }}</td>
-                        <td style="font-size: 14px;">{{ user.userName }}</td>
+                        <td style="font-size: 14px;">{{ this.userCurrent?.name }}</td>
                         <td style="font-size: 14px; max-width: 110px; overflow: hidden;">{{ user.fromBranchName }}</td>
                         <td style="font-size: 14px; max-width: 110px; overflow: hidden;">{{ user.toBranchName }}</td>
                         <td style="text-align: center;">

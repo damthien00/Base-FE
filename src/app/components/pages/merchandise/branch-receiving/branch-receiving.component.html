@@ -390,7 +390,7 @@
                         <div class="col-12 md:col-12">
                             <div class="field grid">
                                 <div class="col-12 mb-2 md:col-6 md:mb-0">
-                                    Nhân viên: Bùi Thị Bảo Anh
+                                    Nhân viên: {{ this.userCurrent?.name }}
                                 </div>
                                 <div
                                     class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end"
@@ -429,7 +429,7 @@
                                     Trạng thái:
                                 </div>
                                 <div class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end">
-                                    {{ this.ladingData?.iAccepted === 'waiting' ? 'Đang chuyển' : this.ladingData?.iAccepted }}
+                                    {{ this.ladingData?.iAccepted === 'waiting' ? 'Đang chuyển' : (this.ladingData?.iAccepted === 'accept' ? 'Chuyển thành công' : this.ladingData?.iAccepted) }}
                                 </div>
                             </div>
 
@@ -472,8 +472,8 @@
                                 pButton
                                 pRipple
                                 icon="pi pi-check"
-                                label="Nhận hàng"
-                                pButton type="button"
+                                [label]="isAccept ? 'Đã chuyển hàng' : 'Nhận hàng'"
+                                type="button"
                                 [disabled]="isAccept"
                                 (click)="showConfirmDialog()"
                             ></button>

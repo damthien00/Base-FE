@@ -195,7 +195,9 @@ export class BranchTransferComponent implements OnInit {
   loadWarrantyPolicies() {
     this.branchService.getBranchsAll().subscribe((response: any) => {
       this.branch = response.data.items
-        .filter((option: any) => option.id !== this.userCurrent?.branchId) // Filter out the current branch
+        .filter((option: any) => 
+          option.id !== this.userCurrent?.branchId && option.isActive !== 0 // Filter out the current branch and inactive branches
+        )
         .map((option: any) => {
           return {
             ...option,
@@ -204,7 +206,6 @@ export class BranchTransferComponent implements OnInit {
         });
     });
   }
-
 
   shortenName(name: string, maxLength: number): string {
     if (name.length > maxLength) {
@@ -363,6 +364,11 @@ export class BranchTransferComponent implements OnInit {
     if (label) {
       label.innerHTML = 'Chọn danh mục';
     }
+  }
+
+  onBranchChange() {
+    // Ẩn thông báo lỗi khi chi nhánh được chọn
+    this.branchError = !this.selectedBranch; // Nếu không chọn chi nhánh, hiển thị lỗi
   }
 
   onEnter(dataId: number) {

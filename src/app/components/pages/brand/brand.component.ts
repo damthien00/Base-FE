@@ -108,6 +108,7 @@ export class BrandComponent implements OnInit {
         (response: any) => {
           this.brands = response.data;
           this.totalRecordsCount = response.totalRecordsCount;
+          this.updateCurrentPageReport();
         },
         (error: any) => {
           console.error(error);
@@ -138,7 +139,12 @@ export class BrandComponent implements OnInit {
   updateCurrentPageReport(): void {
     const startRecord = ((this.pageNumber - 1) * this.pageSize) + 1;
     const endRecord = Math.min(this.pageNumber * this.pageSize, this.totalRecordsCount);
-    this.currentPageReport = `Hiện ${startRecord} tới ${endRecord} của ${this.totalRecordsCount} bản ghi`;
+    if(this.totalRecordsCount === 0){
+      this.currentPageReport = `<strong>0</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecordsCount}</strong> bản ghi`
+    }
+    if(this.totalRecordsCount > 0){
+      this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecordsCount}</strong> bản ghi`
+    }
   }
 
   checkDescriptionLength() {

@@ -362,7 +362,7 @@
                         <div class="col-12 md:col-12">
                             <div class="field grid">
                                 <div class="col-12 mb-2 md:col-6 md:mb-0">
-                                    Nhân viên: Bùi Thị Bảo Anh
+                                    Nhân viên: {{ this.userCurrent?.name }}
                                 </div>
                                 <div
                                     class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end"
@@ -398,7 +398,8 @@
                                         [style]="{ height: '40px', width: '100%' }"
                                         optionValue="id"
                                         [showClear]="true"
-                                        placeholder="Chọn chi nhánh">
+                                        placeholder="Chọn chi nhánh"
+                                        (onChange)="onBranchChange()">
                                     </p-dropdown>
                                     <div *ngIf="branchError" class="error-message" style="color: red;">
                                         Vui lòng chọn chi nhánh.

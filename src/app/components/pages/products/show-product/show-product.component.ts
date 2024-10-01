@@ -29,6 +29,7 @@ export class ShowProductComponent implements OnInit {
     listchecked: boolean[] = [];
     statusFilter: any;
     optionsCategory!: any[];
+    currentPageReport: string = '';
 
     totalRecords = 20;
     pageSize = 30;
@@ -70,6 +71,7 @@ export class ShowProductComponent implements OnInit {
         this.treeCategory = responseGetTreeCategory.data;
         this.products = response.data;
         this.totalRecords = response.totalRecordsCount;
+        this.updateCurrentPageReport();
         for (let index = 0; index < this.products.length; index++) {
             this.showAllVariants.set(
                 this.products[index].id,
@@ -114,6 +116,7 @@ export class ShowProductComponent implements OnInit {
         this.DOMElementDelete = $event.target as any;
         this.productDelete = product;
     }
+
     async ClickDelete() {
         this.loading = true;
         await this.productService
@@ -149,6 +152,7 @@ export class ShowProductComponent implements OnInit {
                 this.closeDiaLogDelete();
             });
     }
+
     async ClickChangeStatus($event: Event, product: any) {
         if ($event) {
             await this.productService
@@ -179,6 +183,7 @@ export class ShowProductComponent implements OnInit {
                 });
         }
     }
+    
     async EvenFilter() {
         this.optionsFillerProduct.Status = this.statusFilter
             ? this.statusFilter.value
@@ -191,6 +196,7 @@ export class ShowProductComponent implements OnInit {
             .then((response) => {
                 this.products = response.data;
                 this.totalRecords = response.totalRecordsCount;
+                
                 for (let index = 0; index < this.products.length; index++) {
                     this.showAllVariants.set(
                         this.products[index].id,
@@ -375,4 +381,30 @@ export class ShowProductComponent implements OnInit {
         // Allow digits and decimal point
         return /^[0-9.]$/.test(inputChar);
     }
+
+    goToPreviousPage(): void {
+        if (this.pageNumber > 1) {
+            this.pageNumber--;
+            this.EvenFilter();
+        }
+    }
+
+    goToNextPage(): void {
+        const lastPage = Math.ceil(this.totalRecords / this.pageSize);
+        if (this.pageNumber < lastPage) {
+            this.pageNumber++;
+            this.EvenFilter();
+        }
+    }
+
+    updateCurrentPageReport(): void {
+        const startRecord = ((this.pageNumber - 1) * this.pageSize) + 1;
+        const endRecord = Math.min(this.pageNumber * this.pageSize, this.totalRecords);
+        if(this.totalRecords === 0){
+          this.currentPageReport = `<strong>0</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`
+        }
+        if(this.totalRecords > 0){
+          this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`
+        }
+      }
 }

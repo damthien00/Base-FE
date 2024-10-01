@@ -132,6 +132,7 @@ export class ShowProductCategoryComponent implements OnInit {
       this.categories = response.data;
       this.totalRecordsCount = response.totalRecordsCount;
       this.filteredCategories = this.categories;
+      this.updateCurrentPageReport();
       this.getCategorieAll();
       this.treeOptions = this.createCategoryTree(this.filteredCategories);
     } catch (error) {
@@ -309,7 +310,12 @@ export class ShowProductCategoryComponent implements OnInit {
   updateCurrentPageReport(): void {
     const startRecord = ((this.pageNumber - 1) * this.pageSize) + 1;
     const endRecord = Math.min(this.pageNumber * this.pageSize, this.totalRecordsCount);
-    this.currentPageReport = `Hiện ${startRecord} tới ${endRecord} của ${this.totalRecordsCount} bản ghi`;
+    if(this.totalRecordsCount === 0){
+      this.currentPageReport = `<strong>0</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecordsCount}</strong> bản ghi`
+    }
+    if(this.totalRecordsCount > 0){
+      this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecordsCount}</strong> bản ghi`
+    }
   }
 
   setSelectableForNode(node: TreeNode, categoryId: number, selectable: boolean) {
