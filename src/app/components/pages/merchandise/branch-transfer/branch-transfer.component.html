@@ -331,14 +331,16 @@
                                     ></i>
                                 </td>
                             </tr>
-                            <tr *ngIf="data.productType == 1 && this.items.length > 0">
+                            <tr *ngIf="data.productType == 1 || this.items.length > 0">
                                 <td colspan="8" class="p-3 border-none">
                                     <div class="flex flex-column">
-                                        <div style="display: flex;" *ngFor="let frameEngine of data.frameEngineData">
-                                            <input type="checkbox" class="large-checkbox" [(ngModel)]="frameEngine.isChecked" (change)="updateQuantity(data)"/>
-                                             <div style="margin: 5px 0;" class="variant-item">
-                                                 <span class="variant-item-label">{{ frameEngine.frameNumber }} / {{ frameEngine.engineNumber }}</span>
-                                             </div>
+                                        <div style="display: flex; flex-wrap: wrap;">
+                                            <div style="display: flex;" *ngFor="let frameEngine of data.frameEngineData">
+                                                <input style="margin: 0 10px;" type="checkbox" class="large-checkbox" [(ngModel)]="frameEngine.isChecked" (change)="updateQuantity(data)"/>
+                                                 <div style="margin: 5px 0;" class="variant-item">
+                                                     <span class="variant-item-label">{{ frameEngine.frameNumber }} / {{ frameEngine.engineNumber }}</span>
+                                                 </div>
+                                            </div>
                                         </div>
                                         <span *ngIf="data.isValid" class="error-message" style="color: red;">
                                             {{ data.isValidMessage }}
@@ -398,6 +400,9 @@
                                         [showClear]="true"
                                         placeholder="Chọn chi nhánh">
                                     </p-dropdown>
+                                    <div *ngIf="branchError" class="error-message" style="color: red;">
+                                        Vui lòng chọn chi nhánh.
+                                    </div>
                                 </div>
                             </div>
 

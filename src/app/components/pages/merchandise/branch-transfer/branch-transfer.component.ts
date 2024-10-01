@@ -60,7 +60,8 @@ export class BranchTransferComponent implements OnInit {
   public userCurrent: any;
   selectedBranch: any;
   items!: any[];
-  
+  branchError: boolean = false;
+
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
@@ -403,7 +404,8 @@ export class BranchTransferComponent implements OnInit {
 
   addToCart(item: any): void {
     console.log(item);
-    // Kiểm tra xem sản phẩm đã có trong inventoryStockInDetails hay chưa
+
+    // Check if the product already exists in the cart
     const existingDetail = this.stockInReceipt.inventoryStockInDetails.find(
       (detail: any) => {
         console.log(detail, item);
@@ -420,12 +422,11 @@ export class BranchTransferComponent implements OnInit {
     console.log(existingDetail);
 
     if (existingDetail) {
-      // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá
+      // If the product already exists, update the quantity and total price
       existingDetail.quantity += 1;
-      existingDetail.total =
-        existingDetail.quantity * existingDetail.price;
+      existingDetail.total = existingDetail.quantity * existingDetail.price;
     } else {
-      // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
+      // If the product doesn't exist, add a new entry
       const newDetail = {
         productId: item.productId,
         productImage: item.productImage,
@@ -433,7 +434,7 @@ export class BranchTransferComponent implements OnInit {
         productVariantId: item.productVariantId,
         warrantyPolicyId: item.warrantyPolicyId,
         productType: item.productType,
-        quantity: item.productType === 1 ? 0 : 1,
+        quantity: item.productType === 1 ? (item.frameEngineData && item.frameEngineData.length > 0 ? 0 : 1) : 1,  // Adjust quantity if frameEngineData is null or empty
         productCode: item.productCode ? '' : '',
         price: item.price,
         unit: item.unit,
@@ -446,14 +447,28 @@ export class BranchTransferComponent implements OnInit {
       };
 
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
-      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId);
-    }
 
-    // Cập nhật lại các giá trị liên quan
-    this.updatePaymentInfo();
-    this.showProducts = false;
-    this.searchInput.nativeElement.value = '';
-    console.log(this.stockInReceipt);
+      // Fetch IMEI data if product type is 1
+      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
+        const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
+          (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
+        );
+
+        if (productInCart) {
+          if (productInCart.frameEngineData && productInCart.frameEngineData.length > 0) {
+            productInCart.quantity = 0; // If frameEngineData is available, set quantity to 0
+          } else {
+            productInCart.quantity = 1; // If frameEngineData is null or empty, set quantity to 1
+          }
+        }
+
+        // Update related values and refresh UI
+        this.updatePaymentInfo();
+        this.showProducts = false;
+        this.searchInput.nativeElement.value = '';
+        console.log(this.stockInReceipt);
+      });
+    }
   }
 
   updateTotal(data: any) {
@@ -582,6 +597,11 @@ export class BranchTransferComponent implements OnInit {
   }
 
   onSubmit() {
+
+    if (!this.selectedBranch) {
+      this.branchError = true;
+      return
+    }
     let hasError = false;
 
     this.stockInReceipt.inventoryStockInDetails.forEach((product) => {

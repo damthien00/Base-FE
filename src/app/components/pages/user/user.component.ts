@@ -96,6 +96,7 @@ export class UserComponent implements OnInit {
     showDialog2 = false;
     showDialog3 = false;
     rolesError: boolean = false;
+    
 
     formatdate: string = 'dd/mm/yy';
     autoCompleteSubject: any;
