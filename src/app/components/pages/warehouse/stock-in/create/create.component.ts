@@ -72,7 +72,6 @@ export class CreateComponent implements OnInit {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
         this.authService.userCurrent.subscribe((user) => {
             this.userCurrent = user;
-            console.log(this.userCurrent);
         });
     }
 
@@ -127,13 +126,34 @@ export class CreateComponent implements OnInit {
             this.optionsFilterProduct.KeyWord = '';
             this.optionsFilterProduct.Barcode = searchTerm.toLowerCase();
             try {
-                const response =
-                    await this.productService.FilterProductVariants(
-                        this.optionsFilterProduct
-                    );
+                const response = await this.productService.FilterProduct(
+                    this.optionsFilterProduct
+                );
                 if (response.data.length > 0) {
-                    console.log(response.data);
-                    this.addToCart(response.data[0]);
+                    console.log(response.data[0]);
+
+                    const item = {
+                        productId: response.data[0].id,
+                        productImage: response.data[0].productImages[0].link,
+                        productVariantId: 215,
+                        productName: `${response.data[0].name}${
+                            '-' +
+                            response.data[0].productVariants[0].valuePropeties1
+                        }${
+                            '-' +
+                            response.data[0].productVariants[0].valuePropeties2
+                        }`,
+                        productType: response.data[0].productType,
+                        quantity: 1,
+                        productCode: response.data[0].productVariants[0].code,
+                        price: response.data[0].productVariants[0].price,
+                        unit: response.data[0].unitName,
+                        mass: response.data[0].mass,
+                        total: response.data[0].productVariants[0].price,
+                        frameNumber: '',
+                        engineNumber: '',
+                    };
+                    this.addToCart(item);
                 } else {
                     // Hiển thị thông báo sản phẩm không tồn tại
                     this.messageService.add({
@@ -303,8 +323,6 @@ export class CreateComponent implements OnInit {
                 );
             }
         );
-        console.log(existingDetail);
-
         if (existingDetail) {
             // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá
             existingDetail.quantity += 1;
@@ -333,7 +351,6 @@ export class CreateComponent implements OnInit {
         this.updatePaymentInfo();
         this.showProducts = false;
         this.searchInput.nativeElement.value = '';
-        console.log(this.stockInReceipt);
     }
 
     updateTotal(data: any) {
@@ -378,7 +395,6 @@ export class CreateComponent implements OnInit {
     removeProduct(index: number) {
         this.stockInReceipt.inventoryStockInDetails.splice(index, 1);
         this.updatePaymentInfo();
-        console.log(this.stockInReceipt);
     }
 
     onDiscountOptionClick(unit: string) {
@@ -408,8 +424,6 @@ export class CreateComponent implements OnInit {
 
     saveDiscount() {
         this.stockInReceipt.totalDiscountAmount = this.calculateTotalDiscount();
-        console.log(this.stockInReceipt.totalDiscountAmount);
-        console.log(this.stockInReceipt);
         this.updatePaymentInfo();
         this.displayDiscountModal = false;
     }
@@ -642,9 +656,7 @@ export class CreateComponent implements OnInit {
             }) && !this.stockInReceipt.isValidMoney;
 
         if (this.isValidForm) {
-            console.log('Form is valid and ready to submit.');
         } else {
-            console.log('Form is not valid. Please check the errors.');
         }
     }
 

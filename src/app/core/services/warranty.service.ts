@@ -23,6 +23,12 @@ export class WarrantyService {
         if (options.ProductName) {
             url += `&productName=${options.ProductName}`;
         }
+        if (options.FrameNumber) {
+            url += `&frameNumber=${options.FrameNumber}`;
+        }
+        if (options.EngineNumber) {
+            url += `&engineNumber=${options.EngineNumber}`;
+        }
 
         return this.http.get<any>(url);
     }

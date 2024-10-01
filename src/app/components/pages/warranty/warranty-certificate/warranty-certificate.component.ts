@@ -12,6 +12,7 @@ import { Product } from 'src/app/core/models/order';
 import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
 import { OptionsFilterWarranty } from 'src/app/core/DTOs/warranty/optionFilterWarranty';
 import { an, dA } from '@fullcalendar/core/internal-common';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 const warrantyOrders = [
     {
@@ -122,15 +123,21 @@ export class WarrantyCertificateComponent implements OnInit {
     pageNumber: number = 1;
     totalRecordsCount: any;
     isLoading: boolean = true;
-
+    warrantyInfos: any;
+    userCurrent: any;
     constructor(
         private productCateogryService: CategoryService,
         private productService: ProductService,
         private messageService: MessageService,
         private warrantyService: WarrantyService,
+        private authService: AuthService,
         private nodeService: NodeService
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+            console.log(this.userCurrent);
+        });
         this.loadWarranty();
     }
 
@@ -145,6 +152,12 @@ export class WarrantyCertificateComponent implements OnInit {
         }
         if (this.optionsFilterWarranty.Imei === '') {
             this.optionsFilterWarranty.Imei = null;
+            this.optionsFilterWarranty.FrameNumber = null;
+            this.optionsFilterWarranty.EngineNumber = null;
+        } else {
+            const imeiParts = this.optionsFilterWarranty.Imei.split('-');
+            this.optionsFilterWarranty.FrameNumber = imeiParts[0];
+            this.optionsFilterWarranty.EngineNumber = imeiParts[1];
         }
         if (this.optionsFilterWarranty.ProductName === '') {
             this.optionsFilterWarranty.ProductName = null;
@@ -157,6 +170,38 @@ export class WarrantyCertificateComponent implements OnInit {
                 this.totalRecordsCount = data.data.totalRecords;
                 this.warranties = data.data.items;
             });
+    }
+
+    warrantyRequest(data: any) {
+        console.log(data);
+
+        const formData = new FormData();
+        formData.append('Code', '');
+        formData.append('CustomerId', data.customer.id.toString());
+        formData.append('CustomerName', data.customer.name);
+        formData.append('PhoneNumber', data.customer.phoneNumber);
+        formData.append('BranchId', this.userCurrent.branchId);
+        formData.append('BranchName', this.userCurrent.branchName);
+        formData.append('TotalQuantity', '1');
+        this.warrantyInfos = {
+            id: data.id,
+            dueDate: '',
+        };
+        const warrantyInfosJson = JSON.stringify(this.warrantyInfos);
+        formData.append('WarrantyInfos', warrantyInfosJson);
+
+        this.warrantyService.createWarrantyClaim(formData).subscribe(
+            (item) => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: 'Tạo phiếu bảo hành hàng lỗi thành công',
+                });
+            },
+            (error) => {
+                console.error('Error:', error);
+            }
+        );
     }
 
     openNew() {

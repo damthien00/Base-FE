@@ -185,7 +185,7 @@
                                                 Tên sản phẩm:
                                             </div>
                                             <div
-                                                htmlfor="name3"
+                                                htmlFor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
                                                 {{
@@ -193,20 +193,38 @@
                                                         .warrantyProducts[0]
                                                         .product.name
                                                 }}
-                                                {{
-                                                    "-" +
+                                                <span
+                                                    *ngIf="
                                                         warrantyOrder
                                                             .warrantyProducts[0]
                                                             .productVariant
                                                             .valuePropeties1
-                                                }}
-                                                {{
-                                                    "-" +
+                                                    "
+                                                >
+                                                    -
+                                                    {{
+                                                        warrantyOrder
+                                                            .warrantyProducts[0]
+                                                            .productVariant
+                                                            .valuePropeties1
+                                                    }}
+                                                </span>
+                                                <span
+                                                    *ngIf="
                                                         warrantyOrder
                                                             .warrantyProducts[0]
                                                             .productVariant
                                                             .valuePropeties2
-                                                }}
+                                                    "
+                                                >
+                                                    -
+                                                    {{
+                                                        warrantyOrder
+                                                            .warrantyProducts[0]
+                                                            .productVariant
+                                                            .valuePropeties2
+                                                    }}
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="field grid">
@@ -276,7 +294,11 @@
                                                 htmlfor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
-                                                {{ warrantyOrder.createdAt }}
+                                                {{
+                                                    warrantyOrder.createdAt
+                                                        | date
+                                                            : "dd/MM/yyyy HH:mm:ss"
+                                                }}
                                             </div>
                                         </div>
                                         <div class="field grid">
@@ -309,11 +331,9 @@
                                             <ng-template pTemplate="header">
                                                 <tr>
                                                     <th>
-                                                        Mã chính sách bảo hành
-                                                    </th>
-                                                    <th>
                                                         Tên chính sách bảo hành
                                                     </th>
+                                                    <th>Kì hạn bảo hành</th>
                                                     <th>
                                                         Ngày hết hạn bảo hành
                                                     </th>
@@ -337,7 +357,8 @@
                                                         >
                                                         {{
                                                             item.product
-                                                                .warrantyPolicyId
+                                                                .warrantyPolicy
+                                                                .name
                                                         }}
                                                     </td>
                                                     <td
@@ -351,10 +372,66 @@
                                                             >Tên chính
                                                             sách</span
                                                         >
-                                                        {{
-                                                            item.product
-                                                                .warrantyPolicyName
-                                                        }}
+                                                        <span
+                                                            *ngIf="
+                                                                !item.product
+                                                                    .warrantyPolicy
+                                                                    .term
+                                                            "
+                                                            >Không bảo hành
+                                                        </span>
+                                                        <span
+                                                            >{{
+                                                                item.product
+                                                                    .warrantyPolicy
+                                                                    .term
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    .warrantyPolicy
+                                                                    .termType ===
+                                                                1
+                                                            "
+                                                            >ngày</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    .warrantyPolicy
+                                                                    .termType ===
+                                                                2
+                                                            "
+                                                            >tuần</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    .warrantyPolicy
+                                                                    .termType ===
+                                                                3
+                                                            "
+                                                            >tháng</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    .warrantyPolicy
+                                                                    .termType ===
+                                                                4
+                                                            "
+                                                            >quý</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    .warrantyPolicy
+                                                                    .termType ===
+                                                                5
+                                                            "
+                                                            >năm</span
+                                                        >
                                                     </td>
                                                     <td
                                                         style="
@@ -389,8 +466,11 @@
                                             class="p-button-outlined"
                                         ></button>
                                         <button
-                                            type="submit"
+                                            type="button"
                                             pButton
+                                            (click)="
+                                                warrantyRequest(warrantyOrder)
+                                            "
                                             style="width: 150px"
                                             label="Yêu cầu bảo hành"
                                             class="p-button-primary"
