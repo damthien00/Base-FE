@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { OptionsFilterLading } from 'src/app/core/models/option-filter-lading';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { MerchandiseService } from 'src/app/core/services/merchandise.service';
 
@@ -20,15 +21,31 @@ export class StockTransferComponent implements OnInit {
     totalRecords: number = 0;
     selectedBranch: any;
     selectedFromBranchName!: string;
+    selectedCode!: string;
+    selectedBranchId!: number;
+    selectedIAccepted: { label: string; value: string } | null = null;
+    Code!: string;
+    IAccepted!: string;
     branch: any[] = [];
     ladigns: any[] = [];
     currentPageReport: string = '';
+    public userCurrent: any;
+    statuses = [
+        { label: 'Đang chuyển', value: 'waiting' },
+        { label: 'Chuyển thành công', value: 'accept' },
+        { label: 'Hủy chuyển hàng', value: 'reject' }
+    ];
     optionsFilterLadings: OptionsFilterLading = new OptionsFilterLading();
 
     constructor(
         private merchandiService: MerchandiseService,
-        private branchService: BranchService
-    ) { }
+        private branchService: BranchService,
+        private authService: AuthService,
+    ) {
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+        });
+    }
 
     ngOnInit() {
         this.items = [
@@ -59,7 +76,7 @@ export class StockTransferComponent implements OnInit {
 
     Filters(): void {
         //debugger
-        this.merchandiService.getFilters(this.PageSize, this.PageIndex, this.FromBranchId, this.ToBranchId, this.FromBranchName, this.ToBranchName)
+        this.merchandiService.getFilters(this.PageSize, this.PageIndex, this.FromBranchId = this.userCurrent?.branchId, this.ToBranchId, this.FromBranchName, this.ToBranchName, this.Code, this.IAccepted)
             .subscribe(
                 response => {
                     this.ladigns = response.data.items;
@@ -86,9 +103,17 @@ export class StockTransferComponent implements OnInit {
         }
     }
 
-    clickButtonFilter() {
-        if (this.selectedFromBranchName) {
 
+    getStatusLabel(statusValue: string): string {
+        const status = this.statuses.find((s) => s.value === statusValue);
+        return status ? status.label : 'Trạng thái không xác định';
+    }
+
+    clickButtonFilter() {
+        if (this.selectedCode) {
+            this.Code = this.selectedCode.trim();
+            this.ToBranchId = this.selectedBranchId;
+            this.IAccepted = this.selectedIAccepted?.value || null;
             this.PageIndex = 1;
             const elementshighlight = document.querySelectorAll(
                 `p-paginator .p-highlight`
@@ -104,7 +129,9 @@ export class StockTransferComponent implements OnInit {
             });
             this.Filters();
         } else {
-
+            this.Code = this.selectedCode?.trim();
+            this.ToBranchId = this.selectedBranchId;
+            this.IAccepted = this.selectedIAccepted?.value || null;
             this.PageIndex = 1;
             const elementshighlight = document.querySelectorAll(
                 `p-paginator .p-highlight`

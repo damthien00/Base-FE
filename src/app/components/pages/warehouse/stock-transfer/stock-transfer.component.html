@@ -1,12 +1,12 @@
 <main id="main" class="main">
     <div class="pagetitle">
         <div>
-          <h3>Quản lý tài khoản</h3>
+          <h3>Danh sách chuyển hàng</h3>
           <nav>
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-              <li class="breadcrumb-item">Quản lý</li>
-              <li class="breadcrumb-item active">Quản lý tài khoản</li>
+              <li class="breadcrumb-item">Chuyển hàng</li>
+              <li class="breadcrumb-item active">Danh sách chuyển hàng</li>
             </ol>
           </nav>
         </div>
@@ -52,6 +52,7 @@
                                         pInputText
                                         type="text"
                                         placeholder="Tìm theo mã chuyển hàng"
+                                        [(ngModel)]="selectedCode"
                                         style="width: 350px"
                                         class="sm:"
                                     />
@@ -69,7 +70,7 @@
                                 <p-dropdown
                                   [options]="branch" 
                                   optionLabel="shortenedName" 
-                                  [(ngModel)]="selectedBranch"
+                                  [(ngModel)]="selectedBranchId"
                                   optionValue="id"
                                   [showClear]="true"
                                   placeholder="Chọn chi nhánh">
@@ -82,9 +83,9 @@
                                     >Trạng thái:</label
                                 >
                                 <p-dropdown
-                                    [options]="this.optionsStatus"
-                                    [(ngModel)]="this.statusFilter"
-                                    optionLabel="name"
+                                    [options]="statuses" 
+                                    [(ngModel)]="selectedIAccepted"
+                                    optionLabel="label"
                                     [showClear]="true"
                                     placeholder="Trạng thái"
                                 >
@@ -106,10 +107,8 @@
                                 pButton
                                 pRipple
                                 label="Lọc"
-                                (click)="EvenFilter()"
+                                (click)="clickButtonFilter()"
                             ></button>
-                            <!-- <button pButton pRipple label="Lọc"></button> -->
-                            <!-- (click)="EvenFilter()" -->
                         </div>
                     </ng-template>
 
