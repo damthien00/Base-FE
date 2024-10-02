@@ -119,4 +119,16 @@ export class ShowComponent implements OnInit {
             this.loadStockIn();
         }
     }
+
+    get startRecord(): number {
+        return (this.pageNumber - 1) * this.pageSize + 1;
+    }
+
+    get endRecord(): number {
+        // Tính toán số bản ghi kết thúc (không vượt quá tổng số bản ghi)
+        const calculatedEnd = (this.pageNumber - 1 + 1) * this.pageSize;
+        return calculatedEnd > this.totalRecordsCount
+            ? this.totalRecordsCount
+            : calculatedEnd;
+    }
 }

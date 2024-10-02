@@ -1,8 +1,7 @@
 const roleConstant = {
-    master : "master",
-    admin : "admin",
-    other:"other"
+    master: 'Master',
+    admin: 'Admin',
+    other: 'Other',
 };
-    
+
 export default roleConstant;
-    

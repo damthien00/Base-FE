@@ -134,20 +134,32 @@
                     </tr>
                 </ng-template>
             </p-table>
-            <div *ngIf="stockInList?.length > 0">
-                <p-paginator
-                    [rows]="pageSize"
-                    (onPageChange)="onPageChange($event)"
-                    [totalRecords]="
-                        totalRecordsCount > 0 ? totalRecordsCount : 1
-                    "
-                    [rowsPerPageOptions]="[10, 20, 30]"
-                ></p-paginator>
+            <div
+                class="flex align-items-center"
+                style="justify-content: space-between"
+            >
+                <p>
+                    <span style="font-weight: 500">{{ startRecord }}</span> -
+                    <span style="font-weight: 500">{{ endRecord }}</span> trong
+                    <span style="font-weight: 500">{{
+                        totalRecordsCount
+                    }}</span>
+                    bản ghi
+                </p>
+                <div *ngIf="stockInList?.length > 0">
+                    <p-paginator
+                        [rows]="pageSize"
+                        (onPageChange)="onPageChange($event)"
+                        [totalRecords]="
+                            totalRecordsCount > 0 ? totalRecordsCount : 1
+                        "
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                    ></p-paginator>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 <p-dialog
     [(visible)]="displayStockInDetailModal"
     modal="true"

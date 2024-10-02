@@ -30,3 +30,36 @@
 .permission-item ul {
   margin-left: 20px;
 }
+
+.permission-tree-box {
+    height: 250px;
+    overflow: hidden;
+    overflow-y: scroll;
+
+    /* Webkit-specific properties */
+    -webkit-overflow-scrolling: touch;
+    /* Cải thiện cuộn mượt mà trên thiết bị di động */
+}
+
+/* Tùy chỉnh thanh cuộn trên trình duyệt Webkit */
+.permission-tree-box::-webkit-scrollbar {
+    width: 8px;
+    /* Chiều rộng của thanh cuộn */
+}
+
+/* Màu nền của thanh cuộn */
+.permission-tree-box::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Màu của tay cầm cuộn */
+.permission-tree-box::-webkit-scrollbar-thumb {
+    background: #cdcbcb;
+    border-radius: 4px;
+    transition: 0.2s linear;
+}
+
+/* Khi hover trên thanh cuộn */
+.permission-tree-box::-webkit-scrollbar-thumb:hover {
+    background: #8c8b8b;
+}

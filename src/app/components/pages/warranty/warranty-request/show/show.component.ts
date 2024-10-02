@@ -1,3 +1,5 @@
+import { OptionsFilterWarrantyClaims } from './../../../../../core/DTOs/warranty/optionFilterWarranty';
+import { WarrantyService } from './../../../../../core/services/warranty.service';
 // import { Component, OnInit } from '@angular/core';
 
 // @Component({
@@ -19,7 +21,6 @@ import { MessageService } from 'primeng/api';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 
-
 import { ProductService } from 'src/app/core/services/product.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { NodeService } from 'src/app/core/services/node.service';
@@ -33,13 +34,10 @@ import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product
     styleUrls: ['./show.component.css'],
     providers: [MessageService],
 })
-// @Component({
-//     selector: 'app-warranty-request',
-//     templateUrl: './warranty-request.component.html',
-//     styleUrls: ['./warranty-request.component.css'],
-// })
 export class ShowComponent implements OnInit {
     optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
+    optionsFilterWarrantyClaims: OptionsFilterWarrantyClaims =
+        new OptionsFilterWarrantyClaims();
     nodes!: any[];
     optionsStatus: any[] = [
         { name: 'Ẩn', value: 0 },
@@ -83,17 +81,19 @@ export class ShowComponent implements OnInit {
     statuses: any[] = [];
 
     rowsPerPageOptions = [5, 10, 20];
-
     pageSize = 30;
     pageNumber = 1;
     totalRecords = 20;
     treeCategory: any[] = [];
 
+    warrantyClaims: any[] = [];
+
     constructor(
         private productCateogryService: CategoryService,
         private productService: ProductService,
         private messageService: MessageService,
-        private nodeService: NodeService
+        private nodeService: NodeService,
+        private warrantyService: WarrantyService
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
         this.optionsFillerProduct.pageIndex = this.pageNumber;
@@ -102,18 +102,24 @@ export class ShowComponent implements OnInit {
 
     async ngOnInit() {
         this.items = [{ label: 'Danh sách yêu cầu bảo hành' }];
-        // this.loading = true;
-        let response = await this.productService.FilterProduct(
-            this.optionsFillerProduct
-        );
-        let responseGetTreeCategory =
-            await this.productCateogryService.getTreeCategory();
-        // this.loading = false;
-        console.log(responseGetTreeCategory);
-        this.treeCategory = responseGetTreeCategory.data;
-        this.products = response.data;
-        this.totalRecords = response.totalRecordsCount;
-        // console.log(b);
+        // let response = await this.productService.FilterProduct(
+        //     this.optionsFillerProduct
+        // );
+        // let responseGetTreeCategory =
+        //     await this.productCateogryService.getTreeCategory();
+        // this.treeCategory = responseGetTreeCategory.data;
+        // this.products = response.data;
+        // this.totalRecords = response.totalRecordsCount;
+        this.loadWarrantyClaims();
+    }
+
+    loadWarrantyClaims() {
+        this.warrantyService
+            .getWarrantyClaims(this.optionsFilterWarrantyClaims)
+            .subscribe((response) => {
+                this.warrantyClaims = response.data.items;
+                console.log(this.warrantyClaims);
+            });
     }
 
     openNew() {
@@ -189,47 +195,6 @@ export class ShowComponent implements OnInit {
         this.productDialog = false;
         this.submitted = false;
     }
-
-    // saveProduct() {
-    //     this.submitted = true;
-
-    //     if (this.product.name?.trim()) {
-    //         if (this.product.id) {
-    //             // @ts-ignore
-    //             this.product.inventoryStatus = this.product.inventoryStatus
-    //                 .value
-    //                 ? this.product.inventoryStatus.value
-    //                 : this.product.inventoryStatus;
-    //             this.products[this.findIndexById(this.product.id)] =
-    //                 this.product;
-    //             this.messageService.add({
-    //                 severity: 'success',
-    //                 summary: 'Successful',
-    //                 detail: 'Product Updated',
-    //                 life: 3000,
-    //             });
-    //         } else {
-    //             this.product.id = this.createId();
-    //             this.product.code = this.createId();
-    //             this.product.image = 'product-placeholder.svg';
-    //             // @ts-ignore
-    //             this.product.inventoryStatus = this.product.inventoryStatus
-    //                 ? this.product.inventoryStatus.value
-    //                 : 'INSTOCK';
-    //             this.products.push(this.product);
-    //             this.messageService.add({
-    //                 severity: 'success',
-    //                 summary: 'Successful',
-    //                 detail: 'Product Created',
-    //                 life: 3000,
-    //             });
-    //         }
-
-    //         this.products = [...this.products];
-    //         this.productDialog = false;
-    //         this.product = {};
-    //     }
-    // }
 
     findIndexById(id: string): number {
         let index = -1;
@@ -310,31 +275,11 @@ export class ShowComponent implements OnInit {
         this.optionsFillerProduct.pageIndex = 1;
 
         console.log(this.optionsFillerProduct);
-        // this.loading = true;
         await this.productService
             .FilterProduct(this.optionsFillerProduct)
             .then((response) => {
                 this.products = response.data;
                 this.totalRecords = response.totalRecordsCount;
-                //   for (let index = 0; index < this.products.length; index++) {
-                //     this.showAllVariants.set(this.products[index].id, this.products[index].productVariants.length > 3 ? 1 : 0);
-                //    }
             });
-        // this.loading = false;
-    }
-
-    checkStartPriceValue() {
-        if (this.optionsFillerProduct.StartPrice != null) {
-            if (this.optionsFillerProduct.StartPrice < 1000) {
-                this.optionsFillerProduct.StartPrice = null;
-            }
-        }
-    }
-    checkEndPriceValue() {
-        if (this.optionsFillerProduct.EndPrice != null) {
-            if (this.optionsFillerProduct.EndPrice < 1000) {
-                this.optionsFillerProduct.EndPrice = null;
-            }
-        }
     }
 }

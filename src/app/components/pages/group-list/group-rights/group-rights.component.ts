@@ -48,7 +48,7 @@ export class GroupRightsComponent implements OnInit {
     showFullDescription: boolean = false;
     selectedPermissionIds: number[] = [];
     expandedItems: Set<number> = new Set();
-	permissionsTree:any=[];
+    permissionsTree: any = [];
 
     optionsFilterCommodities: OptionsFilterCommodities =
         new OptionsFilterCommodities();
@@ -92,7 +92,6 @@ export class GroupRightsComponent implements OnInit {
             ],
             // permissionIds: [[], Validators.required],
             // selectedPermissionIds: [[], Validators.required],
-
         });
     }
 
@@ -128,7 +127,7 @@ export class GroupRightsComponent implements OnInit {
             .getPermissionAll(this.PageSize2, this.PageIndex2)
             .subscribe((response: any) => {
                 this.permissions = this.formatPermissions(response.data.items);
-				this.permissionsTree=response.data.items;
+                this.permissionsTree = response.data.items;
             });
     }
 
@@ -148,7 +147,7 @@ export class GroupRightsComponent implements OnInit {
 
     transformToTreeNodes(permissions: any[]): any[] {
         return permissions.map((permission) => ({
-            label: permission.name,
+            label: permission.displayName,
             id: permission.id,
             children: this.transformToTreeNodes(permission.childrens || []),
         }));
@@ -157,7 +156,7 @@ export class GroupRightsComponent implements OnInit {
     formatPermissions(items: any[]): any[] {
         return items.map((item) => {
             return {
-                label: item.name,
+                label: item.displayName,
                 data: item.name,
                 id: item.id,
                 children: this.formatPermissions(item.childrens),
@@ -264,7 +263,7 @@ export class GroupRightsComponent implements OnInit {
     }
 
     openDialog2(Id: number): void {
-		this.selectedPermissionIds=[];
+        this.selectedPermissionIds = [];
         this.groupRoleId = Id;
         this.getAllFilterRole2();
         this.roleService.getGroupRoleById(Id).subscribe(
@@ -283,8 +282,7 @@ export class GroupRightsComponent implements OnInit {
                 // console.log(
                 //     this.transformToTreeNodes2(this.groupRoleById.permissions)
                 // );
-				this.getPermissionIds(response.data.permissions);
-
+                this.getPermissionIds(response.data.permissions);
             },
             (error) => {
                 console.error('Error:', error);
@@ -311,7 +309,6 @@ export class GroupRightsComponent implements OnInit {
     get rolesControl2() {
         return this.RoleGroupForm2.get('permissionIds');
         // return this.RoleGroupForm2.get('selectedPermissionIds');
-
     }
 
     checkRolesSelection() {
@@ -498,7 +495,7 @@ export class GroupRightsComponent implements OnInit {
             // const permissionIds = formValue.permissionIds.map(
             //     (permission) => permission.id
             // );
-			const permissionIds=this.selectedPermissionIds;
+            const permissionIds = this.selectedPermissionIds;
 
             const payload = {
                 id: this.groupRoleById.id || 0, // Use existing id if editing, 0 if creating new
@@ -545,13 +542,12 @@ export class GroupRightsComponent implements OnInit {
         }
     }
 
-
-	getPermissionIds(permissions: any[]) {
-		permissions.forEach(permission => {
-			this.selectedPermissionIds.push(permission.id);
-			if (permission.childrens && permission.childrens.length > 0) {
-				this.getPermissionIds(permission.childrens);
-			}
-		});
-	}
+    getPermissionIds(permissions: any[]) {
+        permissions.forEach((permission) => {
+            this.selectedPermissionIds.push(permission.id);
+            if (permission.childrens && permission.childrens.length > 0) {
+                this.getPermissionIds(permission.childrens);
+            }
+        });
+    }
 }

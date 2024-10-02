@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { OptionsFilterWarranty } from '../DTOs/warranty/optionFilterWarranty';
+import { OptionsFilterWarrantyClaims } from '../DTOs/warranty/optionFilterWarranty';
 @Injectable({
     providedIn: 'root',
 })
@@ -30,6 +31,27 @@ export class WarrantyService {
             url += `&engineNumber=${options.EngineNumber}`;
         }
 
+        return this.http.get<any>(url);
+    }
+
+    getWarrantyClaims(options: OptionsFilterWarrantyClaims): Observable<any> {
+        console.log(options);
+
+        let url = `${this.url}/api/warranty-claim/paging?pageSize=${options.pageSize}&pageIndex=${options.pageIndex}`;
+        if (options.CustomerKeyword) {
+            url += `&customerKeyword=${options.CustomerKeyword}`;
+        }
+
+        if (options.StartDate) {
+            url += `&startDate=${options.StartDate}`;
+        }
+        if (options.EndDate) {
+            url += `&endDate=${options.EndDate}`;
+        }
+
+        if (options.Status) {
+            url += `&status=${options.Status}`;
+        }
         return this.http.get<any>(url);
     }
 
