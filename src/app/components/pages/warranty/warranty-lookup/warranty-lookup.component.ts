@@ -65,36 +65,38 @@ export class WarrantyLookupComponent implements OnInit {
   checkWarranty2() {
     const inputData = this.phoneNumberForm.get('inputData')?.value;
 
-    const regex = /^([A-Z0-9]+)\/([A-Z0-9]+)$/; // Kiểm tra định dạng E12345/F67890
-    const match = inputData.match(regex);
+    const phoneRegex = /^[0-9]{10,11}$/;
+    const engineFrameRegex = /^([A-Z0-9]+)-([A-Z0-9]+)$/;  // Thay đổi gạch ngang
 
-    if (!match) {
-      this.showErrors = true; // Hiện thông báo lỗi
-      return;
+    if (phoneRegex.test(inputData)) {
+      this.showErrors = false;
+      const apiUrl = `${this.url}/api/warranty/paging?PhoneNumber=${inputData}`;
+
+      this.callWarrantyApi(apiUrl);
+    } else if (engineFrameRegex.test(inputData)) {
+      this.showErrors = false;
+      const match = inputData.match(engineFrameRegex);
+      const frameNumber = match[1];
+      const engineNumber = match[2];
+
+      const apiUrl = `${this.url}/api/warranty/paging?FrameNumber=${frameNumber}&EngineNumber=${engineNumber}`;
+
+      this.callWarrantyApi(apiUrl);
     } else {
-      this.showErrors = false; // Ẩn thông báo lỗi nếu định dạng hợp lệ
+      this.showErrors = true;
     }
+  }
 
-    const isPhoneNumber = /^[0-9]{10,15}$/.test(inputData);
-    const frameNumber = match[1]; // Lấy số khung
-    const engineNumber = match[2]; // Lấy số máy
-    let apiUrl = '';
-
-    // if (isPhoneNumber) {
-    //   apiUrl = `${this.url}/api/warranty/paging?PhoneNumber=${inputData}`;
-    // } else {
-    //   apiUrl = `${this.url}/api/warranty/paging?EngineNumber=${inputData}`;
-    // }
-
-    if (isPhoneNumber) {
-      apiUrl = `${this.url}/api/warranty/paging?PhoneNumber=${inputData}`;
-    } else if (frameNumber && engineNumber) {
-      apiUrl = `${this.url}/api/warranty/paging?FrameNumber=${frameNumber}&EngineNumber=${engineNumber}`;
-    } else {
-      console.log("Định dạng đầu vào không hợp lệ!");
-      return;
+  removeWhitespace() {
+    const inputControl = this.phoneNumberForm.get('inputData');
+    if (inputControl) {
+      // Loại bỏ tất cả khoảng trắng trong giá trị nhập vào
+      const sanitizedValue = inputControl.value.replace(/\s+/g, '');
+      inputControl.setValue(sanitizedValue, { emitEvent: false });
     }
+  }
 
+  callWarrantyApi(apiUrl: string) {
     this.http.get(apiUrl).subscribe(
       (response: any) => {
         const data = response.data.items;
@@ -102,38 +104,25 @@ export class WarrantyLookupComponent implements OnInit {
         // Gán trạng thái đã kiểm tra
         this.isChecked = true;
 
-
         if (data.length === 0) {
           console.log("Không tìm thấy thông tin bảo hành!");
           this.customer = null;
-          this.warrantyData = []; // Không có dữ liệu bảo hành
+          this.warrantyData = [];
           return;
         }
 
+        // Gán thông tin khách hàng
         this.customer = data[0].customer;
 
-        const filteredData = data.filter((item: any) =>
-          item.warrantyProducts && item.warrantyProducts.some((wp: any) =>
-            wp.inventoryStockDetailProductImei?.frameNumber === frameNumber &&
-            wp.inventoryStockDetailProductImei?.engineNumber === engineNumber 
-          )
-        );
-
-        if (filteredData.length > 0) {
-          this.warrantyData = filteredData.map((item: any) => item.warrantyProducts).flat();
-          console.log("Thông tin bảo hành:", this.warrantyData);
-        } else {
-          this.warrantyData = []; // Không tìm thấy dữ liệu phù hợp
-          console.log("Không tìm thấy thông tin khớp với số điện thoại hoặc số máy.");
-        }
+        // Gán thông tin bảo hành
+        this.warrantyData = data.map((item: any) => item.warrantyProducts).flat();
+        console.log("Thông tin bảo hành:", this.warrantyData);
       },
       (error) => {
-        this.isChecked = true;
+        this.isChecked = true; // Gán trạng thái đã kiểm tra ngay cả khi lỗi
         console.error("Đã xảy ra lỗi khi kiểm tra thông tin bảo hành", error);
       }
     );
   }
-
-
 
 }
