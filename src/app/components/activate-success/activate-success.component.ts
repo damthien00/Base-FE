@@ -32,7 +32,7 @@ export class ActivateSuccessComponent implements OnInit {
         if (warrantiesData) {
             this.warrantyById = JSON.parse(warrantiesData);
             console.log(this.warrantyById);
-            // localStorage.removeItem('lastCreatedWarranties');
+            localStorage.removeItem('lastCreatedWarranties');
         }
     }
 
