@@ -28,6 +28,7 @@ export class StockTransferComponent implements OnInit {
     IAccepted!: string;
     branch: any[] = [];
     ladigns: any[] = [];
+    formatdate: string = "dd/mm/yy";
     currentPageReport: string = '';
     public userCurrent: any;
     statuses = [

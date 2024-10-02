@@ -731,7 +731,7 @@ export class UserComponent implements OnInit {
                 districtName: this.districts.find(districts => districts.id === formValues.districtId)?.name || '',
                 wardId: formValues.wardId,
                 wardName: this.wards.find(wards => wards.id === formValues.wardId)?.name || '',
-                role: formValues.roles.map(role => role.name) // Lấy tên của các nhóm quyền
+                role: formValues.roles.map(role => role.normalizedName)
             };
 
             // Gửi yêu cầu tới API để thêm người dùng
