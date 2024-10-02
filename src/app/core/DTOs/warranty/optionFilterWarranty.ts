@@ -8,3 +8,15 @@ export class OptionsFilterWarranty {
     FrameNumber: string | null;
     EngineNumber: string | null;
 }
+
+export class OptionsFilterWarrantyClaims {
+    pageSize: number | null = 10;
+    pageIndex: number | null = 1;
+    StartDate: Date | null = null;
+    EndDate: Date | null = null;
+    CustomerKeyword: string | null;
+    Status: number | null = null;
+
+    // FrameNumber: string | null;
+    // EngineNumber: string | null;
+}

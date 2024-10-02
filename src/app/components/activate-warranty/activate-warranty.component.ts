@@ -185,9 +185,6 @@ export class ActivateWarrantyComponent implements OnInit {
     }
     onSubmit() {
         if (this.createActivateWarranty.valid) {
-            console.log(this.createActivateWarranty.value);
-            console.log(this.productListSelected);
-
             const observables = this.productListSelected.map((product) => {
                 const formData = {
                     code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần

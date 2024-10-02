@@ -1,6 +1,13 @@
 import { WarrantyPolicyService } from './../../../../../core/services/warranty-policy.service';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+    AbstractControl,
+    FormBuilder,
+    FormGroup,
+    ValidationErrors,
+    ValidatorFn,
+    Validators,
+} from '@angular/forms';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -30,11 +37,23 @@ export class EditComponent implements OnInit {
     ) {
         this.updateWarrantyPolicyForm = this.formBuilder.group({
             name: [null, Validators.required],
-            term: [null, Validators.required],
+            term: [
+                null,
+                [Validators.required, Validators.min(0)], // Sửa tại đây
+            ],
             termType: [this.optionsTime[0]],
         });
     }
 
+    nonNegativeValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            // Kiểm tra nếu giá trị là một số và nhỏ hơn 0
+            return typeof value === 'number' && value < 0
+                ? { negative: true } // Trả về lỗi nếu số âm
+                : null; // Trả về null nếu hợp lệ
+        };
+    }
     initializeForm() {
         this.updateWarrantyPolicyForm = this.formBuilder.group({
             id: [this.warrantyPolicy?.id, [Validators.required]],

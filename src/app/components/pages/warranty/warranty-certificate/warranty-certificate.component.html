@@ -358,7 +358,8 @@
                                                         {{
                                                             item.product
                                                                 .warrantyPolicy
-                                                                .name
+                                                                ?.name ||
+                                                                "Sản phẩm không có chính sách bảo hành"
                                                         }}
                                                     </td>
                                                     <td
@@ -375,13 +376,20 @@
                                                         <span
                                                             *ngIf="
                                                                 !item.product
-                                                                    .warrantyPolicy
-                                                                    .term
+                                                                    ?.warrantyPolicy
+                                                                    ?.term
                                                             "
-                                                            >Không bảo hành
-                                                        </span>
+                                                            >Không bảo
+                                                            hành</span
+                                                        >
                                                         <span
-                                                            >{{
+                                                            *ngIf="
+                                                                item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.term
+                                                            "
+                                                        >
+                                                            {{
                                                                 item.product
                                                                     .warrantyPolicy
                                                                     .term
@@ -390,8 +398,8 @@
                                                         <span
                                                             *ngIf="
                                                                 item.product
-                                                                    .warrantyPolicy
-                                                                    .termType ===
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
                                                                 1
                                                             "
                                                             >ngày</span
@@ -399,8 +407,8 @@
                                                         <span
                                                             *ngIf="
                                                                 item.product
-                                                                    .warrantyPolicy
-                                                                    .termType ===
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
                                                                 2
                                                             "
                                                             >tuần</span
@@ -408,8 +416,8 @@
                                                         <span
                                                             *ngIf="
                                                                 item.product
-                                                                    .warrantyPolicy
-                                                                    .termType ===
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
                                                                 3
                                                             "
                                                             >tháng</span
@@ -417,8 +425,8 @@
                                                         <span
                                                             *ngIf="
                                                                 item.product
-                                                                    .warrantyPolicy
-                                                                    .termType ===
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
                                                                 4
                                                             "
                                                             >quý</span
@@ -426,8 +434,8 @@
                                                         <span
                                                             *ngIf="
                                                                 item.product
-                                                                    .warrantyPolicy
-                                                                    .termType ===
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
                                                                 5
                                                             "
                                                             >năm</span

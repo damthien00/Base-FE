@@ -186,10 +186,12 @@ export class WarrantyCertificateComponent implements OnInit {
         formData.append('BranchId', this.userCurrent.branchId);
         formData.append('BranchName', this.userCurrent.branchName);
         formData.append('TotalQuantity', '1');
+
         this.warrantyInfos = {
             id: data.id,
             dueDate: '',
         };
+
         const warrantyInfosJson = JSON.stringify(this.warrantyInfos);
         formData.append('WarrantyInfos', warrantyInfosJson);
 
