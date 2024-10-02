@@ -1,7 +1,7 @@
 <main id="main" class="main">
     <div class="pagetitle">
         <div>
-          <h3>Danh sách khách hàng</h3>
+          <h3>Quản lý khách hàng</h3>
           <nav>
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
@@ -75,8 +75,8 @@
                         <th style="width: 8%; font-size: 14px;">Giới tính</th>
                         <th style="width: 12%; font-size: 14px;">Số điện thoại</th>
                         <th style="width: 12%; font-size: 14px;">Ngày sinh</th>
-                        <th style="width: 12%; font-size: 14px;">Email</th>
-                        <th style="width: 5%; font-size: 14px;">Thao tác</th>
+                        <th style="width: 15%; font-size: 14px;">Email</th>
+                        <th style="width: 2%; font-size: 14px;">Thao tác</th>
                       </tr>
                     </ng-template>
 
@@ -98,6 +98,13 @@
                                   pRipple
                                   icon="pi pi-pencil"
                                   class="p-button-rounded p-button-success mr-2"
+                                  (click)="openDialog2(customer.id)"
+                              ></button>
+                              <button
+                                  pButton
+                                  pRipple
+                                  icon="pi pi-trash"
+                                  class="p-button-rounded p-button-danger mr-2"
                                   (click)="openDialog2(customer.id)"
                               ></button>
                           </div>

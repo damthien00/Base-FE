@@ -145,6 +145,13 @@ import { RouterModule } from '@angular/router';
                     ).then((m) => m.CustomerModule),
             },
             {
+                path: 'supplier/show-supplier',
+                loadChildren: () =>
+                    import(
+                        './supplier/supplier.module'
+                    ).then((m) => m.SupplierModule),
+            },
+            {
                 path: 'role',
                 loadChildren: () =>
                     import(

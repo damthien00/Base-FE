@@ -1,1 +1,349 @@
-<p>supplier works!</p>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <div>
+            <h3>Quản lý nhà cung cấp</h3>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
+                    <li class="breadcrumb-item">Quản lý</li>
+                    <li class="breadcrumb-item active">Danh sách nhà cung cấp</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="btn-add-wrapper">
+            <button
+            pButton
+            pRipple
+            label="Thêm mới"
+            style="height: 40px; width: 130px; border-radius: 10px;"
+            (click)="openCreateDialog()"
+          ></button>
+          </div>
+        <!-- <div class="btn-add-wrapper">
+            <button pButton pRipple label="Thêm mới" style="height: 40px;" class="p-button-success"
+                (click)="openCreateDialog()"></button>
+        </div> -->
+    </div>
+    <div class="toast-container">
+        <p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+    </div>
+    <!-- End Page Title -->
+    <section class="section k-list-table">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-7 mt-3">
+                            <span class="p-input-icon-left" style="width: 100%;">
+                                <i class="pi pi-search"></i>
+                                <input type="text" class="form-control" [(ngModel)]="keySearch"
+                                    (ngModelChange)="onSearchTermChanged($event)"
+                                    placeholder="Tìm kiếm theo tên nhà cung cấp, số điện thoại" style="padding-left: 30px; height: 45px;" />
+                            </span>
+                        </div>
+                        <div class="col-lg-5 mt-3">
+                            <button
+                                style="width: 100px;"
+                                pButton
+                                pRipple
+                                label="Lọc"
+                        ></button>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="data-empty" *ngIf="suppliers.length  === 0">Không tìm thấy kết quả phù hợp</div>
+                        <p-table *ngIf="suppliers.length > 0" [value]="suppliers" [paginator]="true" [rows]="pageSize"
+                            [totalRecords]="totalRecordsCount" [paginator]="false" (onPage)="onPageChange($event)"
+                            styleClass="p-datatable-striped">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 5%;">Mã NCC</th>
+                                    <th style="width: 11%;">Tên nhà cung cấp</th>
+                                    <th style="width: 7%;">Số điện thoại</th>
+                                    <th style="width: 13%;">Địa chỉ</th>
+                                    <th style="width: 12%;">Email</th>
+                                    <th style="width: 15%;">Ghi chú</th>
+                                    <th style="width: 2%;">Thao tác</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-supplier>
+                                <tr>
+                                    <td>{{ supplier.id }}</td>
+                                    <td>{{ supplier.name }}</td>
+                                    <td>{{ supplier.phone }}</td>
+                                    <td>{{ supplier.address }}</td>
+                                    <td>{{ supplier.email }}</td>
+                                    <td>{{ supplier.description }}</td>
+                                    <!-- <td style="text-align: center;">
+                                        <i class="pi pi-pencil" style="font-size: 1.2rem; margin-left: 10px"
+                                            (click)="openUpdateDialog(supplier.id)"></i>
+                                            <p-confirmPopup></p-confirmPopup>
+                                        <i class="pi pi-trash" style="font-size: 1.2rem; margin-left: 10px" (click)="openDeleteDialog($event,supplier.id)"></i>
+                                    
+                                    </td> -->
+                                    <td>
+                                        <div class="flex">
+                                            <button
+                                                pButton
+                                                pRipple
+                                                icon="pi pi-pencil"
+                                                class="p-button-rounded p-button-success mr-2"
+                                                (click)="openUpdateDialog(supplier.id)"
+                                            ></button>
+                                            <button
+                                                pButton
+                                                pRipple
+                                                icon="pi pi-trash"
+                                                class="p-button-rounded p-button-danger mr-2"
+                                                (click)="openDeleteDialog($event,supplier.id)"
+                                            ></button>
+                                        </div>
+                                    </td>   
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                        <div *ngIf="totalRecordsCount === 0" style="text-align: center">
+                            <strong style="text-align: center; width: 100%"
+                              >Không tìm thấy kết quả phù hợp</strong
+                            >
+                          </div>
+                        <div  *ngIf="suppliers.length > 0">
+                            <p-paginator [rows]="pageSize" (onPageChange)="onPageChange($event)"
+                                [totalRecords]="totalRecordsCount > 0 ? totalRecordsCount : 1"
+                                [rowsPerPageOptions]="[10, 20, 30]"></p-paginator>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!---->
+        <div class="dialog-background" *ngIf="showCreateDialog">
+            <div class="dialog-container"  style="width: 700px; padding:0;" >
+                <div class="d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #ccc;padding: 0 10px">
+                    <h5 class="card-title">Thêm nhà cung cấp</h5>
+                    <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger"
+                        [style]="{'border-radius': '25%'}" (click)="closeCreateDialog(customerCreateForm)"></p-button>
+                </div>
+                <div class="card-body" style="padding: 0 20px !important; padding-bottom: 15px !important;" >
+                    <!-- General Form Elements -->
+                    <form #customerCreateForm="ngForm" [style]="{'padding-top':'10px'}" (ngSubmit)="createSupplier(customerCreateForm)">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="addName" class="form-label">Tên nhà cung cấp<span class="red-asterisk">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="supplier.name" id="addName" name="name" ngModel required minlength="1"
+                                        maxlength="255">
+                                    <div *ngIf="customerCreateForm.submitted && customerCreateForm.controls['name']?.invalid"
+                                        class="error-message">
+                                        <div *ngIf="customerCreateForm.controls['name']?.errors?.['required']">
+                                            Tên nhà cung cấp không được bỏ trống
+                                        </div>
+                                        <div
+                                            *ngIf="customerCreateForm.controls['name']?.errors?.['minlength'] || customerCreateForm.controls['name']?.errors?.['maxlength']">
+                                            Tên phải lớn hơn 3 ký tự && nhỏ hơn 10 ký tự
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Số điện thoại<span class="red-asterisk">*</span></label>
+                                    <input type="text" class="form-control" pattern="^(03|05|07|08|09)\d{8}$" (keypress)="validateNumber($event)" minlength="10" maxlength="10" id="phone" name="phone"
+                                        [(ngModel)]="supplier.phone" required>
+                                    <div *ngIf="customerCreateForm.submitted && customerCreateForm.controls['phone']?.invalid">
+                                        <div *ngIf="customerCreateForm.controls['phone']?.errors?.['required']" class="error-message">
+                                            Số điện không được bỏ trống
+                                        </div>
+                                        <!-- <div *ngIf="customerCreateForm.controls['phone']?.errors?.['minlength'] || customerCreateForm.controls['phone']?.errors?.['maxlength']"
+                                            class="error-message">
+                                            Số điện thoại phải đúng 10 ký tự
+                                        </div> -->
+                                        <div *ngIf="customerCreateForm.controls['phone']?.errors?.['pattern']" class="error-message">
+                                            Số điện thoại không hợp lệ
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" [(ngModel)]="supplier.email"
+                                        pattern="^(?!\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(?<!\.)$">
+                                    <div *ngIf="customerCreateForm.submitted && customerCreateForm.controls['email']?.invalid">
+                                        <div *ngIf="customerCreateForm.controls['email']?.errors?.['required']" class="error-message">
+                                            Email không được bỏ trống
+                                        </div>
+                                        <div *ngIf="customerCreateForm.controls['email']?.errors?.['pattern']" class="error-message">
+                                            Nhập sai định dạng email
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <!-- Cột phải -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Địa chỉ</label>
+                                    <input type="text" class="form-control" id="address" name="address" [(ngModel)]="supplier.address"
+                                        maxlength="255">
+                                    <div *ngIf="customerCreateForm.submitted && customerCreateForm.controls['address']?.invalid">
+                                        <div *ngIf="customerCreateForm.controls['address']?.errors?.['required']" class="error-message">
+                                            Địa chỉ không được bỏ trống
+                                        </div>
+                                        <div *ngIf="customerCreateForm.controls['address']?.errors?.['maxlength']" class="error-message">
+                                            Địa chỉ không được vượt quá 255 ký tự
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Mô tả</label>
+                                    <textarea class="form-control" style="height: 100px" id="description" name="description"
+                                        [(ngModel)]="supplier.description"></textarea>
+                                    <!-- <div *ngIf="showNameErrorLength" class="error-message">
+                                        Mô tả không được nhập quá 500 ký tự.
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-end">
+                                <button pButton pRipple label="Đóng" class="p-button-success buttoncloses" type="button"
+                                    (click)="closeCreateDialog(customerCreateForm)"></button>
+                                <button pButton pRipple label="Lưu" class="p-button-success butttonsave" type="submit"></button>
+                            </div>
+                        </div>
+                    </form><!-- End General Form Elements -->
+
+                </div>
+            </div>
+        </div>
+        <!---->
+        <div class="dialog-background" *ngIf="showUpdateDialog">
+            <div class="dialog-container" style="width: 700px; padding:0;" >
+                <div class="" *ngIf="supplierbyId">
+                    <div class="d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #ccc;padding: 0 10px">
+                        <h5 class="card-title">Cập nhật nhà cung cấp</h5>
+                        <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger"
+                            [style]="{'border-radius': '25%'}" (click)="closeUpdateDialog(supplierUpdateForm)"></p-button>
+                    </div>
+                    <form  style="padding: 15px 20px !important"  #supplierUpdateForm="ngForm" (ngSubmit)="updateSupplier(supplierUpdateForm)">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="addName" class="form-label">Tên nhà cung cấp<span class="red-asterisk">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="supplierbyId.name" id="addName" name="name" ngModel required
+                                        minlength="1" maxlength="255">
+                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['name']?.invalid" class="error-message">
+                                        <div *ngIf="supplierUpdateForm.controls['name']?.errors?.['required']">
+                                            Tên nhà cung cấp không được bỏ trống
+                                        </div>
+                                        <div
+                                            *ngIf="supplierUpdateForm.controls['name']?.errors?.['minlength'] || supplierUpdateForm.controls['name']?.errors?.['maxlength']">
+                                            Tên phải lớn hơn 3 ký tự && nhỏ hơn 10 ký tự
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Số điện thoại<span class="red-asterisk">*</span></label>
+                                    <input type="text" class="form-control" pattern="^(03|05|07|08|09)\d{8}$" (keypress)="validateNumber($event)"
+                                        minlength="10" maxlength="10" id="phone" name="phone" [(ngModel)]="supplierbyId.phone" required>
+                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['phone']?.invalid">
+                                        <div *ngIf="supplierUpdateForm.controls['phone']?.errors?.['required']" class="error-message">
+                                            Số điện không được bỏ trống
+                                        </div>
+                                        <!-- <div *ngIf="supplierUpdateForm.controls['phone']?.errors?.['minlength'] || supplierUpdateForm.controls['phone']?.errors?.['maxlength']"
+                                                                    class="error-message">
+                                                                    Số điện thoại phải đúng 10 ký tự
+                                                                </div> -->
+                                        <div *ngIf="supplierUpdateForm.controls['phone']?.errors?.['pattern']" class="error-message">
+                                            Số điện thoại không hợp lệ
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" [(ngModel)]="supplierbyId.email"
+                                        pattern="^(?!\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(?<!\.)$">
+                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['email']?.invalid">
+                                        <div *ngIf="supplierUpdateForm.controls['email']?.errors?.['required']" class="error-message">
+                                            Email không được bỏ trống
+                                        </div>
+                                        <div *ngIf="supplierUpdateForm.controls['email']?.errors?.['pattern']" class="error-message">
+                                            Nhập sai định dạng email
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Địa chỉ</label>
+                                    <input type="text" class="form-control" id="address" name="address" [(ngModel)]="supplierbyId.address"
+                                        maxlength="255">
+                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['address']?.invalid">
+                                        <div *ngIf="supplierUpdateForm.controls['address']?.errors?.['required']" class="error-message">
+                                            Địa chỉ không được bỏ trống
+                                        </div>
+                                        <div *ngIf="supplierUpdateForm.controls['address']?.errors?.['maxlength']" class="error-message">
+                                            Địa chỉ không được vượt quá 255 ký tự
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="taxCode" class="form-label">Mã số thuế</label>
+                                    <input type="text" class="form-control" id="taxCode" name="taxCode" [(ngModel)]="supplierbyId.taxCode" inputmode="numeric" 
+                                        pattern="^\d{10,13}$">
+                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['taxCode']?.invalid">
+                                        <div *ngIf="supplierUpdateForm.controls['taxCode']?.errors?.['required']" class="error-message">
+                                            Mã số thuế không được bỏ trống
+                                        </div>
+                                        <div *ngIf="supplierUpdateForm.controls['taxCode']?.errors?.['pattern']" class="error-message">
+                                            Mã số thuế chỉ được chứa từ 10 đến 13 chữ số
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Mô tả</label>
+                                    <textarea class="form-control" style="height: 100px" id="description" name="description"
+                                        [(ngModel)]="supplierbyId.description" ></textarea>
+                                    <!-- <div *ngIf="showNameErrorLength" class="error-message">
+                                        Mô tả không được nhập quá 500 ký tự.
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-12">
+                            <div class="col-sm-12 buttonsl">
+                                <button pButton pRipple label="Đóng" class="p-button-success buttoncloses" type="button"
+                                    (click)="closeUpdateDialog(supplierUpdateForm)"></button>
+                                <button pButton pRipple label="Lưu" class="p-button-success butttonsave"
+                                    type="submit"></button>
+                            </div>
+                        </div>
+                        <!-- <div class="row mb-3 btn-save">
+              <div class="col-sm-10">
+                <button pButton pRipple label="Lưu" class="p-button-success"></button>
+                <div *ngIf="errorMessage" class="error-message">
+                  {{ errorMessage }}
+                </div>
+              </div>
+            </div> -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <p-dialog header="Xóa nhà cung cấp?" [modal]="true" appendTo="body" [(visible)]="showDeleteDialog"
+        [style]="{width: '450px'}" [contentStyle]="{height: ''}">
+        <div class="container">
+            <form #deleteForm="ngForm" >
+                <div class="row mb-3"  *ngIf="supplierbyId">
+                    <span>Bạn có chắc chắn muốn xóa nhà cung cấp này? Lưu ý, sau khi xóa bạn không thể hoàn tác hay khôi phục nhà cung cấp này ?</span>
+                    <h5 style="text-align: center;margin-top: 5px;font-weight: 600;">{{supplierbyId.name}}</h5>
+                </div>
+                <div class="footer-note" style="text-align: right; display: flex; gap:5px;justify-content: flex-end;">
+                    <!-- (click)="closeDeleteDialog(deleteForm)" -->
+                    <button  type="button" pButton pRipple label="Hủy" (click)="showDeleteDialog = false"
+                        class="p-button-success buttoncloses"></button>
+                    <button pButton pRipple type="submit" label="Đồng ý" class="buttonfilter" style="background: red;border: none;" (click)="deleteSupplier(supplierbyId.id)"></button>
+                </div>
+            </form>
+        </div>
+    </p-dialog>
+</main>
