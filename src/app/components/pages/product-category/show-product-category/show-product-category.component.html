@@ -129,6 +129,11 @@
                 </tr>
               </ng-template>
             </p-table>
+            <div *ngIf="totalRecordsCount === 0" style="text-align: center">
+              <strong style="text-align: center; width: 100%"
+                >Không tìm thấy kết quả phù hợp</strong
+              >
+            </div>
             <div class="paging-bot dg-fix">
               <div class="paging-info">
                 <div [innerHTML]="currentPageReport"></div>

@@ -34,8 +34,11 @@
                             type="text"
                             formControlName="inputData"
                             spellcheck="false"
-                            placeholder="Nhập số máy hoặc số điện thoại"
+                            placeholder="Nhập số khung/số máy hoặc số điện thoại"
                         />
+                        <div *ngIf="showErrors" class="error-message" style="color: red;">
+                            Vui lòng nhập đủ số máy và số khung để kiểm tra!
+                        </div>
 
                     </div>
                 </div>
