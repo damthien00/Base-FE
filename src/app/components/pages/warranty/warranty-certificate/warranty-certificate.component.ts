@@ -150,15 +150,18 @@ export class WarrantyCertificateComponent implements OnInit {
         if (this.optionsFilterWarranty.CustomerKeyword === '') {
             this.optionsFilterWarranty.CustomerKeyword = null;
         }
-        if (this.optionsFilterWarranty.Imei === '') {
+        if (!this.optionsFilterWarranty.Imei) {
+            // If Imei is null, undefined, or an empty string, reset other properties
             this.optionsFilterWarranty.Imei = null;
             this.optionsFilterWarranty.FrameNumber = null;
             this.optionsFilterWarranty.EngineNumber = null;
         } else {
+            // If Imei has a value, proceed with splitting
             const imeiParts = this.optionsFilterWarranty.Imei.split('-');
-            this.optionsFilterWarranty.FrameNumber = imeiParts[0];
-            this.optionsFilterWarranty.EngineNumber = imeiParts[1];
+            this.optionsFilterWarranty.FrameNumber = imeiParts[0] || null;
+            this.optionsFilterWarranty.EngineNumber = imeiParts[1] || null;
         }
+
         if (this.optionsFilterWarranty.ProductName === '') {
             this.optionsFilterWarranty.ProductName = null;
         }
