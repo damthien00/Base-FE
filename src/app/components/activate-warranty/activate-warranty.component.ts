@@ -183,6 +183,112 @@ export class ActivateWarrantyComponent implements OnInit {
     onClearWard() {
         this.createActivateWarranty.get('wardId')?.setValue(null);
     }
+
+    // onSubmit() {
+    //     if (this.createActivateWarranty.valid) {
+    //         const observables = this.productListSelected.map((product) => {
+    //             const formData = {
+    //                 code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần
+    //                 customerName:
+    //                     this.createActivateWarranty.value.customerName ||
+    //                     'string',
+    //                 branchId: product.branchId || 5,
+    //                 branchName: product.branchName || 'Chi nhánh Khoái Châu',
+    //                 phoneNumber:
+    //                     this.createActivateWarranty.value.phoneNumber ||
+    //                     'string',
+    //                 wardName:
+    //                     this.createActivateWarranty.value.wardId?.name || '',
+    //                 districtName:
+    //                     this.createActivateWarranty.value.districtId?.name ||
+    //                     '',
+    //                 cityName:
+    //                     this.createActivateWarranty.value.cityId?.name || '',
+    //                 customer: {
+    //                     name:
+    //                         this.createActivateWarranty.value.customerName ||
+    //                         'string',
+    //                     phoneNumber:
+    //                         this.createActivateWarranty.value.phoneNumber ||
+    //                         'string',
+    //                     wardId: this.createActivateWarranty.value.wardId?.id,
+    //                     wardName:
+    //                         this.createActivateWarranty.value.wardId?.name,
+    //                     districtId:
+    //                         this.createActivateWarranty.value.districtId?.id,
+    //                     districtName:
+    //                         this.createActivateWarranty.value.districtId?.name,
+    //                     cityId: this.createActivateWarranty.value.cityId?.id,
+    //                     cityName:
+    //                         this.createActivateWarranty.value.cityId?.name,
+    //                     addressDetail:
+    //                         this.createActivateWarranty.value.address,
+    //                 },
+    //                 warrantyProducts: [
+    //                     {
+    //                         productId: product.productId,
+    //                         productVariantId: product.productVariantId,
+    //                         productName: product.productVariant.productName,
+    //                         value1: product.productVariant.valuePropeties1,
+    //                         value2: product.productVariant.valuePropeties2,
+    //                         sk: product.frameNumber,
+    //                         sm: product.engineNumber,
+    //                         inventoryStockDetailProductImeiId: product.id,
+    //                         expirationDate: product.term
+    //                             ? this.calculateExpirationDate(
+    //                                   product.term,
+    //                                   product.termType
+    //                               )
+    //                             : new Date(
+    //                                   new Date().getTime() + 7 * 60 * 60 * 1000
+    //                               ).toISOString(),
+    //                     },
+    //                 ],
+    //             };
+    //             console.log(formData);
+
+    //             localStorage.setItem(
+    //                 'lastCreatedWarranties',
+    //                 JSON.stringify(formData)
+    //             );
+    //             // Gọi API tạo bảo hành cho từng sản phẩm
+    //             return this.warrantyService.createWarranty(formData);
+    //         });
+
+    //         // Gọi tất cả các yêu cầu tạo bảo hành
+    //         forkJoin(observables).subscribe(
+    //             (responses) => {
+    //                 const inventoryStockDetailProductImeiIds =
+    //                     this.productListSelected.map((product) => product.id);
+    //                 const formData1 = {
+    //                     inventoryStockDetailProductImeiIds,
+    //                 };
+
+    //                 this.warrantyService.updatePurchased(formData1).subscribe(
+    //                     (response) => {
+    //                         // Xử lý thành công
+    //                     },
+    //                     (error) => {
+    //                         console.error(
+    //                             'Error creating inventoryStockIn:',
+    //                             error
+    //                         );
+    //                     }
+    //                 );
+
+    //                 // Điều hướng tới trang thành công
+    //                 this.router.navigate(['/activate-success']);
+    //             },
+    //             (error) => {
+    //                 console.error('Error creating warranties:', error);
+    //             }
+    //         );
+    //     } else {
+    //         console.log('Form is invalid');
+    //         this.createActivateWarranty.markAllAsTouched();
+    //     }
+    // }
+
     onSubmit() {
         if (this.createActivateWarranty.valid) {
             const observables = this.productListSelected.map((product) => {
@@ -244,10 +350,21 @@ export class ActivateWarrantyComponent implements OnInit {
                         },
                     ],
                 };
+
+                // Lấy dữ liệu đã lưu từ localStorage
+                const storedData = JSON.parse(
+                    localStorage.getItem('lastCreatedWarranties') || '[]'
+                );
+
+                // Thêm dữ liệu mới vào mảng
+                storedData.push(formData);
+
+                // Lưu lại mảng dữ liệu vào localStorage
                 localStorage.setItem(
                     'lastCreatedWarranties',
-                    JSON.stringify(formData)
+                    JSON.stringify(storedData)
                 );
+
                 // Gọi API tạo bảo hành cho từng sản phẩm
                 return this.warrantyService.createWarranty(formData);
             });
