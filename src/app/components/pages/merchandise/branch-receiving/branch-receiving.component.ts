@@ -342,15 +342,15 @@ export class BranchReceivingComponent {
               .subscribe(
                 (response2) => {
                   console.log('Cập nhật inventory thành công', response2);
-                  this.messageService.add({
-                    severity: 'success',
-                    summary: '',
-                    detail: 'Nhận hàng thành công',
-                    life: 3000
-                  });
-                  setTimeout(() => {
-                    this.router.navigate(['/pages/stock-transfer']);
-                  }, 3000);
+                  // this.messageService.add({
+                  //   severity: 'success',
+                  //   summary: '',
+                  //   detail: 'Nhận hàng thành công',
+                  //   life: 3000
+                  // });
+                  // setTimeout(() => {
+                  //   this.router.navigate(['/pages/stock-transfer']);
+                  // }, 3000);
                   this.hideConfirmDialog(); // Ẩn dialog sau khi cập nhật thành công
                 },
                 (error2) => {

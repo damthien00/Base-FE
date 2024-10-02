@@ -459,13 +459,24 @@
                                 </div>
                             </div>
 
-                            <div class="field">
+                            <div class="field" *ngIf="!isAccept">
                                 <!-- Ghi chú -->
                                 <label htmlFor="email1">Ghi chú</label>
                                 <textarea
                                     [(ngModel)]="recipientNote"
                                     pInputTextarea
                                     spellcheck="false"
+                                ></textarea>
+                            </div>
+
+                            <div class="field" *ngIf="isAccept">
+                                <!-- Ghi chú -->
+                                <label htmlFor="email1">Ghi chú</label>
+                                <textarea
+                                    [(ngModel)]="this.ladingData.note"
+                                    pInputTextarea
+                                    spellcheck="false"
+                                    readonly
                                 ></textarea>
                             </div>
                             <button

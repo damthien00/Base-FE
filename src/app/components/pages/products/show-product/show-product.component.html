@@ -317,11 +317,12 @@
                                     style="
                                         margin: 15px 0;
                                         width: 90%;
-                                        height: 23px;
+                                        height: 26px;
                                         border: 1px solid #d9d9d9;
                                         border-radius: 15px;
                                         text-align: center;
                                         background-color: red;
+                                        color: white;
                                     "
                                     [style.background-color]="
                                         variant.quantity === 0
@@ -344,11 +345,12 @@
                                     style="
                                         margin: 15px 0;
                                         width: 90%;
-                                        height: 23px;
+                                        height: 26px;
                                         border: 1px solid #d9d9d9;
                                         border-radius: 15px;
                                         text-align: center;
                                         background-color: red;
+                                        color: white;
                                     "
                                     [style.background-color]="
                                         product.totalQuantity === 0
@@ -455,6 +457,11 @@
                         ></p-button>
                     </ng-template>
                 </p-table>
+                <div *ngIf="totalRecords === 0" style="text-align: center">
+                    <strong style="text-align: center; width: 100%"
+                      >Không tìm thấy kết quả phù hợp</strong
+                    >
+                  </div>
                 <div class="paginator">
                     <p-paginator
                         [rows]="this.pageSize"

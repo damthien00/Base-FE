@@ -138,6 +138,13 @@ import { RouterModule } from '@angular/router';
                     ).then((m) => m.BranchReceivingModule),
             },
             {
+                path: 'customer/show-customer',
+                loadChildren: () =>
+                    import(
+                        './list-customer/customer/customer.module'
+                    ).then((m) => m.CustomerModule),
+            },
+            {
                 path: 'role',
                 loadChildren: () =>
                     import(

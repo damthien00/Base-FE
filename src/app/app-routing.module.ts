@@ -18,7 +18,7 @@ import { AdminGuard } from './core/guards/admin.guard';
                     children: [
                         {
                             path: '',
-                            canActivate: [AdminGuard],
+                            // canActivate: [AdminGuard],
                             loadChildren: () =>
                                 import(
                                     'src/app/components/dashboard/dashboard.module'
@@ -26,7 +26,7 @@ import { AdminGuard } from './core/guards/admin.guard';
                         },
                         {
                             path: 'dashboard',
-                            canActivate: [AdminGuard],
+                            // canActivate: [AdminGuard],
                             loadChildren: () =>
                                 import(
                                     'src/app/components/dashboard/dashboard.module'
@@ -34,7 +34,7 @@ import { AdminGuard } from './core/guards/admin.guard';
                         },
                         {
                             path: 'pages',
-                            canActivate: [AdminGuard],
+                            // canActivate: [AdminGuard],
                             loadChildren: () =>
                                 import('./components/pages/pages.module').then(
                                     (m) => m.PagesModule

@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { environment } from 'src/environments/environment';
 import { B } from '@fullcalendar/core/internal-common';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
     selector: 'app-show',
@@ -17,6 +18,7 @@ export class ShowComponent implements OnInit {
     stockInList: any[];
     optionsFilterStockIn: OptionsFilterStockIn = new OptionsFilterStockIn();
     displayStockInDetailModal: boolean = false;
+    public userCurrent: any;
 
     stockInItemDetail: any;
     code: any;
@@ -28,7 +30,14 @@ export class ShowComponent implements OnInit {
     totalRecordsCount: any;
     isLoading: boolean = true;
 
-    constructor(private stockInService: StockInService) {}
+    constructor(
+        private stockInService: StockInService,
+        private authService: AuthService
+    ) {
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+        });
+    }
 
     ngOnInit() {
         this.items = [
