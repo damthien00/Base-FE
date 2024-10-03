@@ -566,8 +566,8 @@ export class CreateComponent implements OnInit {
 
         if (files.length > maxFileCount) {
             this.messageService.add({
-                severity: 'success', // Mức độ của thông báo (success, info, warn, error)
-                summary: 'Thành công', // Tiêu đề của thông báo
+                severity: 'warn',
+                summary: 'Cảnh báo',
                 detail: `Vui lòng chỉ chọn tối đa ${maxFileCount} file.`, // Nội dung của thông báo
             });
             // alert();
@@ -580,8 +580,8 @@ export class CreateComponent implements OnInit {
             // Kiểm tra kích thước file
             if (file.size > maxSize) {
                 this.messageService.add({
-                    severity: 'success',
-                    summary: 'Thành công',
+                    severity: 'warn',
+                    summary: 'Cảnh báo',
                     detail: `File "${file.name}" vượt quá kích thước tối đa 3MB.`,
                 });
                 return;
@@ -589,8 +589,8 @@ export class CreateComponent implements OnInit {
 
             if (!allowedExtensions.exec(file.name)) {
                 this.messageService.add({
-                    severity: 'success',
-                    summary: 'Thành công',
+                    severity: 'warn',
+                    summary: 'Cảnh báo',
                     detail: `File "${file.name}" không phải định dạng cho phép (jpeg, jpg, png, gif, bmp).`,
                 });
                 return;

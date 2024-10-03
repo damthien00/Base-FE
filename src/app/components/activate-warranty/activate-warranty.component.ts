@@ -4,7 +4,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { WarrantyService } from 'src/app/core/services/warranty.service';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, switchMap } from 'rxjs';
+import { CustomerService } from 'src/app/core/services/customer.service';
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
     query: string;
@@ -22,6 +23,7 @@ export class ActivateWarrantyComponent implements OnInit {
         private productImeiService: ProductImeiService,
         private addressService: AddressService,
         private formBuilder: FormBuilder,
+        private customerService: CustomerService,
         private warrantyService: WarrantyService,
         private router: Router
     ) {
@@ -54,6 +56,7 @@ export class ActivateWarrantyComponent implements OnInit {
     selectedCityId!: number;
     selectedDistrictId!: number;
     selectedWardId!: number;
+    customerId: any;
     ngOnInit() {
         this.getCitiesByCountry(1);
     }
@@ -286,108 +289,116 @@ export class ActivateWarrantyComponent implements OnInit {
     //         this.createActivateWarranty.markAllAsTouched();
     //     }
     // }
-    onSubmit() {
-        if (this.createActivateWarranty.valid) {
-            // Tạo mảng để lưu trữ dữ liệu bảo hành cho tất cả sản phẩm
-            const warrantyProducts = this.productListSelected.map((product) => {
-                return {
-                    productId: product.productId,
-                    productVariantId: product.productVariantId,
-                    productName: product.productVariant.productName,
-                    value1: product.productVariant.valuePropeties1,
-                    value2: product.productVariant.valuePropeties2,
-                    sk: product.frameNumber,
-                    sm: product.engineNumber,
-                    inventoryStockDetailProductImeiId: product.id,
-                    expirationDate: product.term
-                        ? this.calculateExpirationDate(
-                              product.term,
-                              product.termType
-                          )
-                        : new Date(
-                              new Date().getTime() + 7 * 60 * 60 * 1000
-                          ).toISOString(),
-                };
-            });
+    // onSubmit() {
+    //     if (this.createActivateWarranty.valid) {
+    //         // Tạo mảng để lưu trữ dữ liệu bảo hành cho tất cả sản phẩm
 
-            const formData = {
-                code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần
-                customerName:
-                    this.createActivateWarranty.value.customerName || 'string',
-                branchId: this.productListSelected[0]?.branchId || 5, // Lấy branchId từ sản phẩm đầu tiên
-                branchName:
-                    this.productListSelected[0]?.branchName ||
-                    'Chi nhánh Khoái Châu',
-                phoneNumber:
-                    this.createActivateWarranty.value.phoneNumber || 'string',
-                wardName: this.createActivateWarranty.value.wardId?.name || '',
-                districtName:
-                    this.createActivateWarranty.value.districtId?.name || '',
-                cityName: this.createActivateWarranty.value.cityId?.name || '',
-                customer: {
-                    name:
-                        this.createActivateWarranty.value.customerName ||
-                        'string',
-                    phoneNumber:
-                        this.createActivateWarranty.value.phoneNumber ||
-                        'string',
-                    wardId: this.createActivateWarranty.value.wardId?.id,
-                    wardName: this.createActivateWarranty.value.wardId?.name,
-                    districtId:
-                        this.createActivateWarranty.value.districtId?.id,
-                    districtName:
-                        this.createActivateWarranty.value.districtId?.name,
-                    cityId: this.createActivateWarranty.value.cityId?.id,
-                    cityName: this.createActivateWarranty.value.cityId?.name,
-                    addressDetail: this.createActivateWarranty.value.address,
-                },
-                warrantyProducts, // Gán mảng sản phẩm vào formData
-            };
+    //         const formDataCus = {
+    //             name:
+    //                 this.createActivateWarranty.value.customerName || 'string',
+    //             phoneNumber:
+    //                 this.createActivateWarranty.value.phoneNumber || 'string',
+    //             wardId: this.createActivateWarranty.value.wardId?.id,
+    //             wardName: this.createActivateWarranty.value.wardId?.name,
+    //             districtId: this.createActivateWarranty.value.districtId?.id,
+    //             districtName:
+    //                 this.createActivateWarranty.value.districtId?.name,
+    //             cityId: this.createActivateWarranty.value.cityId?.id,
+    //             cityName: this.createActivateWarranty.value.cityId?.name,
+    //             addressDetail: this.createActivateWarranty.value.address,
+    //         };
 
-            // Lưu vào localStorage
-            localStorage.setItem(
-                'lastCreatedWarranties',
-                JSON.stringify(formData)
-            );
+    //         this.customerService
+    //             .createCustomer(formDataCus)
+    //             .subscribe((item) => {
+    //                 this.customerId = item.data.id;
+    //             });
 
-            // Gọi API tạo bảo hành cho từng sản phẩm
-            const observables = this.productListSelected.map((product) => {
-                return this.warrantyService.createWarranty(formData);
-            });
+    //         const warrantyProducts = this.productListSelected.map((product) => {
+    //             return {
+    //                 productId: product.productId,
+    //                 productVariantId: product.productVariantId,
+    //                 productName: product.productVariant.productName,
+    //                 value1: product.productVariant.valuePropeties1,
+    //                 value2: product.productVariant.valuePropeties2,
+    //                 sk: product.frameNumber,
+    //                 sm: product.engineNumber,
+    //                 inventoryStockDetailProductImeiId: product.id,
+    //                 expirationDate: product.term
+    //                     ? this.calculateExpirationDate(
+    //                           product.term,
+    //                           product.termType
+    //                       )
+    //                     : new Date(
+    //                           new Date().getTime() + 7 * 60 * 60 * 1000
+    //                       ).toISOString(),
+    //             };
+    //         });
 
-            // Gọi tất cả các yêu cầu tạo bảo hành
-            forkJoin(observables).subscribe(
-                (responses) => {
-                    const inventoryStockDetailProductImeiIds =
-                        this.productListSelected.map((product) => product.id);
-                    const formData1 = {
-                        inventoryStockDetailProductImeiIds,
-                    };
+    //         const formData = {
+    //             code: 'string', // Bạn có thể thay thế giá trị này từ form nếu cần
+    //             customerName:
+    //                 this.createActivateWarranty.value.customerName || 'string',
+    //             branchId: this.productListSelected[0]?.branchId || 5, // Lấy branchId từ sản phẩm đầu tiên
+    //             branchName:
+    //                 this.productListSelected[0]?.branchName ||
+    //                 'Chi nhánh Khoái Châu',
+    //             phoneNumber:
+    //                 this.createActivateWarranty.value.phoneNumber || 'string',
+    //             wardName: this.createActivateWarranty.value.wardId?.name || '',
 
-                    this.warrantyService.updatePurchased(formData1).subscribe(
-                        (response) => {
-                            // Xử lý thành công
-                        },
-                        (error) => {
-                            console.error(
-                                'Error creating inventoryStockIn:',
-                                error
-                            );
-                        }
-                    );
+    //             customerId: this.customerId,
+    //             districtName:
+    //                 this.createActivateWarranty.value.districtId?.name || '',
+    //             cityName: this.createActivateWarranty.value.cityId?.name || '',
+    //             customer: null,
+    //             warrantyProducts, // Gán mảng sản phẩm vào formData
+    //         };
 
-                    // Điều hướng tới trang thành công
-                    this.router.navigate(['/activate-success']);
-                },
-                (error) => {
-                    console.error('Error creating warranties:', error);
-                }
-            );
-        } else {
-            console.log('Form is invalid');
-            this.createActivateWarranty.markAllAsTouched();
-        }
-    }
+    //         // Lưu vào localStorage
+    //         localStorage.setItem(
+    //             'lastCreatedWarranties',
+    //             JSON.stringify(formData)
+    //         );
+
+    //         // Gọi API tạo bảo hành cho từng sản phẩm
+    //         const observables = this.productListSelected.map((product) => {
+    //             return this.warrantyService.createWarranty(formData);
+    //         });
+
+    //         // Gọi tất cả các yêu cầu tạo bảo hành
+    //         forkJoin(observables).subscribe(
+    //             (responses) => {
+    //                 const inventoryStockDetailProductImeiIds =
+    //                     this.productListSelected.map((product) => product.id);
+    //                 const formData1 = {
+    //                     inventoryStockDetailProductImeiIds,
+    //                 };
+
+    //                 this.warrantyService.updatePurchased(formData1).subscribe(
+    //                     (response) => {
+    //                         // Xử lý thành công
+    //                     },
+    //                     (error) => {
+    //                         console.error(
+    //                             'Error creating inventoryStockIn:',
+    //                             error
+    //                         );
+    //                     }
+    //                 );
+
+    //                 // Điều hướng tới trang thành công
+    //                 this.router.navigate(['/activate-success']);
+    //             },
+    //             (error) => {
+    //                 console.error('Error creating warranties:', error);
+    //             }
+    //         );
+    //     } else {
+    //         console.log('Form is invalid');
+    //         this.createActivateWarranty.markAllAsTouched();
+    //     }
+    // }
 
     // onSubmit() {
     //     if (this.createActivateWarranty.valid) {
@@ -502,6 +513,137 @@ export class ActivateWarrantyComponent implements OnInit {
     //         this.createActivateWarranty.markAllAsTouched();
     //     }
     // }
+
+    onSubmit() {
+        if (this.createActivateWarranty.valid) {
+            // Tạo mảng để lưu trữ dữ liệu bảo hành cho tất cả sản phẩm
+            const formDataCus = {
+                name:
+                    this.createActivateWarranty.value.customerName || 'string',
+                phoneNumber:
+                    this.createActivateWarranty.value.phoneNumber || 'string',
+                wardId: this.createActivateWarranty.value.wardId?.id,
+                wardName: this.createActivateWarranty.value.wardId?.name,
+                districtId: this.createActivateWarranty.value.districtId?.id,
+                districtName:
+                    this.createActivateWarranty.value.districtId?.name,
+                cityId: this.createActivateWarranty.value.cityId?.id,
+                cityName: this.createActivateWarranty.value.cityId?.name,
+                addressDetail: this.createActivateWarranty.value.address,
+            };
+
+            // Sử dụng switchMap để đợi tạo customer xong rồi mới tiếp tục
+            this.customerService
+                .createCustomer(formDataCus)
+                .pipe(
+                    switchMap((item) => {
+                        this.customerId = item.data.id;
+
+                        const warrantyProducts = this.productListSelected.map(
+                            (product) => {
+                                return {
+                                    productId: product.productId,
+                                    productVariantId: product.productVariantId,
+                                    productName:
+                                        product.productVariant.productName,
+                                    value1: product.productVariant
+                                        .valuePropeties1,
+                                    value2: product.productVariant
+                                        .valuePropeties2,
+                                    sk: product.frameNumber,
+                                    sm: product.engineNumber,
+                                    inventoryStockDetailProductImeiId:
+                                        product.id,
+                                    expirationDate: product.term
+                                        ? this.calculateExpirationDate(
+                                              product.term,
+                                              product.termType
+                                          )
+                                        : new Date(
+                                              new Date().getTime() +
+                                                  7 * 60 * 60 * 1000
+                                          ).toISOString(),
+                                };
+                            }
+                        );
+
+                        const formData = {
+                            code: 'string',
+                            customerName:
+                                this.createActivateWarranty.value
+                                    .customerName || 'string',
+                            branchId:
+                                this.productListSelected[0]?.branchId || 5,
+                            branchName:
+                                this.productListSelected[0]?.branchName ||
+                                'Chi nhánh Khoái Châu',
+                            phoneNumber:
+                                this.createActivateWarranty.value.phoneNumber ||
+                                'string',
+                            wardName:
+                                this.createActivateWarranty.value.wardId
+                                    ?.name || '',
+                            customerId: this.customerId,
+                            districtName:
+                                this.createActivateWarranty.value.districtId
+                                    ?.name || '',
+                            cityName:
+                                this.createActivateWarranty.value.cityId
+                                    ?.name || '',
+                            customer: null,
+                            warrantyProducts,
+
+                            cusSuccess: formDataCus,
+                        };
+
+                        // Lưu vào localStorage
+                        localStorage.setItem(
+                            'lastCreatedWarranties',
+                            JSON.stringify(formData)
+                        );
+
+                        // Tạo mảng các observable cho từng sản phẩm
+                        const observables = this.productListSelected.map(
+                            (product) => {
+                                return this.warrantyService.createWarranty(
+                                    formData
+                                );
+                            }
+                        );
+
+                        // Sử dụng forkJoin để gọi tất cả API createWarranty cho từng sản phẩm
+                        return forkJoin(observables).pipe(
+                            switchMap((responses) => {
+                                const inventoryStockDetailProductImeiIds =
+                                    this.productListSelected.map(
+                                        (product) => product.id
+                                    );
+                                const formData1 = {
+                                    inventoryStockDetailProductImeiIds,
+                                };
+
+                                // Cập nhật trạng thái Purchased
+                                return this.warrantyService.updatePurchased(
+                                    formData1
+                                );
+                            })
+                        );
+                    })
+                )
+                .subscribe(
+                    (response) => {
+                        // Xử lý thành công
+                        this.router.navigate(['/activate-success']);
+                    },
+                    (error) => {
+                        console.error('Error during the process:', error);
+                    }
+                );
+        } else {
+            console.log('Form is invalid');
+            this.createActivateWarranty.markAllAsTouched();
+        }
+    }
 
     removeProduct(index: number) {
         this.productListSelected.splice(index, 1); // Xóa sản phẩm khỏi danh sách

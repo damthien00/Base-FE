@@ -22,6 +22,7 @@ export interface User {
     roles: Role[];
     // roleNames: string[];
     address: string;
+    isRefreshToken: boolean;
 }
 
 interface Role {

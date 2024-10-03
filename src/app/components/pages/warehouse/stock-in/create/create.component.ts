@@ -1,3 +1,4 @@
+import { OptionsFilterBranch } from './../../../../../core/DTOs/branch/optionsFilterBranchs';
 import { StockInService } from './../../../../../core/services/stock-in.service';
 import { FunctionService } from 'src/app/core/utils/function.utils';
 import {
@@ -16,6 +17,7 @@ import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { OptionsFilterProductVariant } from 'src/app/core/DTOs/stock-in/optionFilterProductVariant';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { OptionsFilterSupplier } from 'src/app/core/DTOs/supplier/OptionsFilterSupplier';
 
 export interface WarehouseReceipt {
     id?: number;
@@ -55,10 +57,12 @@ export class CreateComponent implements OnInit {
 
     displayDiscountModal = false;
     optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
+    optionsFilterSupplier: OptionsFilterSupplier = new OptionsFilterSupplier();
     frameNumber: any;
     engineNumber: any;
     public userCurrent: any;
-
+    supplierSelected: any;
+    suppliers: any;
     onBarcode: boolean = false;
     constructor(
         private nodeService: NodeService,
@@ -116,6 +120,15 @@ export class CreateComponent implements OnInit {
     //     this.optionsFillerProduct.KeyWord = searchTerm;
     //     this.loadProducts();
     // }
+
+    searchSupplier(data: any) {
+        this.optionsFilterSupplier.nameOrPhone = data.query;
+        this.stockInService
+            .getSupplier(this.optionsFilterSupplier)
+            .subscribe((data) => {
+                this.suppliers = data.data;
+            });
+    }
 
     async onProductSearch(event: Event) {
         const input = event.target as HTMLInputElement;
@@ -217,9 +230,7 @@ export class CreateComponent implements OnInit {
                         productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
                         price: itemVariant.price,
                         unit: item.unitName,
-                        mass: itemVariant.sellCounts
-                            ? itemVariant.sellCounts
-                            : 0,
+                        mass: itemVariant.quantity ? itemVariant.quantity : 0,
                         total:
                             item.productType === 1 ? 0 : itemVariant.price * 1,
                         frameNumber: '',
@@ -239,7 +250,7 @@ export class CreateComponent implements OnInit {
                     productCode: item.code || '', // Đảm bảo mã sản phẩm
                     price: item.sellingPrice,
                     unit: item.unitName,
-                    mass: item.mass,
+                    mass: item.totalQuantity,
                     total: item.productType === 1 ? 0 : item.sellingPrice * 1,
                     frameNumber: '',
                     engineNumber: '',
@@ -520,8 +531,8 @@ export class CreateComponent implements OnInit {
                 }
             );
             const formData = {
-                supplierId: 1,
-                supplierName: 'string',
+                supplierId: this.supplierSelected.id,
+                supplierName: this.supplierSelected.name,
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
                 branchId: this.userCurrent.branchId,
@@ -556,347 +567,6 @@ export class CreateComponent implements OnInit {
             this.isSubmitting = false;
         }
     }
-
-    // checkValidity() {
-    //     if (this.stockInReceipt.inventoryStockInDetails.length == 0) {
-    //         this.messageService.add({
-    //             severity: 'error',
-    //             summary: 'Chú ý',
-    //             detail: 'Phiếu nhập chưa có sản phẩm',
-    //         });
-    //         this.isValidForm = false;
-    //         return;
-    //     }
-
-    //     // Kiểm tra giá trị thanh toán và tổng giảm giá
-    //     if (
-    //         this.stockInReceipt.customerPayment ===
-    //         this.stockInReceipt.totalAmountPaid
-    //     ) {
-    //         this.stockInReceipt.isValidMoney = false;
-    //         delete this.stockInReceipt.isMessageValidMoney;
-    //     } else {
-    //         this.stockInReceipt.isValidMoney = true;
-    //         this.stockInReceipt.isMessageValidMoney =
-    //             'Bằng tiền cần trả nhà cung cấp';
-    //     }
-
-    //     // Kiểm tra các sản phẩm và IMEI
-    //     this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
-    //         if (product.quantity === 0) {
-    //             product.isValid = true;
-    //             product.isValidMessage = 'Số lượng > 0';
-    //         } else {
-    //             product.isValid = false;
-    //             delete product.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //         }
-
-    //         if (product.productImeis) {
-    //             product.productImeis.forEach((imei) => {
-    //                 if (!imei.frameNumber || !imei.engineNumber) {
-    //                     imei.isValid = true;
-    //                     if (!imei.frameNumber && !imei.engineNumber) {
-    //                         imei.isValidMessage =
-    //                             'Vui lòng nhập số khung và số máy';
-    //                     } else if (!imei.frameNumber) {
-    //                         imei.isValidMessage = 'Vui lòng nhập số khung';
-    //                     } else if (!imei.engineNumber) {
-    //                         imei.isValidMessage = 'Vui lòng nhập số máy';
-    //                     }
-    //                     console.log(imei.frameNumber, imei.engineNumber);
-    //                 } else {
-    //                     // if (!imei.isValid) {
-    //                     this.stockInService
-    //                         .checkExistEngineAndFrame(
-    //                             imei.frameNumber,
-    //                             imei.engineNumber
-    //                         )
-    //                         .subscribe(
-    //                             (exists) => {
-    //                                 console.log(exists);
-    //                                 if (exists.data) {
-    //                                     imei.isValid = true;
-    //                                     imei.isValidMessage =
-    //                                         'Số khung hoặc số máy đã tồn tại';
-    //                                 } else {
-    //                                     imei.isValid = false;
-    //                                     delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //                                 }
-    //                             },
-    //                             (error) => {
-    //                                 console.error(
-    //                                     'Error checking engine and frame number:',
-    //                                     error
-    //                                 );
-    //                             }
-    //                         );
-    //                     // imei.isValid = false;
-    //                     delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //                     // }
-    //                 }
-    //             });
-    //         }
-    //     });
-
-    //     // Kiểm tra tính hợp lệ của form
-    //     this.isValidForm =
-    //         this.stockInReceipt.inventoryStockInDetails?.every((product) => {
-    //             // Kiểm tra số lượng sản phẩm
-    //             if (product.quantity === 0) {
-    //                 return false;
-    //             }
-
-    //             // Kiểm tra IMEI nếu có
-    //             if (product.productImeis) {
-    //                 return product.productImeis.every((imei) => !imei.isValid);
-    //             }
-
-    //             // Kiểm tra tính hợp lệ của sản phẩm
-    //             return !product.isValid;
-    //         }) && !this.stockInReceipt.isValidMoney;
-
-    //     if (this.isValidForm) {
-    //     } else {
-    //     }
-    // }
-
-    // checkValidity() {
-    //     if (this.stockInReceipt.inventoryStockInDetails.length == 0) {
-    //         this.messageService.add({
-    //             severity: 'error',
-    //             summary: 'Chú ý',
-    //             detail: 'Phiếu nhập chưa có sản phẩm',
-    //         });
-    //         this.isValidForm = false;
-    //         return;
-    //     }
-
-    //     // Kiểm tra giá trị thanh toán và tổng giảm giá
-    //     if (
-    //         this.stockInReceipt.customerPayment ===
-    //         this.stockInReceipt.totalAmountPaid
-    //     ) {
-    //         this.stockInReceipt.isValidMoney = false;
-    //         delete this.stockInReceipt.isMessageValidMoney;
-    //     } else {
-    //         this.stockInReceipt.isValidMoney = true;
-    //         this.stockInReceipt.isMessageValidMoney =
-    //             'Bằng tiền cần trả nhà cung cấp';
-    //     }
-
-    //     // Khởi tạo Set để kiểm tra trùng cả số khung và số máy
-    //     const imeiSet = new Set();
-
-    //     // Kiểm tra các sản phẩm và IMEI
-    //     this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
-    //         if (product.quantity === 0) {
-    //             product.isValid = true;
-    //             product.isValidMessage = 'Số lượng > 0';
-    //         } else {
-    //             product.isValid = false;
-    //             delete product.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //         }
-
-    //         if (product.productImeis) {
-    //             product.productImeis.forEach((imei) => {
-    //                 if (!imei.frameNumber || !imei.engineNumber) {
-    //                     imei.isValid = true;
-    //                     if (!imei.frameNumber && !imei.engineNumber) {
-    //                         imei.isValidMessage =
-    //                             'Vui lòng nhập số khung và số máy';
-    //                     } else if (!imei.frameNumber) {
-    //                         imei.isValidMessage = 'Vui lòng nhập số khung';
-    //                     } else if (!imei.engineNumber) {
-    //                         imei.isValidMessage = 'Vui lòng nhập số máy';
-    //                     }
-    //                     console.log(imei.frameNumber, imei.engineNumber);
-    //                 } else {
-    //                     // Tạo chuỗi kết hợp số khung và số máy
-    //                     const imeiKey = `${imei.frameNumber}-${imei.engineNumber}`;
-
-    //                     // Kiểm tra xem cả số khung và số máy đã tồn tại trong Set chưa
-    //                     if (imeiSet.has(imeiKey)) {
-    //                         imei.isValid = true;
-    //                         imei.isValidMessage =
-    //                             'Số khung và số máy đã tồn tại trong danh sách';
-    //                     } else {
-    //                         // Thêm chuỗi số khung và số máy vào Set
-    //                         imeiSet.add(imeiKey);
-
-    //                         // Kiểm tra xem số khung và số máy đã tồn tại trong hệ thống chưa
-    //                         this.stockInService
-    //                             .checkExistEngineAndFrame(
-    //                                 imei.frameNumber,
-    //                                 imei.engineNumber
-    //                             )
-    //                             .subscribe(
-    //                                 (exists) => {
-    //                                     console.log(exists);
-    //                                     if (exists.data) {
-    //                                         imei.isValid = true;
-    //                                         imei.isValidMessage =
-    //                                             'Số khung hoặc số máy đã tồn tại';
-    //                                     } else {
-    //                                         imei.isValid = false;
-    //                                         delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //                                     }
-    //                                 },
-    //                                 (error) => {
-    //                                     console.error(
-    //                                         'Error checking engine and frame number:',
-    //                                         error
-    //                                     );
-    //                                 }
-    //                             );
-    //                         delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     });
-
-    //     // Kiểm tra tính hợp lệ của form
-    //     this.isValidForm =
-    //         this.stockInReceipt.inventoryStockInDetails?.every((product) => {
-    //             // Kiểm tra số lượng sản phẩm
-    //             if (product.quantity === 0) {
-    //                 return false;
-    //             }
-
-    //             // Kiểm tra IMEI nếu có
-    //             if (product.productImeis) {
-    //                 return product.productImeis.every((imei) => !imei.isValid);
-    //             }
-
-    //             // Kiểm tra tính hợp lệ của sản phẩm
-    //             return !product.isValid;
-    //         }) && !this.stockInReceipt.isValidMoney;
-
-    //     if (this.isValidForm) {
-    //         // Form hợp lệ
-    //     } else {
-    //         // Form không hợp lệ
-    //     }
-    // }
-
-    // checkValidity() {
-    //     if (this.stockInReceipt.inventoryStockInDetails.length == 0) {
-    //         this.messageService.add({
-    //             severity: 'error',
-    //             summary: 'Chú ý',
-    //             detail: 'Phiếu nhập chưa có sản phẩm',
-    //         });
-    //         this.isValidForm = false;
-    //         return;
-    //     }
-
-    //     // Kiểm tra giá trị thanh toán và tổng giảm giá
-    //     if (
-    //         this.stockInReceipt.customerPayment ===
-    //         this.stockInReceipt.totalAmountPaid
-    //     ) {
-    //         this.stockInReceipt.isValidMoney = false;
-    //         delete this.stockInReceipt.isMessageValidMoney;
-    //     } else {
-    //         this.stockInReceipt.isValidMoney = true;
-    //         this.stockInReceipt.isMessageValidMoney =
-    //             'Bằng tiền cần trả nhà cung cấp';
-    //     }
-
-    //     // Khởi tạo Set để kiểm tra trùng cả số khung và số máy
-    //     const imeiSet = new Set();
-
-    //     // Kiểm tra các sản phẩm và IMEI
-    //     this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
-    //         if (product.quantity === 0) {
-    //             product.isValid = true;
-    //             product.isValidMessage = 'Số lượng > 0';
-    //         } else {
-    //             product.isValid = false;
-    //             delete product.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //         }
-
-    //         if (product.productImeis) {
-    //             product.productImeis.forEach((imei) => {
-    //                 if (!imei.frameNumber || !imei.engineNumber) {
-    //                     imei.isValid = true;
-    //                     if (!imei.frameNumber && !imei.engineNumber) {
-    //                         imei.isValidMessage =
-    //                             'Vui lòng nhập số khung và số máy';
-    //                     } else if (!imei.frameNumber) {
-    //                         imei.isValidMessage = 'Vui lòng nhập số khung';
-    //                     } else if (!imei.engineNumber) {
-    //                         imei.isValidMessage = 'Vui lòng nhập số máy';
-    //                     }
-    //                     console.log(imei.frameNumber, imei.engineNumber);
-    //                 } else {
-    //                     // Tạo chuỗi kết hợp số khung và số máy
-    //                     const imeiKey = `${imei.frameNumber}-${imei.engineNumber}`;
-
-    //                     // Kiểm tra xem cả số khung và số máy đã tồn tại trong Set chưa
-    //                     if (imeiSet.has(imeiKey)) {
-    //                         imei.isValid = true;
-    //                         imei.isValidMessage =
-    //                             'Số khung và số máy đã tồn tại trong danh sách';
-    //                     } else {
-    //                         // Thêm chuỗi số khung và số máy vào Set
-    //                         imeiSet.add(imeiKey);
-
-    //                         // Kiểm tra xem số khung và số máy đã tồn tại trong hệ thống chưa
-    //                         this.stockInService
-    //                             .checkExistEngineAndFrame(
-    //                                 imei.frameNumber,
-    //                                 imei.engineNumber
-    //                             )
-    //                             .subscribe(
-    //                                 (exists) => {
-    //                                     console.log(exists);
-    //                                     if (exists.data) {
-    //                                         imei.isValid = true;
-    //                                         imei.isValidMessage =
-    //                                             'Số khung hoặc số máy đã tồn tại';
-    //                                     } else {
-    //                                         imei.isValid = false;
-    //                                         delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //                                     }
-    //                                 },
-    //                                 (error) => {
-    //                                     console.error(
-    //                                         'Error checking engine and frame number:',
-    //                                         error
-    //                                     );
-    //                                 }
-    //                             );
-    //                         delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     });
-
-    //     // Kiểm tra tính hợp lệ của form
-    //     this.isValidForm =
-    //         this.stockInReceipt.inventoryStockInDetails?.every((product) => {
-    //             // Kiểm tra số lượng sản phẩm
-    //             if (product.quantity === 0) {
-    //                 return false;
-    //             }
-
-    //             // Kiểm tra IMEI nếu có
-    //             if (product.productImeis) {
-    //                 return product.productImeis.every((imei) => !imei.isValid);
-    //             }
-
-    //             // Kiểm tra tính hợp lệ của sản phẩm
-    //             return !product.isValid;
-    //         }) && !this.stockInReceipt.isValidMoney;
-
-    //     if (this.isValidForm) {
-    //         // Form hợp lệ
-    //     } else {
-    //         // Form không hợp lệ
-    //     }
-    // }
 
     onBarcodeClick() {
         this.activeBarcode = !this.activeBarcode;
@@ -941,8 +611,9 @@ export class CreateComponent implements OnInit {
                 'Bằng tiền cần trả nhà cung cấp';
         }
 
-        // Khởi tạo Set để kiểm tra trùng cả số khung và số máy
-        const imeiSet = new Set();
+        // Khởi tạo Set để kiểm tra trùng số khung và số máy
+        const frameNumbers = new Set<string>(); // Set cho số khung
+        const engineNumbers = new Set<string>(); // Set cho số máy
         const duplicateMessages: string[] = [];
 
         // Kiểm tra các sản phẩm và IMEI
@@ -957,6 +628,29 @@ export class CreateComponent implements OnInit {
 
             if (product.productImeis) {
                 product.productImeis.forEach((imei) => {
+                    // Kiểm tra số khung
+                    if (imei.frameNumber) {
+                        if (frameNumbers.has(imei.frameNumber)) {
+                            imei.isValid = true;
+                            imei.isValidMessage = `Số khung ${imei.frameNumber} đã tồn tại trong danh sách`;
+                            duplicateMessages.push(imei.isValidMessage);
+                        } else {
+                            frameNumbers.add(imei.frameNumber);
+                        }
+                    }
+
+                    // Kiểm tra số máy
+                    if (imei.engineNumber) {
+                        if (engineNumbers.has(imei.engineNumber)) {
+                            imei.isValid = true;
+                            imei.isValidMessage = `Số máy ${imei.engineNumber} đã tồn tại trong danh sách`;
+                            duplicateMessages.push(imei.isValidMessage);
+                        } else {
+                            engineNumbers.add(imei.engineNumber);
+                        }
+                    }
+
+                    // Kiểm tra cả hai số khung và số máy chưa được nhập
                     if (!imei.frameNumber || !imei.engineNumber) {
                         imei.isValid = true;
                         if (!imei.frameNumber && !imei.engineNumber) {
@@ -967,52 +661,35 @@ export class CreateComponent implements OnInit {
                         } else if (!imei.engineNumber) {
                             imei.isValidMessage = 'Vui lòng nhập số máy';
                         }
-                        console.log(imei.frameNumber, imei.engineNumber);
                     } else {
-                        // Tạo chuỗi kết hợp số khung và số máy
-                        const imeiKey = `${imei.frameNumber}-${imei.engineNumber}`;
-
-                        // Kiểm tra xem cả số khung và số máy đã tồn tại trong Set chưa
-                        if (imeiSet.has(imeiKey)) {
-                            imei.isValid = true;
-                            imei.isValidMessage =
-                                'Số khung và số máy đã tồn tại trong danh sách';
-                            // Thêm thông báo trùng lặp
-                            duplicateMessages.push(imei.isValidMessage);
-                        } else {
-                            // Thêm chuỗi số khung và số máy vào Set
-                            imeiSet.add(imeiKey);
-
-                            // Kiểm tra xem số khung và số máy đã tồn tại trong hệ thống chưa
-                            this.stockInService
-                                .checkExistEngineAndFrame(
-                                    imei.frameNumber,
-                                    imei.engineNumber
-                                )
-                                .subscribe(
-                                    (exists) => {
-                                        console.log(exists);
-                                        if (exists.data) {
-                                            imei.isValid = true;
-                                            imei.isValidMessage =
-                                                'Số khung hoặc số máy đã tồn tại';
-                                            duplicateMessages.push(
-                                                imei.isValidMessage
-                                            );
-                                        } else {
-                                            imei.isValid = false;
-                                            delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-                                        }
-                                    },
-                                    (error) => {
-                                        console.error(
-                                            'Error checking engine and frame number:',
-                                            error
+                        // Kiểm tra số khung và số máy đã tồn tại trong hệ thống chưa
+                        this.stockInService
+                            .checkExistEngineAndFrame(
+                                imei.frameNumber,
+                                imei.engineNumber
+                            )
+                            .subscribe(
+                                (exists) => {
+                                    if (exists.data) {
+                                        imei.isValid = true;
+                                        imei.isValidMessage =
+                                            'Số khung hoặc số máy đã tồn tại';
+                                        duplicateMessages.push(
+                                            imei.isValidMessage
                                         );
+                                    } else {
+                                        imei.isValid = false;
+                                        delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
                                     }
-                                );
-                            delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-                        }
+                                },
+                                (error) => {
+                                    console.error(
+                                        'Error checking engine and frame number:',
+                                        error
+                                    );
+                                }
+                            );
+                        delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
                     }
                 });
             }
@@ -1037,11 +714,11 @@ export class CreateComponent implements OnInit {
 
         // Hiển thị thông báo nếu có trùng lặp
         if (duplicateMessages.length > 0) {
-            // this.messageService.add({
-            //     severity: 'error',
-            //     summary: 'Lỗi',
-            //     detail: duplicateMessages.join(', '),
-            // });
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: duplicateMessages.join(', '),
+            });
         }
 
         if (this.isValidForm) {

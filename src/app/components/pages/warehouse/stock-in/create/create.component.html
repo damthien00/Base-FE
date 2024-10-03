@@ -431,6 +431,19 @@
                     <div class="grid p-fluid">
                         <div class="col-12 md:col-12">
                             <div class="field grid">
+                                <div class="col-12 md:col-12">
+                                    <p-autoComplete
+                                        [(ngModel)]="supplierSelected"
+                                        [suggestions]="suppliers"
+                                        field="name"
+                                        placeholder="Nhập nhà cung cấp"
+                                        (completeMethod)="
+                                            searchSupplier($event)
+                                        "
+                                    />
+                                </div>
+                            </div>
+                            <div class="field grid">
                                 <!-- Tổng số sản phẩm -->
 
                                 <div class="col-12 mb-2 md:col-5 md:mb-0">

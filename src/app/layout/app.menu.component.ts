@@ -1,17 +1,45 @@
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { LayoutService } from './service/app.layout.service';
+import { AuthService } from '../core/services/auth.service';
+import { RefreshTokenService } from '../core/signlrs/refresh-token.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-menu',
     templateUrl: './app.menu.component.html',
+    providers: [MessageService],
 })
 export class AppMenuComponent implements OnInit {
     model: any[] = [];
+    authToken: any = null;
 
-    constructor(public layoutService: LayoutService) {}
+    constructor(
+        public layoutService: LayoutService,
+        private refreshTokenService: RefreshTokenService,
+        private authService: AuthService,
+        private messageService: MessageService
+    ) {
+        this.authToken = this.authService.getAuthTokenLocalStorage();
+    }
 
     ngOnInit() {
+        this.refreshTokenService.startConnection();
+        this.refreshTokenService.addActivityListener((activity) => {
+            if (activity != null) {
+                this.authService
+                    .refreshToken({ refreshToken: this.authToken.refreshToken })
+                    .subscribe((res) => {
+                        if (res.status == true) {
+                            this.messageService.add({
+                                severity: 'warn',
+                                summary: 'Cảnh báo',
+                                detail: 'Bạn đã ',
+                            });
+                        }
+                    });
+            }
+        });
         this.model = [
             {
                 label: '',
