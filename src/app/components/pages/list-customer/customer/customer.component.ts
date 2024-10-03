@@ -31,6 +31,8 @@ export class CustomerComponent implements OnInit {
   showNameError2: boolean = false;
   showNameError3: boolean = false;
   showNameError4: boolean = false;
+  showNameError5: boolean = false;
+  showNameError6: boolean = false;
   showDialog = false;
   showDialog2 = false;
   showDialog3 = false;
@@ -56,6 +58,7 @@ export class CustomerComponent implements OnInit {
     { label: 'Nam', value: 'nam' },
     { label: 'Nữ', value: 'nữ' }
   ];
+  isSubmitting: boolean = false;
 
 
   constructor(
@@ -296,6 +299,32 @@ export class CustomerComponent implements OnInit {
       return;
     }
 
+    this.isSubmitting = true;
+    const formValues = this.customerForm.value;
+
+    let hasError = false;
+
+    if (!formValues.name || formValues.name.length === 0) {
+      this.showNameError5 = true;
+      hasError = true;
+    }
+
+    if (!formValues.phoneNumber || formValues.phoneNumber.length === 0) {
+      this.showNameError6 = true;
+      hasError = true;
+    }
+
+    if (hasError) {
+      this.messages = [{
+        severity: 'error',
+        summary: 'Không thể lưu vì:',
+        detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+        life: 5000
+      }];
+      this.isSubmitting = false;
+      return
+    }
+
 
     try {
       this.savingInProgress = true;
@@ -355,6 +384,7 @@ export class CustomerComponent implements OnInit {
     if (this.savingInProgress) {
       return;
     }
+
 
     try {
       this.savingInProgress = true;
@@ -425,5 +455,61 @@ export class CustomerComponent implements OnInit {
     } finally {
       this.savingInProgress = false;
     }
+  }
+
+  openDialog3(customer: number): void {
+    this.customersService.getCustomerById(customer).subscribe(
+      (response: any) => {
+        if (response.isSucceeded) {
+          this.customerDelete = response.data;
+          this.showDialog3 = true;
+          this.customerForm2.get('id')?.setValue(this.customerDelete.id);
+          console.log('data', this.customerDelete);
+        } else {
+          console.error('Failed to get brand by ID:', response.message);
+        }
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
+  }
+
+  closeDialog3() {
+    this.showDialog3 = false;
+    this.showNameError = false;
+    this.showNameError2 = false;
+    this.showNameError3 = false;
+    this.showNameError4 = false;
+  }
+
+  deleteCustomer(id: any): void {
+    this.customersService.deleteCustomer(id).subscribe(
+      () => {
+        console.log('Customer deleted successfully');
+        this.messages = [
+          {
+            severity: 'success',
+            summary: 'Thành công',
+            detail: 'Xóa khách hàng thành công',
+            life: 3000,
+          },
+        ];
+        this.filterCustomers();
+        this.closeDialog3();
+      },
+      (error) => {
+        this.messages = [
+          {
+            severity: 'error',
+            summary: 'Thất bại',
+            detail: 'Xóa hàng thất bại',
+            life: 3000,
+          },
+        ];
+        console.error('Error deleting customer:', error);
+        this.closeDialog3();
+      }
+    );
   }
 }

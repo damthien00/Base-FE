@@ -74,6 +74,10 @@ export class SupplierService {
     });
   }
 
+  filterSuplier(options: any): Observable<Supplier[]> {
+    return this.http.post<Supplier[]>(`${this.url}/api/supplier/filter`, options);
+  }
+
   deleteSupplier(id: number): Observable<any> {
     return this.http.delete<any>(`${this.url}/api/supplier/delete/${id}`)
       .pipe(
