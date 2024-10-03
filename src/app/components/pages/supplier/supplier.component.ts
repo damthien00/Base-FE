@@ -58,9 +58,9 @@ export class SupplierComponent implements OnInit {
     this.searchTermChanged
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((searchTerm) => {
-        this.getSuppliers();
+        this.filterSuplier();
       });
-    this.getSuppliers();
+    this.filterSuplier();
   }
 
   //Validate
@@ -190,18 +190,44 @@ export class SupplierComponent implements OnInit {
   }
 
   //Call API
-  getSuppliers(): void {
-    this.supplierService
-      .FilterSuppliers(this.pageSize, this.pageNumber, this.keySearch.trim())
-      .subscribe(
-        (response: any) => {
+  // getSuppliers(): void {
+  //   this.supplierService
+  //     .FilterSuppliers(this.pageSize, this.pageNumber, this.keySearch.trim())
+  //     .subscribe(
+  //       (response: any) => {
+  //         this.suppliers = response.data;
+  //         this.totalRecordsCount = response.totalRecordsCount;
+  //       },
+  //       (error: any) => {
+  //         console.error(error);
+  //       }
+  //     );
+  // }
+
+  filterSuplier(): void {
+    const options = {
+      nameOrPhone: this.keySearch,
+      pageIndex: this.pageNumber,
+      pageSize: this.pageSize,
+    };
+
+    this.supplierService.filterSuplier(options).subscribe(
+      (response: any) => {
+        if (response && response.data) {
           this.suppliers = response.data;
           this.totalRecordsCount = response.totalRecordsCount;
-        },
-        (error: any) => {
-          console.error(error);
+        } else {
+          console.error('Invalid response format. Data property not found.');
         }
-      );
+      },
+      (error) => {
+        console.error('Error filtering customers:', error);
+      }
+    );
+  }
+
+  onFilterClick(): void {
+    this.filterSuplier();
   }
 
   deleteSupplier(id: any): void {
@@ -215,7 +241,7 @@ export class SupplierComponent implements OnInit {
             life: 3000,
           },
         ];
-        this.getSuppliers();
+        this.filterSuplier();
         this.showDeleteDialog = false;
       },
       (error) => {
@@ -255,7 +281,7 @@ export class SupplierComponent implements OnInit {
           },
         ];
         this.savingInProgress = false;
-        this.getSuppliers();
+        this.filterSuplier();
       } catch (error) {
         this.errorMessage =
           'Cập nhật nhà cung cấp thất bại. Vui lòng thử lại sau.';
@@ -305,7 +331,7 @@ export class SupplierComponent implements OnInit {
             life: 3000,
           },
         ];
-        this.getSuppliers();
+        this.filterSuplier();
       } catch (error) {
         this.errorMessage = 'Tạo nhà cung cấp thất bại. Vui lòng thử lại sau.';
         console.error('Đã xảy ra lỗi khi tạo nhà cung cấp:', error);
@@ -329,13 +355,13 @@ export class SupplierComponent implements OnInit {
   onPageChange(event: any): void {
     this.pageSize = event.rows;
     this.pageNumber = event.page + 1;
-    this.getSuppliers();
+    this.filterSuplier();
   }
 
   goToPreviousPage(): void {
     if (this.pageNumber > 1) {
       this.pageNumber--;
-      this.getSuppliers();
+      this.filterSuplier();
     }
   }
 
@@ -343,7 +369,7 @@ export class SupplierComponent implements OnInit {
     const lastPage = Math.ceil(this.totalRecordsCount / this.pageSize);
     if (this.pageNumber < lastPage) {
       this.pageNumber++;
-      this.getSuppliers();
+      this.filterSuplier();
     }
   }
 

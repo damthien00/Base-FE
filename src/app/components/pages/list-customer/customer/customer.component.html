@@ -105,7 +105,7 @@
                                   pRipple
                                   icon="pi pi-trash"
                                   class="p-button-rounded p-button-danger mr-2"
-                                  (click)="openDialog2(customer.id)"
+                                  (click)="openDialog3(customer.id)"
                               ></button>
                           </div>
                       </td>
@@ -156,7 +156,7 @@
                             [style]="{ height: '40px', width: '95%' }"
                             formControlName="name"
                           />
-                          <div *ngIf="customerForm.get('name')?.invalid && (customerForm.get('name')?.dirty || customerForm.get('name')?.touched)">
+                          <div *ngIf="customerForm.get('name')?.invalid && (customerForm.get('name')?.dirty || customerForm.get('name')?.touched) || showNameError5">
                           <div *ngIf="customerForm.get('name')?.errors?.['required']" class="error-message">
                               Tên không được bỏ trống
                           </div>
@@ -184,7 +184,7 @@
                         <div *ngIf="showNameError2" class="error-message">
                         Số điện thoại không được trùng nhau
                         </div>
-                        <div *ngIf="customerForm.get('phoneNumber')?.invalid && (customerForm.get('phoneNumber')?.dirty || customerForm.get('phoneNumber')?.touched)">
+                        <div *ngIf="customerForm.get('phoneNumber')?.invalid && (customerForm.get('phoneNumber')?.dirty || customerForm.get('phoneNumber')?.touched) || showNameError6">
                         <div *ngIf="customerForm.get('phoneNumber')?.errors?.['required']" class="error-message">
                             Số điện thoại là bắt buộc
                         </div>
@@ -252,126 +252,149 @@
           </div>
         </div>
 
-        
-    <div class="dialog-background" *ngIf="showDialog2">
-      <div class="dialog-container-customer">
-        <div class="card-body" *ngIf="customerById">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title">Thông tin cơ bản</h5>
-            <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" [style]="{'border-radius': '25%'}" (click)="closeDialog2()"></p-button>
-          </div>
-          <!-- General Form Elements -->
-          <form [formGroup]="customerForm2" (ngSubmit)="onUpdateSubmit()" style="padding: 15px;">
-            <div class="row mb-12">
-              <div class="row mb-12">                 
-                <div class="col-lg-12">
-                  <div class="row">
-                      <div class="col-lg-6">
-                        <label class="labelip"
-                          >Tên khách hàng<span class="red-asterisk">*</span></label
-                        >
-                        <input
-                          type="text"
-                          class="form-control"
-                          pInputText
-                          [style]="{ height: '40px', width: '95%' }"
-                          formControlName="name"
-                        />
-                        <div *ngIf="customerForm2.get('name')?.invalid && (customerForm2.get('name')?.dirty || customerForm2.get('name')?.touched)">
-                        <div *ngIf="customerForm2.get('name')?.errors?.['required']" class="error-message">
-                            Tên không được bỏ trống
-                        </div>
-                        <div *ngIf="customerForm2.get('name')?.errors?.['minlength']" class="error-message">
-                            Tên phải từ 6 ký tự
-                        </div>
-                        <div *ngIf="customerForm2.get('name')?.errors?.['maxlength']" class="error-message">
-                            Tên không được quá 100 ký tự
-                        </div>
-                        </div>
-                      </div>
-                      <div class="col-lg-6">
-                        <label class="labelip"
-                          >Số điện thoại<span class="red-asterisk">*</span></label
-                        >
-                        <input
-                          type="text"
-                          class="form-control"
-                          pInputText
-                          [style]="{ height: '40px', width: '95%' }"
-                          (keypress)="onKeyPress($event)"
-                          (input)="checkNameLength()"
-                          formControlName="phoneNumber"
-                        />
-                      <div *ngIf="showNameError2" class="error-message">
-                      Số điện thoại không được trùng nhau
-                      </div>
-                      <div *ngIf="customerForm2.get('phoneNumber')?.invalid && (customerForm2.get('phoneNumber')?.dirty || customerForm2.get('phoneNumber')?.touched)">
-                      <div *ngIf="customerForm2.get('phoneNumber')?.errors?.['required']" class="error-message">
-                          Số điện thoại là bắt buộc
-                      </div>
-                      <!-- <div *ngIf="customerForm.get('phoneNumber')?.errors?.['pattern']" class="error-message">
-                          Số điện thoại phải bắt đầu bằng 03, 05, 07, 08, hoặc 09 và có 10 chữ số.
-                      </div>
-                      <div *ngIf="customerForm.get('phoneNumber')?.errors?.['minlength']" class="error-message">
-                          Số điện thoại phải có đúng 10 chữ số.
-                      </div>
-                      <div *ngIf="customerForm.get('phoneNumber')?.errors?.['maxlength']" class="error-message">
-                          Số điện thoại phải có đúng 10 chữ số.
-                      </div> -->
-                      </div>
-      
-                      </div>
-                      <div class="col-lg-6 mt-5">
-                        <label class="labelip"
-                          >Email</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          pInputText
-                          [style]="{ height: '40px', width: '95%' }"
-                          formControlName="email"
-                        />
-                        <div *ngIf="customerForm2.get('email')?.errors && (customerForm2.get('email')?.dirty || customerForm2.get('email')?.touched)">
-                        <div *ngIf="customerForm2.get('email')?.errors?.['invalidEmail']" class="error-message">
-                            Email không hợp lệ.
-                        </div>
-                        <div *ngIf="customerForm2.get('email')?.errors?.['maxlength']" class="error-message">
-                            Email không được vượt quá 254 ký tự.
-                        </div>
-                        </div>
-                      </div>
-                      <div class="col-lg-6 mt-5">
-                        <label class="labelip">Ngày sinh</label>
-                        <p-calendar [showIcon]="true" [style]="{ height: '40px', width: '95%' }" formControlName="dayOfBirth" dateFormat="dd/mm/yy"></p-calendar>
-                        <div *ngIf="customerForm2.get('dayOfBirth')?.invalid && (customerForm2.get('dayOfBirth')?.dirty || customerForm2.get('dayOfBirth')?.touched)">
-                          <div *ngIf="customerForm2.get('dayOfBirth')?.errors?.['invalidDateOfBirth']" class="error-message">
-                              Ngày sinh phải nhỏ hơn hoặc bằng ngày hiện tại.
+        <div class="dialog-background" *ngIf="showDialog2">
+          <div class="dialog-container-customer">
+            <div class="card-body" *ngIf="customerById">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title">Thông tin cơ bản</h5>
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" [style]="{'border-radius': '25%'}" (click)="closeDialog2()"></p-button>
+              </div>
+              <!-- General Form Elements -->
+              <form [formGroup]="customerForm2" (ngSubmit)="onUpdateSubmit()" style="padding: 15px;">
+                <div class="row mb-12">
+                  <div class="row mb-12">                 
+                    <div class="col-lg-12">
+                      <div class="row">
+                          <div class="col-lg-6">
+                            <label class="labelip"
+                              >Tên khách hàng<span class="red-asterisk">*</span></label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              pInputText
+                              [style]="{ height: '40px', width: '95%' }"
+                              formControlName="name"
+                            />
+                            <div *ngIf="customerForm2.get('name')?.invalid && (customerForm2.get('name')?.dirty || customerForm2.get('name')?.touched)">
+                            <div *ngIf="customerForm2.get('name')?.errors?.['required']" class="error-message">
+                                Tên không được bỏ trống
+                            </div>
+                            <div *ngIf="customerForm2.get('name')?.errors?.['minlength']" class="error-message">
+                                Tên phải từ 6 ký tự
+                            </div>
+                            <div *ngIf="customerForm2.get('name')?.errors?.['maxlength']" class="error-message">
+                                Tên không được quá 100 ký tự
+                            </div>
+                            </div>
                           </div>
+                          <div class="col-lg-6">
+                            <label class="labelip"
+                              >Số điện thoại<span class="red-asterisk">*</span></label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              pInputText
+                              [style]="{ height: '40px', width: '95%' }"
+                              (keypress)="onKeyPress($event)"
+                              (input)="checkNameLength()"
+                              formControlName="phoneNumber"
+                            />
+                          <div *ngIf="showNameError2" class="error-message">
+                          Số điện thoại không được trùng nhau
+                          </div>
+                          <div *ngIf="customerForm2.get('phoneNumber')?.invalid && (customerForm2.get('phoneNumber')?.dirty || customerForm2.get('phoneNumber')?.touched)">
+                          <div *ngIf="customerForm2.get('phoneNumber')?.errors?.['required']" class="error-message">
+                              Số điện thoại là bắt buộc
+                          </div>
+                          <!-- <div *ngIf="customerForm.get('phoneNumber')?.errors?.['pattern']" class="error-message">
+                              Số điện thoại phải bắt đầu bằng 03, 05, 07, 08, hoặc 09 và có 10 chữ số.
+                          </div>
+                          <div *ngIf="customerForm.get('phoneNumber')?.errors?.['minlength']" class="error-message">
+                              Số điện thoại phải có đúng 10 chữ số.
+                          </div>
+                          <div *ngIf="customerForm.get('phoneNumber')?.errors?.['maxlength']" class="error-message">
+                              Số điện thoại phải có đúng 10 chữ số.
+                          </div> -->
+                          </div>
+          
+                          </div>
+                          <div class="col-lg-6 mt-5">
+                            <label class="labelip"
+                              >Email</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              pInputText
+                              [style]="{ height: '40px', width: '95%' }"
+                              formControlName="email"
+                            />
+                            <div *ngIf="customerForm2.get('email')?.errors && (customerForm2.get('email')?.dirty || customerForm2.get('email')?.touched)">
+                            <div *ngIf="customerForm2.get('email')?.errors?.['invalidEmail']" class="error-message">
+                                Email không hợp lệ.
+                            </div>
+                            <div *ngIf="customerForm2.get('email')?.errors?.['maxlength']" class="error-message">
+                                Email không được vượt quá 254 ký tự.
+                            </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 mt-5">
+                            <label class="labelip">Ngày sinh</label>
+                            <p-calendar [showIcon]="true" [style]="{ height: '40px', width: '95%' }" formControlName="dayOfBirth" dateFormat="dd/mm/yy"></p-calendar>
+                            <div *ngIf="customerForm2.get('dayOfBirth')?.invalid && (customerForm2.get('dayOfBirth')?.dirty || customerForm2.get('dayOfBirth')?.touched)">
+                              <div *ngIf="customerForm2.get('dayOfBirth')?.errors?.['invalidDateOfBirth']" class="error-message">
+                                  Ngày sinh phải nhỏ hơn hoặc bằng ngày hiện tại.
+                              </div>
+                              </div>
+                          </div>
+                          <div class="col-lg-12 mt-5">
+                            <label class="labelip">Giới tính</label>
+                            <p-dropdown 
+                              [style]="{ height: '40px', width: '98%' }"
+                              [options]="genders" 
+                              formControlName="gender" 
+                              placeholder="Chọn giới tính">
+                            </p-dropdown>
                           </div>
                       </div>
-                      <div class="col-lg-12 mt-5">
-                        <label class="labelip">Giới tính</label>
-                        <p-dropdown 
-                          [style]="{ height: '40px', width: '98%' }"
-                          [options]="genders" 
-                          formControlName="gender" 
-                          placeholder="Chọn giới tính">
-                        </p-dropdown>
-                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+                <div class="row mb-12 mt-5">
+                  <div class="col-sm-12 buttonsl">
+                      <button pButton pRipple label="Đóng" class="p-button-success buttoncloses" type="button" (click)="closeDialog2()"></button>
+                      <button pButton pRipple label="Lưu" class="p-button-success butttonsave" type="submit"></button>
+                  </div>
+                </div>
+              </form><!-- End General Form Elements -->
             </div>
-            <div class="row mb-12 mt-5">
-              <div class="col-sm-12 buttonsl">
-                  <button pButton pRipple label="Đóng" class="p-button-success buttoncloses" type="button" (click)="closeDialog2()"></button>
-                  <button pButton pRipple label="Lưu" class="p-button-success butttonsave" type="submit"></button>
-              </div>
-            </div>
-          </form><!-- End General Form Elements -->
+          </div>
         </div>
-      </div>
-    </div>
+
+        <div class="dialog-background" *ngIf="showDialog3">
+          <div class="dialog-container-customerdelete">
+            <div class="card-body" *ngIf="customerDelete" >
+              <div class="d-flex justify-content-between align-items-center" style="padding: 5px;">
+                <h5 class="card-title">Xóa khách hàng</h5>
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" [style]="{'border-radius': '25%'}" (click)="closeDialog3()"></p-button>
+              </div>
+              <!-- General Form Elements -->
+              <form style="padding: 15px;">
+                <div class="row mb-12">
+                  <label>Bạn có chắc muốn xóa khách hàng này? Lưu ý: Sau khi xóa bạn không thể hoàn tác hay khôi phục khách hàng.</label>
+                  <strong class="name-customer-delete">{{customerDelete.name}}</strong>
+                </div>
+                <div class="row mb-12 mt-5">
+                  <div class="col-sm-12 buttonsl">
+                      <button pButton pRipple label="Hủy" class="p-button-success buttoncloses" type="button" (click)="closeDialog3()"></button>
+                      <button pButton pRipple label="Đồng ý" class="p-button-success buttondelete" type="submit" (click)="deleteCustomer(customerDelete.id)"></button>
+                  </div>
+                </div>
+              </form><!-- End General Form Elements -->
+            </div>
+          </div>
+        </div>
     </section>
 
 

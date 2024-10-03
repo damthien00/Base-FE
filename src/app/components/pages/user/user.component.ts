@@ -464,7 +464,8 @@ export class UserComponent implements OnInit {
         this.roleService.getRoleAll(this.PageSize2, this.PageIndex2).subscribe((response: any) => {
             this.Roles2 = response.data.items.map((role: any) => ({
                 label: role.name,  // Tên của role
-                value: role.id     // Giá trị là ID của role
+                value: role.id,
+                normalizedName: role.normalizedName    // Giá trị là ID của role
             }));
         });
     }
@@ -731,7 +732,7 @@ export class UserComponent implements OnInit {
                 districtName: this.districts.find(districts => districts.id === formValues.districtId)?.name || '',
                 wardId: formValues.wardId,
                 wardName: this.wards.find(wards => wards.id === formValues.wardId)?.name || '',
-                role: formValues.roles.map(role => role.normalizedName)
+                roles: formValues.roles.map(role => role.normalizedName)
             };
 
             // Gửi yêu cầu tới API để thêm người dùng
@@ -883,13 +884,14 @@ export class UserComponent implements OnInit {
 
         const roleNames = this.RoleGroupForm2.value.roles.map((roleId: number) => {
             const role = this.Roles2.find((r: any) => r.value === roleId);
-            return role ? role.label : null;
+            return role ? role.normalizedName : null;  // Use normalizedName instead of label
         }).filter((roleName: string) => roleName !== null);
-
+        
         const assignRolesData = {
             userId: this.RoleGroupForm2.value.id,
-            roleNames: roleNames
+            roleNames: roleNames  // Now uses normalizedName
         };
+        
 
         try {
             this.savingInProgress = true;

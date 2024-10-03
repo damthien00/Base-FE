@@ -295,8 +295,8 @@ export class BranchTransferComponent implements OnInit {
             productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
             price: itemVariant.price,
             unit: item.unitName,
-            mass: itemVariant.sellCounts
-              ? itemVariant.sellCounts
+            mass: itemVariant.quantity
+              ? itemVariant.quantity
               : 0,
             total:
               item.productType === 1 ? 0 : itemVariant.price * 1,
@@ -318,7 +318,7 @@ export class BranchTransferComponent implements OnInit {
           productCode: item.code || '', // Đảm bảo mã sản phẩm
           price: item.sellingPrice,
           unit: item.unitName,
-          mass: item.mass,
+          mass: item.totalQuantity,
           total: item.productType === 1 ? 0 : item.sellingPrice * 1,
           frameNumber: '',
           engineNumber: '',
