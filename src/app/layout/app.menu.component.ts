@@ -13,7 +13,7 @@ import { MessageService } from 'primeng/api';
 export class AppMenuComponent implements OnInit {
     model: any[] = [];
     authToken: any = null;
-
+    userCurrent: any;
     constructor(
         public layoutService: LayoutService,
         private refreshTokenService: RefreshTokenService,
@@ -21,12 +21,16 @@ export class AppMenuComponent implements OnInit {
         private messageService: MessageService
     ) {
         this.authToken = this.authService.getAuthTokenLocalStorage();
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+            // console.log(this.userCurrent);
+        });
     }
 
     ngOnInit() {
         this.refreshTokenService.startConnection();
         this.refreshTokenService.addActivityListener((activity) => {
-            if (activity != null) {
+            if (activity != null && activity.id == this.userCurrent.id) {
                 this.authService
                     .refreshToken({ refreshToken: this.authToken.refreshToken })
                     .subscribe((res) => {

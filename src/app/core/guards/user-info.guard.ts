@@ -17,11 +17,29 @@ export class userInfoGuard {
             this.authService.getAuthTokenLocalStorage();
         if (authToken?.accessToken) {
             if (this.authService.getUserCurrent()) {
+                if (this.authService.getUserCurrent().isRefreshToken == true) {
+                    this.authService
+                        .refreshToken({ refreshToken: authToken.refreshToken })
+                        .subscribe((re) => {
+                            this.authService.setAuthTokenLocalStorage(re.data);
+                        });
+                }
                 return of(true);
             } else {
                 return this.authService.fetchUserCurrent().pipe(
                     map((res) => {
                         if (res.status) {
+                            if (res.data.isRefreshToken == true) {
+                                this.authService
+                                    .refreshToken({
+                                        refreshToken: authToken.refreshToken,
+                                    })
+                                    .subscribe((re) => {
+                                        this.authService.setAuthTokenLocalStorage(
+                                            re.data
+                                        );
+                                    });
+                            }
                             this.authService.setUserCurrent(res.data);
                             return true;
                         } else {

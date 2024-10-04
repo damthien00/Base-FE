@@ -27,7 +27,7 @@
                     <div
                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                     >
-                        {{ warrantyById?.cusSuccess?.name }}
+                        {{ warrantyById[0]?.cusSuccess?.name }}
                     </div>
                 </div>
                 <div class="field grid">
@@ -40,7 +40,7 @@
                     <div
                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                     >
-                        {{ warrantyById?.cusSuccess?.phoneNumber }}
+                        {{ warrantyById[0]?.cusSuccess?.phoneNumber }}
                     </div>
                 </div>
                 <div class="field grid">
@@ -55,17 +55,17 @@
                     >
                         <ng-container
                             *ngIf="
-                                warrantyById?.cusSuccess?.wardName ||
-                                    warrantyById?.cusSuccess.addressDetail ||
-                                    warrantyById?.cusSuccess?.districtName ||
-                                    warrantyById?.cusSuccess?.cityName;
+                                warrantyById[0]?.cusSuccess?.wardName ||
+                                    warrantyById[0]?.cusSuccess.addressDetail ||
+                                    warrantyById[0]?.cusSuccess?.districtName ||
+                                    warrantyById[0]?.cusSuccess?.cityName;
                                 else noInfo
                             "
                         >
-                            {{ warrantyById?.cusSuccess?.addressDetail }},
-                            {{ warrantyById?.cusSuccess?.wardName }},
-                            {{ warrantyById?.cusSuccess?.districtName }},
-                            {{ warrantyById?.cusSuccess?.cityName }}
+                            {{ warrantyById[0]?.cusSuccess?.addressDetail }},
+                            {{ warrantyById[0]?.cusSuccess?.wardName }},
+                            {{ warrantyById[0]?.cusSuccess?.districtName }},
+                            {{ warrantyById[0]?.cusSuccess?.cityName }}
                         </ng-container>
                         <ng-template #noInfo> Chưa có thông tin </ng-template>
                     </div>
@@ -73,7 +73,7 @@
             </div>
         </div>
         <div class="mt-3">
-            <p-table [value]="warrantyById?.warrantyProducts">
+            <p-table [value]="warrantyById">
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Mã SP</th>
@@ -83,27 +83,32 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
                     <tr>
-                        <td>{{ product?.productId }}</td>
+                        <td>{{ product?.warrantyProducts[0].productId }}</td>
                         <td>
                             <div class="flex flex-column">
                                 <span>
-                                    {{ product?.productName }}
-                                    {{ product?.value1 }}
-                                    {{ product?.value2 }}</span
+                                    {{
+                                        product?.warrantyProducts[0]
+                                            ?.productName
+                                    }}
+                                    {{ product?.warrantyProducts[0]?.value1 }}
+                                    {{
+                                        product?.warrantyProducts[0]?.value2
+                                    }}</span
                                 >
                                 <span style="font-size: 13px"
                                     ><strong>Số khung:</strong>
-                                    {{ product?.sk }}</span
+                                    {{ product?.warrantyProducts[0]?.sk }}</span
                                 >
                                 <span style="font-size: 13px"
                                     ><strong>Số máy:</strong>
-                                    {{ product?.sm }}</span
+                                    {{ product?.warrantyProducts[0]?.sm }}</span
                                 >
                             </div>
                         </td>
                         <td>
                             {{
-                                product.expirationDate
+                                product?.warrantyProducts[0].expirationDate
                                     | date : "dd/MM/yyyy HH:mm:ss"
                             }}
                         </td>
