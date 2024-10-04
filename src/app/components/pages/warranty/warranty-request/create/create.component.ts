@@ -375,20 +375,20 @@ export class CreateComponent implements OnInit {
         }
         console.log(this.listCart);
 
-        for (const item of this.listCart) {
-            if (!item.returnDate) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Lỗi',
-                    detail: `Sản phẩm "${item.product.name}${
-                        '-' + item.productVariant?.valuePropeties1
-                    }${
-                        '-' + item.productVariant?.valuePropeties2
-                    }" phải có ngày trả.`,
-                });
-                return;
-            }
-        }
+        // for (const item of this.listCart) {
+        //     if (!item.returnDate) {
+        //         this.messageService.add({
+        //             severity: 'error',
+        //             summary: 'Lỗi',
+        //             detail: `Sản phẩm "${item.product.name}${
+        //                 '-' + item.productVariant?.valuePropeties1
+        //             }${
+        //                 '-' + item.productVariant?.valuePropeties2
+        //             }" phải có ngày trả.`,
+        //         });
+        //         return;
+        //     }
+        // }
         const formData = new FormData();
         formData.append('Code', '');
         formData.append('CustomerId', this.selectedItem.id.toString());
