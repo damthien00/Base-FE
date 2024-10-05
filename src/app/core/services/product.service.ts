@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import { Observable, catchError, throwError } from 'rxjs';
 import { OptionsSearchProduct, Products } from '../models/product';
 import { OptionsFilterProduct } from '../models/options-filter-product';
+import { OptionsFilterInventoryProduct } from '../DTOs/inventory-product/optionsFilterInventoryProduct';
 
 @Injectable()
 export class ProductService {
@@ -26,6 +27,40 @@ export class ProductService {
         } catch (error) {
             return JSON.parse(JSON.stringify(error));
         }
+    }
+
+    getInventoryProducts(
+        optionsFilterInventoryProduct: OptionsFilterInventoryProduct
+    ): Observable<any> {
+        const {
+            pageSize,
+            pageIndex,
+            productName,
+            productVariantName,
+            brandId,
+            fromQuantity,
+            toQuantity,
+        } = optionsFilterInventoryProduct;
+
+        let url = `${this.url}/api/inventory/paging?pageSize=${pageSize}&pageIndex=${pageIndex}`;
+
+        if (productName) {
+            url += `&productName=${productName}`;
+        }
+        if (productVariantName) {
+            url += `&productVariantName=${productVariantName}`;
+        }
+        if (brandId) {
+            url += `&brandId=${brandId}`;
+        }
+        if (fromQuantity !== null) {
+            url += `&fromQuantity=${fromQuantity}`;
+        }
+        if (toQuantity !== null) {
+            url += `&toQuantity=${toQuantity}`;
+        }
+
+        return this.http.get<any>(url);
     }
 
     FilterProduct(options: OptionsFilterProduct): Promise<any> {
@@ -140,9 +175,7 @@ export class ProductService {
         );
     }
 
-    CheckSku(
-        sku: string
-    ): Observable<{ data: boolean; [key: string]: any }> {
+    CheckSku(sku: string): Observable<{ data: boolean; [key: string]: any }> {
         return this.http.get<{ data: boolean; [key: string]: any }>(
             `${this.url}/api/product/checksku?sku=${sku}`
         );
@@ -189,6 +222,8 @@ export class ProductService {
 
     getStockDetailsByProductCode(productCode: string): Observable<any> {
         const encodedProductCode = encodeURIComponent(productCode);
-        return this.http.get(`${this.url}/api/inventory-stock-in/getstockindetailsbyproductcode?productCode=${encodedProductCode}`);
-      }
+        return this.http.get(
+            `${this.url}/api/inventory-stock-in/getstockindetailsbyproductcode?productCode=${encodedProductCode}`
+        );
+    }
 }

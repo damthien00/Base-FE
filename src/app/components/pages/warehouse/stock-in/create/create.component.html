@@ -436,6 +436,7 @@
                                         [(ngModel)]="supplierSelected"
                                         [suggestions]="suppliers"
                                         field="name"
+                                        spellcheck="false"
                                         placeholder="Nhập nhà cung cấp"
                                         (completeMethod)="
                                             searchSupplier($event)

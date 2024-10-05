@@ -36,7 +36,6 @@ export class AuthGuard implements CanActivate {
                         } else {
                             this.authService.setUserCurrent(null);
                             this.authService.setAuthTokenLocalStorage(null);
-
                             this.router.navigate([Page.Login]);
                             return false;
                         }

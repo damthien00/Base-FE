@@ -1,0 +1,300 @@
+<div class="grid">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-2">
+            <div class="">
+                <h3>Sản phẩm tồn</h3>
+                <p-breadcrumb [model]="items"></p-breadcrumb>
+            </div>
+        </p-toolbar>
+        <div class="card">
+            <p-toast></p-toast>
+            <p-table
+                #dt
+                [value]="products"
+                [columns]="cols"
+                responsiveLayout="scroll"
+                [(selection)]="selectedProducts"
+                selectionMode="multiple"
+                [rowHover]="true"
+                dataKey="id"
+                [rows]="pageSize"
+                [first]="pageNumber * pageSize"
+                [paginator]="false"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex flex-column gap-3 align-items-end md:flex-row md:"
+                    >
+                        <div class="flex flex-column">
+                            <label
+                                for="email1"
+                                class="block text-900 text-large font-weight mb-2"
+                                >Tìm kiếm theo sản phẩm:</label
+                            >
+                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <i class="pi pi-search"></i>
+                                <input
+                                    pInputText
+                                    type="text"
+                                    [(ngModel)]="
+                                        this.optionsFilterInventoryProduct
+                                            .productVariantName
+                                    "
+                                    placeholder="Nhập tên sản phẩm/biến thể"
+                                    style="width: 350px"
+                                    class="sm:"
+                                />
+                            </span>
+                        </div>
+
+                        <div class="flex flex-column">
+                            <label
+                                for="email1"
+                                class="block text-900 text-large font-weight mb-2"
+                                >Số lượng tồn:</label
+                            >
+                            <div class="flex flex-row align-items-center gap-2">
+                                <p-inputNumber
+                                    (blur)="checkStartPriceValue()"
+                                    [(ngModel)]="
+                                        this.optionsFilterInventoryProduct
+                                            .toQuantity
+                                    "
+                                    mode="decimal"
+                                    placeholder="Từ:"
+                                    inputId="minmax-buttons"
+                                    [min]="0"
+                                    [max]="10000000"
+                                />
+                                -
+                                <p-inputNumber
+                                    (blur)="checkEndPriceValue()"
+                                    [(ngModel)]="
+                                        this.optionsFilterInventoryProduct
+                                            .fromQuantity
+                                    "
+                                    mode="decimal"
+                                    placeholder="Đến:"
+                                    inputId="minmax-buttons"
+                                    [min]="0"
+                                    [max]="10000000"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex flex-column">
+                            <label
+                                for="email1"
+                                class="block text-900 text-large font-weight mb-2"
+                                >Tìm kiếm theo chi nhánh:</label
+                            >
+                            <p-autoComplete
+                                [(ngModel)]="brandIdSelected"
+                                [suggestions]="branchs"
+                                placeholder="Nhập chi nhánh"
+                                [dropdown]="true"
+                                [forceSelection]="true"
+                                (completeMethod)="searchBranch($event)"
+                                field="name"
+                            />
+                        </div>
+                        <button
+                            pButton
+                            pRipple
+                            label="Lọc"
+                            (click)="loadProduct()"
+                        ></button>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem"></th>
+                        <th>Ảnh</th>
+                        <th style="width: 25rem" pSortableColumn="name">
+                            Sản phẩm
+                        </th>
+                        <th>Chi nhánh</th>
+                        <th>Tồn kho</th>
+                    </tr>
+                </ng-template>
+                <ng-template
+                    pTemplate="body"
+                    let-product
+                    let-expanded="expanded"
+                >
+                    <tr>
+                        <td>
+                            <div
+                                *ngIf="
+                                    product.variants &&
+                                    product.variants.length > 0
+                                "
+                            >
+                                <p-button
+                                    type="button"
+                                    pRipple
+                                    [pRowToggler]="product"
+                                    [text]="true"
+                                    [rounded]="true"
+                                    [plain]="true"
+                                    [icon]="
+                                        expanded
+                                            ? 'pi pi-chevron-down'
+                                            : 'pi pi-chevron-right'
+                                    "
+                                />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <img
+                                    [src]="imageUrl + product.productImage"
+                                    [alt]="product.productName"
+                                    width="50"
+                                    height="50"
+                                    class="shadow-4"
+                                />
+                                <svg
+                                    *ngIf="product.productImages?.length === 0"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="jss3869 ng-star-inserted"
+                                    style="
+                                        color: rgb(232, 234, 235);
+                                        height: 50px;
+                                    "
+                                >
+                                    <path
+                                        _ngcontent-ng-c1628733639=""
+                                        d="M19 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2ZM5 19V5h14l.002 14H5Z"
+                                        fill="currentColor"
+                                    ></path>
+                                    <path
+                                        _ngcontent-ng-c1628733639=""
+                                        d="m10 14-1-1-3 4h12l-5-7-3 4ZM8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
+                                        fill="currentColor"
+                                    ></path>
+                                </svg>
+                            </div>
+                        </td>
+
+                        <td>{{ product.productName }}</td>
+                        <td>{{ product.branchName }}</td>
+                        <td>{{ product.quantity }}</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="rowexpansion" let-product>
+                    <tr>
+                        <td colspan="12">
+                            <div class="py-3 px-7">
+                                <p-table
+                                    [value]="product.variants"
+                                    dataKey="id"
+                                >
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th pSortableColumn="id">Ảnh</th>
+                                            <th pSortableColumn="customer">
+                                                Phiên bản
+                                            </th>
+                                            <th pSortableColumn="date">
+                                                Tồn kho
+                                            </th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-variant>
+                                        <tr>
+                                            <td>
+                                                <img
+                                                    *ngIf="product.productImage"
+                                                    [src]="
+                                                        imageUrl +
+                                                        product.productImage
+                                                    "
+                                                    [alt]="
+                                                        variant.productVariantName
+                                                    "
+                                                    width="50"
+                                                    height="50"
+                                                    class="shadow-4"
+                                                />
+                                                <svg
+                                                    *ngIf="!variant.linkImage"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="jss3869 ng-star-inserted"
+                                                    style="
+                                                        color: rgb(
+                                                            232,
+                                                            234,
+                                                            235
+                                                        );
+                                                        height: 50px;
+                                                    "
+                                                >
+                                                    <path
+                                                        _ngcontent-ng-c1628733639=""
+                                                        d="M19 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2ZM5 19V5h14l.002 14H5Z"
+                                                        fill="currentColor"
+                                                    ></path>
+                                                    <path
+                                                        _ngcontent-ng-c1628733639=""
+                                                        d="m10 14-1-1-3 4h12l-5-7-3 4ZM8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
+                                                        fill="currentColor"
+                                                    ></path>
+                                                </svg>
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <h6
+                                                        class="mb-1"
+                                                        style="font-size: 15px"
+                                                    >
+                                                        {{
+                                                            variant.productVariantName
+                                                        }}
+                                                    </h6>
+                                                </div>
+                                            </td>
+                                            <td>{{ variant.quantity }}</td>
+                                        </tr>
+                                    </ng-template>
+                                    <!-- <ng-template pTemplate="emptymessage">
+                                        <tr>
+                                            <td colspan="6">There are no order for this product yet.</td>
+                                        </tr>
+                                    </ng-template> -->
+                                </p-table>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+            <div
+                class="flex align-items-center"
+                style="justify-content: space-between"
+            >
+                <p>
+                    <span style="font-weight: 500">{{ startRecord }}</span> -
+                    <span style="font-weight: 500">{{ endRecord }}</span> trong
+                    <span style="font-weight: 500">{{
+                        totalRecordsCount
+                    }}</span>
+                    bản ghi
+                </p>
+                <div *ngIf="products?.length > 0">
+                    <p-paginator
+                        [rows]="pageSize"
+                        (onPageChange)="onPageChange($event)"
+                        [totalRecords]="
+                            totalRecordsCount > 0 ? totalRecordsCount : 1
+                        "
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                    ></p-paginator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -24,7 +24,9 @@ export class AdminGuard implements CanActivate {
     ): boolean {
         if (
             this.authService.hasRole(this.roles.admin) ||
-            this.authService.hasRole(this.roles.master)
+            this.authService.hasRole(this.roles.master) ||
+            //thn code
+            this.authService.hasRole(this.roles.employee)
         ) {
             return true;
         } else {
