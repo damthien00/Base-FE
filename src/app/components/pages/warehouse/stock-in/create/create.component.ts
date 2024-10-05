@@ -242,7 +242,7 @@ export class CreateComponent implements OnInit {
                     productId: item.id,
                     productImage:
                         item.productImages && item.productImages.length > 0
-                            ? item.productImages[0].link
+                            ? item.productImages[0]?.link
                             : null,
                     productName: item.name,
                     productType: item.productType,
@@ -336,9 +336,15 @@ export class CreateComponent implements OnInit {
         );
         if (existingDetail) {
             // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá
-            existingDetail.quantity += 1;
-            existingDetail.total =
-                existingDetail.quantity * existingDetail.price;
+            // existingDetail.quantity += 1;
+            // existingDetail.total =
+            //     existingDetail.quantity * existingDetail.price;
+
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Chú ý',
+                detail: 'Sản phẩm đã có trong danh sách',
+            });
         } else {
             // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
             const newDetail = {
@@ -518,6 +524,7 @@ export class CreateComponent implements OnInit {
                         productVariantId: product.productVariantId
                             ? product.productVariantId
                             : 1,
+                        productVariantName: product.productName,
                         productName: product.productName,
                         productCode: product.productCode,
                         productImage: product.productImage,
@@ -544,6 +551,7 @@ export class CreateComponent implements OnInit {
                 createName: this.userCurrent.name,
                 inventoryStockInDetails: products,
             };
+            console.log(formData);
 
             this.productService.createStockIn(formData).subscribe(
                 (response) => {

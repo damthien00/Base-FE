@@ -92,6 +92,13 @@ export class AppMenuComponent implements OnInit {
                                 routerLink: ['/pages/products/show-product'],
                             },
                             {
+                                label: 'Sản phẩm tồn',
+                                icon: 'pi pi-fw pi-box',
+                                routerLink: [
+                                    '/pages/products/show-inventory-product',
+                                ],
+                            },
+                            {
                                 label: 'Danh mục sản phẩm',
                                 icon: 'pi pi-fw pi-tags',
                                 routerLink: ['/pages/product-category/show'],

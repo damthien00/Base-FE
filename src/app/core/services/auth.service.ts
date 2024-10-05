@@ -21,7 +21,6 @@ export class AuthService {
     ) {}
 
     public url = environment.url;
-
     isLoggedIn(): boolean {
         const token = localStorage.getItem('token');
         if (token) {

@@ -64,10 +64,10 @@ export class LoginComponent {
                     this.authService.setAuthTokenLocalStorage(res.data);
                     this.authService.fetchUserCurrent().subscribe((data) => {
                         this.authService.setUserCurrent(data.data);
-
                         if (
                             this.authService.hasRole(roleConstant.admin) ||
-                            this.authService.hasRole(roleConstant.master)
+                            this.authService.hasRole(roleConstant.master) ||
+                            this.authService.hasRole(roleConstant.employee)
                         ) {
                             this.messageService.add({
                                 severity: 'success',

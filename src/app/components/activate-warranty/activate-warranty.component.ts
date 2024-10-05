@@ -1,3 +1,4 @@
+import { BranchService } from './../../core/services/branch.service';
 import { AddressService } from 'src/app/core/services/address.service';
 import { ProductImeiService } from './../../core/services/product-imei.service';
 import { Component, OnInit } from '@angular/core';
@@ -6,6 +7,9 @@ import { WarrantyService } from 'src/app/core/services/warranty.service';
 import { Router } from '@angular/router';
 import { forkJoin, switchMap, tap } from 'rxjs';
 import { CustomerService } from 'src/app/core/services/customer.service';
+import { OptionsFilterCustomer } from 'src/app/core/DTOs/customer/optionsFilterCustomers';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { OptionsFilterBranch } from 'src/app/core/DTOs/branch/optionsFilterBranchs';
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
     query: string;
@@ -16,18 +20,24 @@ interface AutoCompleteCompleteEvent {
     styleUrls: ['./activate-warranty.component.css'],
 })
 export class ActivateWarrantyComponent implements OnInit {
+    optionsFilterCustomer: OptionsFilterCustomer = new OptionsFilterCustomer();
     countries: any[] | undefined;
     filteredCountries: any[] | undefined;
     createActivateWarranty: FormGroup;
+    customers: any;
+    userCurrent: any;
     constructor(
         private productImeiService: ProductImeiService,
         private addressService: AddressService,
         private formBuilder: FormBuilder,
         private customerService: CustomerService,
         private warrantyService: WarrantyService,
-        private router: Router
+        private branchService: BranchService,
+        private router: Router,
+        private authService: AuthService
     ) {
         this.createActivateWarranty = this.formBuilder.group({
+            branch: [null, [Validators.required]],
             phoneNumber: [
                 null,
                 [Validators.required, Validators.pattern('^\\d{10}$')],
@@ -46,6 +56,11 @@ export class ActivateWarrantyComponent implements OnInit {
             wardId: [null],
             address: [null],
         });
+
+        this.authService.userCurrent.subscribe((res) => {
+            this.userCurrent = res;
+            console.log(this.userCurrent);
+        });
     }
     products!: any[];
     keywords: any;
@@ -57,6 +72,11 @@ export class ActivateWarrantyComponent implements OnInit {
     selectedDistrictId!: number;
     selectedWardId!: number;
     customerId: any;
+    branchs: any[] = [];
+    optionsFilterBranch: OptionsFilterBranch = new OptionsFilterBranch();
+
+    selectedBranch: any;
+    // brandIdSelected: any;
     ngOnInit() {
         this.getCitiesByCountry(1);
     }
@@ -76,6 +96,64 @@ export class ActivateWarrantyComponent implements OnInit {
 
         this.filteredCountries = filtered;
     }
+
+    searchBranch(event: AutoCompleteCompleteEvent) {
+        this.optionsFilterBranch.name = event.query;
+        this.loadBranchs();
+    }
+
+    loadBranchs() {
+        this.branchService
+            .getBranchs(this.optionsFilterBranch)
+            .subscribe((data) => {
+                console.log(data);
+                this.branchs = data.data.items;
+                console.log(this.branchs);
+            });
+    }
+
+    loadCustomers() {
+        this.customerService
+            .getCustomers(this.optionsFilterCustomer)
+            .subscribe((data) => {
+                console.log(data);
+                this.customers = data.data.items;
+            });
+    }
+
+    search(event: AutoCompleteCompleteEvent) {
+        this.optionsFilterCustomer.Keyword = event.query;
+        this.loadCustomers();
+    }
+
+    onSelect(event: any) {
+        const selectedCustomer = event.value; // Dữ liệu khách hàng đã chọn
+        console.log(selectedCustomer);
+
+        this.createActivateWarranty.patchValue({
+            phoneNumber: selectedCustomer.phoneNumber.trim(),
+            customerName: selectedCustomer.name,
+            cityId: selectedCustomer.cityId || null,
+            districtId: selectedCustomer.districtId || null,
+            wardId: selectedCustomer.wardId || null,
+            address: selectedCustomer.addressDetail || null,
+        });
+
+        console.log(this.createActivateWarranty.value);
+    }
+
+    // onCustomerSelect(event: any) {
+    //     const customerId = event.value.id;
+    //     this.warrantyService
+    //         .getWarrantyByCustomer(customerId)
+    //         .subscribe((data) => {
+    //             this.warrantyId = data.data.items[0].id;
+    //             this.productList = data.data.items[0].warrantyProducts;
+    //             console.log(this.productList);
+    //         });
+
+    //     this.listCart = [];
+    // }
 
     onSearchProductEmei() {
         if (this.keywords) {
@@ -97,7 +175,7 @@ export class ActivateWarrantyComponent implements OnInit {
                                         (p) => p.id === product.id // So sánh theo ID hoặc một thuộc tính duy nhất của sản phẩm
                                     );
 
-                                if (!isProductExists) {
+                                if (!isProductExists && product.term) {
                                     this.productListSelected.push(product);
                                 } else {
                                     console.log(
@@ -646,6 +724,9 @@ export class ActivateWarrantyComponent implements OnInit {
     // }
 
     onSubmit() {
+        console.log(this.createActivateWarranty.value);
+
+        console.log(this.selectedBranch);
         if (this.createActivateWarranty.valid) {
             // Tạo thông tin khách hàng
             const formDataCus = {
@@ -662,7 +743,6 @@ export class ActivateWarrantyComponent implements OnInit {
                 cityName: this.createActivateWarranty.value.cityId?.name,
                 addressDetail: this.createActivateWarranty.value.address,
             };
-
             // Tạo khách hàng trước khi tạo phiếu bảo hành
             this.customerService
                 .createCustomer(formDataCus)
@@ -670,10 +750,8 @@ export class ActivateWarrantyComponent implements OnInit {
                     switchMap((item) => {
                         // Lấy ID của khách hàng vừa tạo
                         this.customerId = item.data.id;
-
                         // Khởi tạo mảng để lưu tất cả các phiếu bảo hành
                         const allWarranties = [];
-
                         // Tạo mảng các observable cho từng sản phẩm, mỗi sản phẩm sẽ có 1 phiếu bảo hành riêng
                         const observables = this.productListSelected.map(
                             (product) => {
@@ -689,6 +767,7 @@ export class ActivateWarrantyComponent implements OnInit {
                                         .valuePropeties2,
                                     sk: product.frameNumber,
                                     sm: product.engineNumber,
+                                    quantity: -1,
                                     inventoryStockDetailProductImeiId:
                                         product.id,
                                     expirationDate: product.term
@@ -701,17 +780,19 @@ export class ActivateWarrantyComponent implements OnInit {
                                                   7 * 60 * 60 * 1000
                                           ).toISOString(),
                                 };
-
                                 // Dữ liệu phiếu bảo hành cho từng sản phẩm
+
                                 const formData = {
                                     code: 'string',
                                     customerName:
                                         this.createActivateWarranty.value
                                             .customerName || 'string',
-                                    branchId: product.branchId || 5,
+                                    branchId:
+                                        this.createActivateWarranty.value.branch
+                                            .id || 1,
                                     branchName:
-                                        product.branchName ||
-                                        'Chi nhánh Khoái Châu',
+                                        this.createActivateWarranty.value.branch
+                                            .name || 'Chi nhánh Khoái Châu',
                                     phoneNumber:
                                         this.createActivateWarranty.value
                                             .phoneNumber || 'string',
@@ -729,17 +810,14 @@ export class ActivateWarrantyComponent implements OnInit {
                                     warrantyProducts: [warrantyProduct], // Mỗi lần chỉ chứa 1 sản phẩm
                                     cusSuccess: formDataCus,
                                 };
-
                                 // Lưu từng phiếu bảo hành vào mảng
                                 allWarranties.push(formData);
-
                                 // Gọi API tạo phiếu bảo hành cho sản phẩm này
                                 return this.warrantyService.createWarranty(
                                     formData
                                 );
                             }
                         );
-
                         // Sử dụng forkJoin để gọi song song tất cả các API tạo phiếu bảo hành
                         return forkJoin(observables).pipe(
                             switchMap((responses) => {
@@ -747,11 +825,9 @@ export class ActivateWarrantyComponent implements OnInit {
                                     this.productListSelected.map(
                                         (product) => product.id
                                     );
-
                                 const formData1 = {
                                     inventoryStockDetailProductImeiIds,
                                 };
-
                                 // Sau khi tạo phiếu bảo hành, cập nhật trạng thái Purchased cho tất cả sản phẩm
                                 return this.warrantyService.updatePurchased(
                                     formData1
