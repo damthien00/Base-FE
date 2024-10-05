@@ -20,7 +20,6 @@ export class AppMenuComponent implements OnInit {
         private authService: AuthService,
         private messageService: MessageService
     ) {
-        this.authToken = this.authService.getAuthTokenLocalStorage();
         this.authService.userCurrent.subscribe((user) => {
             this.userCurrent = user;
             // console.log(this.userCurrent);
@@ -31,6 +30,8 @@ export class AppMenuComponent implements OnInit {
         this.refreshTokenService.startConnection();
         this.refreshTokenService.addActivityListener((activity) => {
             if (activity != null && activity.id == this.userCurrent.id) {
+                // console.log(this.authToken);
+                this.authToken = this.authService.getAuthTokenLocalStorage();
                 this.authService
                     .refreshToken({ refreshToken: this.authToken.refreshToken })
                     .subscribe((res) => {
@@ -38,8 +39,10 @@ export class AppMenuComponent implements OnInit {
                             this.messageService.add({
                                 severity: 'warn',
                                 summary: 'Cảnh báo',
-                                detail: 'Bạn đã ',
+                                detail: 'Bạn đã bị thay đổi quyền',
                             });
+
+                            this.authService.setAuthTokenLocalStorage(res.data);
                         }
                     });
             }
