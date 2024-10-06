@@ -5,6 +5,7 @@ import { MenuItem } from 'primeng/api';
 import { TreeNode } from 'primeng/api';
 import { NgForm } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-show-product-category',
@@ -59,10 +60,18 @@ export class ShowProductCategoryComponent implements OnInit {
   dataLoaded: boolean = false;
   cols: any[] = [];
   items: MenuItem[] | undefined;
+  public userCurrent: any;
 
   private searchTermChanged: Subject<string> = new Subject<string>();
 
-  constructor(private categoryService: CategoryService) { }
+  constructor(
+    private categoryService: CategoryService,
+    private authService: AuthService,
+  ) {
+    this.authService.userCurrent.subscribe((user) => {
+      this.userCurrent = user;
+    });
+   }
 
   ngOnInit(): void {
     this.cols = [
@@ -74,9 +83,7 @@ export class ShowProductCategoryComponent implements OnInit {
     ];
     this.items = [
       { icon: 'pi pi-home', route: '/installation' },
-      { label: 'Components' },
-      { label: 'Form' },
-      { label: 'InputText', route: '/inputtext' },
+      { label: 'Danh mục sản phẩm' }
     ];
     this.searchTermChanged
     .pipe(

@@ -2,13 +2,9 @@
     <div class="pagetitle">
         <div>
             <h3>Quản lý nhà cung cấp</h3>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-                    <li class="breadcrumb-item">Quản lý</li>
-                    <li class="breadcrumb-item active">Danh sách nhà cung cấp</li>
-                </ol>
-            </nav>
+            <p-breadcrumb
+            [model]="items">
+            </p-breadcrumb>
         </div>
         <div class="btn-add-wrapper">
             <button
@@ -230,7 +226,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="addName" class="form-label">Tên nhà cung cấp<span class="red-asterisk">*</span></label>
-                                    <input type="text" class="form-control" [(ngModel)]="supplierbyId.name" id="addName" name="name" ngModel required
+                                    <input type="text" [style]="{ height: '40px', width: '95%' }" class="form-control" [(ngModel)]="supplierbyId.name" id="addName" name="name" ngModel required
                                         minlength="1" maxlength="255">
                                     <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['name']?.invalid" class="error-message">
                                         <div *ngIf="supplierUpdateForm.controls['name']?.errors?.['required']">
@@ -242,9 +238,38 @@
                                         </div>
                                     </div>
                                 </div>
+                              
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" [style]="{ height: '40px', width: '95%' }" class="form-control" id="email" name="email" [(ngModel)]="supplierbyId.email"
+                                        pattern="^(?!\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(?<!\.)$">
+                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['email']?.invalid">
+                                        <div *ngIf="supplierUpdateForm.controls['email']?.errors?.['required']" class="error-message">
+                                            Email không được bỏ trống
+                                        </div>
+                                        <div *ngIf="supplierUpdateForm.controls['email']?.errors?.['pattern']" class="error-message">
+                                            Nhập sai định dạng email
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Địa chỉ</label>
+                                    <input type="text" [style]="{ height: '40px', width: '95%' }" class="form-control" id="address" name="address" [(ngModel)]="supplierbyId.address"
+                                        maxlength="255">
+                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['address']?.invalid">
+                                        <div *ngIf="supplierUpdateForm.controls['address']?.errors?.['required']" class="error-message">
+                                            Địa chỉ không được bỏ trống
+                                        </div>
+                                        <div *ngIf="supplierUpdateForm.controls['address']?.errors?.['maxlength']" class="error-message">
+                                            Địa chỉ không được vượt quá 255 ký tự
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="phone" class="form-label">Số điện thoại<span class="red-asterisk">*</span></label>
-                                    <input type="text" class="form-control" pattern="^(03|05|07|08|09)\d{8}$" (keypress)="validateNumber($event)"
+                                    <input type="text" [style]="{ height: '40px', width: '95%' }" class="form-control" pattern="^(03|05|07|08|09)\d{8}$" (keypress)="validateNumber($event)"
                                         minlength="10" maxlength="10" id="phone" name="phone" [(ngModel)]="supplierbyId.phone" required>
                                     <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['phone']?.invalid">
                                         <div *ngIf="supplierUpdateForm.controls['phone']?.errors?.['required']" class="error-message">
@@ -260,49 +285,8 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" [(ngModel)]="supplierbyId.email"
-                                        pattern="^(?!\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(?<!\.)$">
-                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['email']?.invalid">
-                                        <div *ngIf="supplierUpdateForm.controls['email']?.errors?.['required']" class="error-message">
-                                            Email không được bỏ trống
-                                        </div>
-                                        <div *ngIf="supplierUpdateForm.controls['email']?.errors?.['pattern']" class="error-message">
-                                            Nhập sai định dạng email
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Địa chỉ</label>
-                                    <input type="text" class="form-control" id="address" name="address" [(ngModel)]="supplierbyId.address"
-                                        maxlength="255">
-                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['address']?.invalid">
-                                        <div *ngIf="supplierUpdateForm.controls['address']?.errors?.['required']" class="error-message">
-                                            Địa chỉ không được bỏ trống
-                                        </div>
-                                        <div *ngIf="supplierUpdateForm.controls['address']?.errors?.['maxlength']" class="error-message">
-                                            Địa chỉ không được vượt quá 255 ký tự
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="taxCode" class="form-label">Mã số thuế</label>
-                                    <input type="text" class="form-control" id="taxCode" name="taxCode" [(ngModel)]="supplierbyId.taxCode" inputmode="numeric" 
-                                        pattern="^\d{10,13}$">
-                                    <div *ngIf="supplierUpdateForm.submitted && supplierUpdateForm.controls['taxCode']?.invalid">
-                                        <div *ngIf="supplierUpdateForm.controls['taxCode']?.errors?.['required']" class="error-message">
-                                            Mã số thuế không được bỏ trống
-                                        </div>
-                                        <div *ngIf="supplierUpdateForm.controls['taxCode']?.errors?.['pattern']" class="error-message">
-                                            Mã số thuế chỉ được chứa từ 10 đến 13 chữ số
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
                                     <label for="description" class="form-label">Mô tả</label>
-                                    <textarea class="form-control" style="height: 100px" id="description" name="description"
+                                    <textarea class="form-control" style="height: 125px" id="description" name="description"
                                         [(ngModel)]="supplierbyId.description" ></textarea>
                                     <!-- <div *ngIf="showNameErrorLength" class="error-message">
                                         Mô tả không được nhập quá 500 ký tự.

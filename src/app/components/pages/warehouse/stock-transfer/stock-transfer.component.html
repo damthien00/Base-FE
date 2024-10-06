@@ -1,14 +1,11 @@
 <main id="main" class="main">
     <div class="pagetitle">
-        <div>
+        <div class="">
           <h3>Danh sách chuyển hàng</h3>
-          <nav>
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-              <li class="breadcrumb-item">Chuyển hàng</li>
-              <li class="breadcrumb-item active">Danh sách chuyển hàng</li>
-            </ol>
-          </nav>
+          <p-breadcrumb
+              [model]="items"
+              [home]="{ icon: 'pi pi-home' }"
+          ></p-breadcrumb>
         </div>
     
         <div class="btn-add-wrapper">

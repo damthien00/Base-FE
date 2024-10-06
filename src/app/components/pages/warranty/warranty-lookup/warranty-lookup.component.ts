@@ -115,8 +115,9 @@ export class WarrantyLookupComponent implements OnInit {
         this.customer = data[0].customer;
 
         // Gán thông tin bảo hành
-        this.warrantyData = data.map((item: any) => item.warrantyProducts).flat();
-        console.log("Thông tin bảo hành:", this.warrantyData);
+        this.warrantyData = data.reduce((acc: any[], item: any) => {
+          return acc.concat(item.warrantyProducts);
+        }, []);
       },
       (error) => {
         this.isChecked = true; // Gán trạng thái đã kiểm tra ngay cả khi lỗi

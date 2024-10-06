@@ -16,6 +16,7 @@ import { BranchService } from 'src/app/core/services/branch.service';
 import { RoleService } from 'src/app/core/services/role.service';
 import { AddressService } from 'src/app/core/services/address.service';
 import { forkJoin } from 'rxjs';
+import { MenuItem } from 'primeng/api';
 
 @Component({
     selector: 'app-user',
@@ -96,6 +97,7 @@ export class UserComponent implements OnInit {
     showDialog2 = false;
     showDialog3 = false;
     rolesError: boolean = false;
+    items: MenuItem[] | undefined;
     
 
     formatdate: string = 'dd/mm/yy';
@@ -216,6 +218,11 @@ export class UserComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.items = [
+            { icon: 'pi pi-home', route: '/installation' },
+            { label: 'Quản trị hệ thống' },
+            { label: 'Quản lý tài khoản' }
+          ];
         this.getCitiesByCountry(1);
         this.Filters();
         this.getAllFilterRole();

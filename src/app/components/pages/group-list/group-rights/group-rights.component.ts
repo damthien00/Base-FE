@@ -8,7 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { OptionsFilterCommodities } from 'src/app/core/models/option-filter-commodities';
 import { RoleService } from 'src/app/core/services/role.service';
-import { TreeNode } from 'primeng/api';
+import { MenuItem, TreeNode } from 'primeng/api';
 import { PermissionService } from 'src/app/core/services/permission.service';
 
 @Component({
@@ -49,6 +49,7 @@ export class GroupRightsComponent implements OnInit {
     selectedPermissionIds: number[] = [];
     expandedItems: Set<number> = new Set();
     permissionsTree: any = [];
+    items: MenuItem[] | undefined;
 
     optionsFilterCommodities: OptionsFilterCommodities =
         new OptionsFilterCommodities();
@@ -96,6 +97,11 @@ export class GroupRightsComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.items = [
+            { icon: 'pi pi-home', route: '/installation' },
+            { label: 'Quản trị hệ thống' },
+            { label: 'Nhóm quyền' }
+        ];
         this.Filters();
         this.getAllFilterRole();
         this.getAllFilterRole2();
@@ -112,15 +118,20 @@ export class GroupRightsComponent implements OnInit {
         limit: number,
         showFull: boolean
     ): string {
+        if (!description) {
+            return ''; // Trả về chuỗi rỗng nếu description không có dữ liệu
+        }
+
         const parser = new DOMParser();
         const doc = parser.parseFromString(description, 'text/html');
-        const plainText = doc.body.textContent;
+        const plainText = doc.body.textContent || ''; // Xử lý nếu không có nội dung text
 
         if (plainText.length > limit && !showFull) {
             return plainText.substring(0, limit) + '...';
         }
         return plainText;
     }
+
 
     getAllFilterRole(): void {
         this.permissionService

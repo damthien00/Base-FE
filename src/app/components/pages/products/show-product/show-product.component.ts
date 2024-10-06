@@ -57,7 +57,7 @@ export class ShowProductComponent implements OnInit {
 
     async ngOnInit() {
         this.items = [
-            { label: 'Sản phẩm', route: '/products/show' },
+            { icon: 'pi pi-home', route: '/installation' },
             { label: 'Danh sách sản phẩm' },
         ];
         this.loading = true;
@@ -79,6 +79,7 @@ export class ShowProductComponent implements OnInit {
             );
         }
     }
+    
 
     toggleContent() {
         this.showContent = !this.showContent;
@@ -106,6 +107,7 @@ export class ShowProductComponent implements OnInit {
             label.innerHTML = this.selectedNodes.name;
         }
     }
+    
     closeDiaLogDelete() {
         this.showDiaLogDelete = false;
         this.DOMElementDelete = null;

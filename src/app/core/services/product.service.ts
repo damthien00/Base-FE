@@ -44,6 +44,22 @@ export class ProductService {
         });
     }
 
+    FilterProductView(options: OptionsFilterProduct): Promise<any> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let response = await this.http
+                    .post<OptionsFilterProduct>(
+                        `${this.url}/api/product/filter-products`,
+                        options
+                    )
+                    .toPromise();
+                resolve(response);
+            } catch (error) {
+                reject(JSON.parse(JSON.stringify(error)));
+            }
+        });
+    }
+
     FilterProductVariants(options: OptionsFilterProduct): Promise<any> {
         return new Promise(async (resolve, reject) => {
             try {
