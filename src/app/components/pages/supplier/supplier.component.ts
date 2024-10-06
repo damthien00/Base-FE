@@ -1,6 +1,6 @@
 import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { Paginator } from 'primeng/paginator';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { FormGroup, NgForm } from '@angular/forms';
 import { Table } from 'primeng/table';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -45,6 +45,7 @@ export class SupplierComponent implements OnInit {
   messages: any[] = [];
   updateSuccess: boolean = false;
   contentDeleteDialog: any;
+  items: MenuItem[] | undefined;
 
   //Event
   showDeleteDialog: boolean = false;
@@ -55,6 +56,10 @@ export class SupplierComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.items = [
+      { icon: 'pi pi-home', route: '/installation' },
+      { label: 'Danh mục nhà cung cấp' }
+    ];
     this.searchTermChanged
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((searchTerm) => {

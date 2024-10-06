@@ -206,7 +206,7 @@ export class CreateComponent implements OnInit {
     async loadProducts() {
         this.optionsFilterProduct.pageIndex = 1;
         this.optionsFilterProduct.pageSize = 10;
-        let response = await this.productService.FilterProduct(
+        let response = await this.productService.FilterProductView(
             this.optionsFilterProduct
         );
 

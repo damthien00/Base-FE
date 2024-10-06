@@ -59,6 +59,7 @@ export class CustomerComponent implements OnInit {
     { label: 'Nữ', value: 'nữ' }
   ];
   isSubmitting: boolean = false;
+  items: MenuItem[] | undefined;
 
 
   constructor(
@@ -69,6 +70,10 @@ export class CustomerComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.items = [
+      { icon: 'pi pi-home', route: '/installation' },
+      { label: 'Danh mục khách hàng' }
+    ];
     this.filterCustomers();
     this.FormGroupCustomers();
   }

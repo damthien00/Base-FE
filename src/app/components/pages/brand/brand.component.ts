@@ -5,6 +5,8 @@ import { Table } from 'primeng/table';
 import { BrandService } from 'src/app/core/services/brand.service';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { NgForm } from '@angular/forms';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-brand',
@@ -38,10 +40,17 @@ export class BrandComponent implements OnInit {
   value: string | undefined;
   keySearch: string = '';
   savingInProgress = false;
+  public userCurrent: any;
+  items: MenuItem[] | undefined;
 
   private searchTermChanged: Subject<string> = new Subject<string>();
 
-  constructor(private brandService: BrandService) {
+  constructor(
+    private brandService: BrandService,
+    private authService: AuthService,) {
+    this.authService.userCurrent.subscribe((user) => {
+      this.userCurrent = user;
+    });
   }
 
   openDialog() {
@@ -85,6 +94,10 @@ export class BrandComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.items = [
+      { icon: 'pi pi-home', route: '/installation' },
+      { label: 'Danh mục thương hiệu' }
+    ];
     this.searchTermChanged
       .pipe(
         debounceTime(300),

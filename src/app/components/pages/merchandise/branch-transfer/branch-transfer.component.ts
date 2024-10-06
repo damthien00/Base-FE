@@ -195,7 +195,7 @@ export class BranchTransferComponent implements OnInit {
   loadWarrantyPolicies() {
     this.branchService.getBranchsAll().subscribe((response: any) => {
       this.branch = response.data.items
-        .filter((option: any) => 
+        .filter((option: any) =>
           option.id !== this.userCurrent?.branchId && option.isActive !== 0 // Filter out the current branch and inactive branches
         )
         .map((option: any) => {
@@ -270,7 +270,7 @@ export class BranchTransferComponent implements OnInit {
   async loadProducts() {
     this.optionsFilterProduct.pageIndex = 1;
     this.optionsFilterProduct.pageSize = 10;
-    let response = await this.productService.FilterProduct(
+    let response = await this.productService.FilterProductView(
       this.optionsFilterProduct
     );
 
@@ -641,6 +641,14 @@ export class BranchTransferComponent implements OnInit {
             .map(frameEngine => frameEngine.id) // Get the id of the selected frame/engine
         );
 
+        const billOfLadingProductNormals = this.stockInReceipt.inventoryStockInDetails.map((product) => ({
+          productId: product.productId,
+          productVarriantId: product.productVariantId,
+          quantity: product.productType === 1 
+            ? (product.frameEngineData && product.frameEngineData.length > 0 ? 0 : 1)
+            : 1,
+        }));
+
       const selectedBranch = this.branch.find(option => option.id === this.selectedBranch);
       const toBranchId = selectedBranch ? selectedBranch.id : 0; // Replace with actual logic if needed
       const toBranchName = selectedBranch ? selectedBranch.name : 'string';
@@ -655,7 +663,8 @@ export class BranchTransferComponent implements OnInit {
         isDeleted: 0,
         iAccepted: 'waiting',
         recipientNote: 'string',
-        inventoryStockDetailProductImeiIds: inventoryStockDetailProductImeiIds
+        inventoryStockDetailProductImeiIds: inventoryStockDetailProductImeiIds,
+        billOfLadingProductNormals: billOfLadingProductNormals,
       };
 
       this.merchandiseService.createladingIn(formData).subscribe(
