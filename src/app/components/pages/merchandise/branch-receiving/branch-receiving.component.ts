@@ -62,12 +62,17 @@ export class BranchReceivingComponent {
   selectedBranch: any;
   ladingId!: number;
   recipientNote!: string;
+  totalQuantity!: number;
+  totalQuantity2!: number;
+  totalQuantityProduct!: number;
   displayConfirmation: boolean = false; 
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
   frameNumber: any;
   engineNumber: any;
+  displayedProducts: any;
+  displayedProducts2: any;
   public url = environment.url;
   ladingData: any = {};
   groupedByProductId: any[] = [];
@@ -220,80 +225,87 @@ export class BranchReceivingComponent {
         if (response && response.data) {
           this.ladingData = response.data; // Gán dữ liệu vào biến `ladingData`
           this.isAccept = this.ladingData.iAccepted === 'accept';
-          this.groupedByProductId = this.groupItemsByProductId(response.data.inventoryStockDetailProductImeis);
-          this.groupedByProductVariantId = this.groupItemsByProductVariantId(response.data.inventoryStockDetailProductImeis);
+          const groupedProducts = this.groupProductsByVariant(this.ladingData.inventoryStockDetailProductImeis);
+          this.displayedProducts = groupedProducts; 
+
+          const groupedProducts2 = this.groupProductsByVariant2(this.ladingData.billOfLadingProductNormals);
+          this.displayedProducts2 = groupedProducts2; 
+
+          this.totalQuantity = this.calculateTotalQuantity(groupedProducts);
+          this.totalQuantity2 = this.calculateTotalQuantity(groupedProducts2);
+          this.totalQuantityProduct = this.totalQuantity + this.totalQuantity2;
         }
       }, error => {
         console.error('Error fetching data:', error);
       });
   }
 
-  groupItemsByProductId(items: any[]): any[] {
-    const productMap = new Map();
+  groupProductsByVariant(products: any[]): any[] {
+    const productMap = new Map<string, any>();
   
-    items.forEach(item => {
-      const key = item.productId;
+    products.forEach(product => {
+      const key = `${product.productId}-${product.productVariantId}`;
       if (productMap.has(key)) {
-        const existingItem = productMap.get(key);
-        existingItem.quantity += 1; // Tăng số lượng
-        existingItem.totalPriceProduct = existingItem.productPrice * existingItem.quantity
-        existingItem.frameNumbers.push(item.frameNumber); // Thêm frameNumber vào danh sách
-        existingItem.engineNumbers.push(item.engineNumber); // Thêm engineNumber vào danh sách
-      } else {
-        productMap.set(key, {
-          ...item,
-          quantity: 1,
-          totalPriceProduct: item.productPrice,
-          frameNumbers: [item.frameNumber], // Khởi tạo danh sách frameNumber
-          engineNumbers: [item.engineNumber], // Khởi tạo danh sách engineNumber
+        const existingProduct = productMap.get(key);
+        existingProduct.quantity += 1;
+        existingProduct.totalAmountVariant = existingProduct.quantity * existingProduct.productVariantPrice;
+        existingProduct.totalAmountProduct = existingProduct.quantity * existingProduct.productPrice;
+      }
+      else {
+        productMap.set(key, { 
+          productId: product.productId, 
+          productVariantId: product.productVariantId,
+          productName: product.productName,
+          productVariantName: product.productVariantName,
+          productImage: product.productImage,
+          productVariantImage: product.productVariantImage,
+          productPrice: product.productPrice,
+          productVariantPrice: product.productVariantPrice,
+          totalAmountProduct: product.productPrice,
+          totalAmountVariant: product.productVariantPrice,
+          quantity: 1
         });
       }
     });
   
-    return Array.from(productMap.values());
+    return Array.from(productMap.values()); // Convert map values to an array
   }
+
+  groupProductsByVariant2(products: any[]): any[] {
+    const productMap = new Map<string, any>();
   
-  // Hàm gộp dữ liệu theo productVariantId
-  groupItemsByProductVariantId(items: any[]): any[] {
-    const variantMap = new Map();
-  
-    items.forEach(item => {
-      if (item.productVariantName) {
-        const key = item.productVariantId;
-        if (variantMap.has(key)) {
-          const existingItem = variantMap.get(key);
-          existingItem.quantity += 1; // Tăng số lượng
-          existingItem.totalPriceVariant = existingItem.productVariantPrice * existingItem.quantity
-          existingItem.frameNumbers.push(item.frameNumber); // Thêm frameNumber vào danh sách
-          existingItem.engineNumbers.push(item.engineNumber); // Thêm engineNumber vào danh sách
-        } else {
-          variantMap.set(key, {
-            ...item,
-            quantity: 1,
-            totalPriceVariant: item.productVariantPrice,
-            frameNumbers: [item.frameNumber], // Khởi tạo danh sách frameNumber
-            engineNumbers: [item.engineNumber], // Khởi tạo danh sách engineNumber
-          });
-        }
+    products.forEach(product => {
+      const key = `${product.productId}-${product.productVariantId}`;
+      if (productMap.has(key)) {
+        const existingProduct = productMap.get(key);
+        existingProduct.quantity += 1;
+        existingProduct.totalAmountVariant = existingProduct.quantity * existingProduct.productVariantPrice;
+        existingProduct.totalAmountProduct = existingProduct.quantity * existingProduct.productPrice;
+      }
+      else {
+        productMap.set(key, { 
+          productId: product.productId, 
+          productVariantId: product.productVariantId,
+          productName: product.productName,
+          productVariantName: product.productVariantName,
+          productImage: product.productImage,
+          productVariantImage: product.productVariantImage,
+          productPrice: product.productPrice,
+          productVariantPrice: product.productVariantPrice,
+          totalAmountProduct: product.productPrice,
+          totalAmountVariant: product.productVariantPrice,
+          quantity: product.quantity
+        });
       }
     });
   
-    return Array.from(variantMap.values());
+    return Array.from(productMap.values()); // Convert map values to an array
   }
 
-  getTotalQuantityByProductId(): number {
-    return this.groupedByProductId.reduce((total, product) => total + product.quantity, 0);
+  calculateTotalQuantity(products: any[]): number {
+    return products.reduce((total, product) => total + product.quantity, 0);
   }
 
-  getTotalQuantityByProductVariantId(): number {
-    return this.groupedByProductVariantId.reduce((total, variant) => total + variant.quantity, 0);
-  }
-
-  getTotalQuantity(): number {
-    const totalByProductId = this.getTotalQuantityByProductId();
-    const totalByProductVariantId = this.getTotalQuantityByProductVariantId();
-    return totalByProductId + totalByProductVariantId;
-  }
   
   onConfirm(): void {
     this.ladingData.iAccepted = 'accept'; // Gán giá trị "accept" cho iAccepted
@@ -311,7 +323,25 @@ export class BranchReceivingComponent {
     const updateLadingData = {
       id: this.ladingId,
       iAccepted: this.ladingData.iAccepted,
-      recipientNote: this.recipientNote
+      recipientNote: this.recipientNote,
+      inventoryStockDetailProductImeis: this.ladingData.inventoryStockDetailProductImeis.map((item: any) => ({
+        productId: item.productId,
+        productVarriantId: item.productVariantId,
+        productName: item.productName,
+        productVarriantName: item.productVarriantName,
+        inventoryStockDetailProductImeiId: item.id
+      })),
+      fromBranchId: this.ladingData.fromBranchId,
+      toBranchId: this.ladingData.toBranchId,
+      fromBranchName: this.ladingData.fromBranchName,
+      toBranchName: this.ladingData.toBranchName,
+      updateInvenRequests: this.ladingData.billOfLadingProductNormals.map((item: any) => ({
+        productId: item.productId,
+        productVarriantId: item.productVariantId,
+        productName: item.productName,
+        productVarriantName: item.productVarriantName,
+        quantity: item.quantity
+      }))
     };
 
     // Tạo dữ liệu cho API /api/inventory-stock-detail-product-imei/update-branch

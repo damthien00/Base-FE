@@ -27,6 +27,20 @@ export class MerchandiseService {
     return this.http.get<any>(url);
   }
 
+  getCheckQuantity(productId: number, productVariantId: number, branchId: number): Observable<any> {
+    let url = `${this.url}/api/inventory/check-quantity?ProductId=${productId}`;
+
+    if (productVariantId !== null && productVariantId !== undefined) {
+      url += `&ProductVariantId=${productVariantId}`;
+    }
+
+    if (branchId !== null && branchId !== undefined) {
+      url += `&BranchId=${branchId}`;
+    }
+
+    return this.http.get<any>(url);
+  }
+
   createladingIn(data: any): Observable<any> {
     return this.http
       .post<any>(`${this.url}/api/bill-of-lading/create`, data)

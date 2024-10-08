@@ -136,13 +136,13 @@
                                     class="md:w-20rem w-full"
                                     containerStyleClass="w-full"
                                     placeholder="Chọn quyền"
-                                    [panelStyle]="{
-                                        'min-width': '300px',
-                                    }"
+                                    [panelStyle]="{ 'min-width': '300px' }"
                                     display="chip"
                                     selectionMode="checkbox"
                                     class="permissions"
-                                >
+                                    (onNodeSelect)="onNodeSelect($event)"
+                                    (onNodeUnselect)="onNodeUnselect($event)"
+                                 >
                                 </p-treeSelect>
                                 <div
                                     *ngIf="
