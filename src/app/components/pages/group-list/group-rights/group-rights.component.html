@@ -136,13 +136,13 @@
                                     class="md:w-20rem w-full"
                                     containerStyleClass="w-full"
                                     placeholder="Chọn quyền"
-                                    [panelStyle]="{
-                                        'min-width': '300px',
-                                    }"
+                                    [panelStyle]="{ 'min-width': '300px' }"
                                     display="chip"
                                     selectionMode="checkbox"
                                     class="permissions"
-                                >
+                                    (onNodeSelect)="onNodeSelect($event)"
+                                    (onNodeUnselect)="onNodeUnselect($event)"
+                                 >
                                 </p-treeSelect>
                                 <div
                                     *ngIf="
@@ -283,16 +283,9 @@
                                         </ng-container>
                                     </ul>
                                 </div>
-                                <div
-                                    *ngIf="
-                                        (rolesControl2?.hasError('required') &&
-                                            rolesControl2?.touched) ||
-                                        showNameError7
-                                    "
-                                    class="error-message"
-                                >
+                                <div *ngIf="!validatePermissions() || showNameError3" class="error-message">
                                     Vui lòng chọn ít nhất một quyền.
-                                </div>
+                                  </div>
                             </div>
                             <div style="margin-bottom: 20px" class="col-lg-12">
                                 <label class="labelip"

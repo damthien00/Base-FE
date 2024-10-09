@@ -122,9 +122,9 @@
                             <th style="width: 10%; text-align: right">
                                 Giá bán
                             </th>
-                            <th style="width: 7%; text-align: right">
+                            <!-- <th style="width: 7%; text-align: right">
                                 Tồn kho
-                            </th>
+                            </th> -->
                             <th style="width: 10%; text-align: center">
                                 Trạng thái
                             </th>
@@ -226,7 +226,7 @@
                                     }}
                                 </p>
                             </td>
-                            <td class="quantity-product">
+                            <!-- <td class="quantity-product">
                                 <p
                                     style="margin: 15px 0; height: 23px"
                                     *ngFor="
@@ -255,7 +255,7 @@
                                             : product.totalQuantity
                                     }}
                                 </p>
-                            </td>
+                            </td> -->
                             <td
                                 class="n-product-status"
                                 style="
@@ -426,6 +426,7 @@
                       >Không tìm thấy kết quả phù hợp</strong
                     >
                   </div>
+                  <div [innerHTML]="currentPageReport" class="current-page-report"></div>
                 <div class="paginator">
                     <p-paginator
                         [rows]="this.pageSize"

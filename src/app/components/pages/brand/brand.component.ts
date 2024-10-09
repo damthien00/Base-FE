@@ -16,7 +16,7 @@ import { MenuItem } from 'primeng/api';
 export class BrandComponent implements OnInit {
   @ViewChild('dataTable', { static: true }) dataTable!: Table;
   @ViewChild('paginator') paginator!: Paginator;
-  brands: any[] = [];
+  brands!: any;
   totalRecordsCount: number = 0;
   pageSize: number = 30;
   pageNumber: number = 1;

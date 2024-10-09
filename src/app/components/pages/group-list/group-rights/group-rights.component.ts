@@ -41,6 +41,7 @@ export class GroupRightsComponent implements OnInit {
     isSubmitting: boolean = false;
     showNameError: boolean = false;
     showNameError2: boolean = false;
+    showNameError3: boolean = false;
     PageIndex: number = 1;
     PageSize: number = 30;
     PageIndex2: number = 1;
@@ -113,6 +114,10 @@ export class GroupRightsComponent implements OnInit {
         return isValid ? null : { whitespace: true };
     }
 
+    validatePermissions(): boolean {
+        return this.selectedPermissionIds.length > 0;
+      }
+
     truncateDescription(
         description: string,
         limit: number,
@@ -164,16 +169,54 @@ export class GroupRightsComponent implements OnInit {
         }));
     }
 
-    formatPermissions(items: any[]): any[] {
+    formatPermissions(items: any[], parent: any = null): any[] {
         return items.map((item) => {
-            return {
+            const formattedItem = {
                 label: item.displayName,
                 data: item.name,
                 id: item.id,
-                children: this.formatPermissions(item.childrens),
+                parent: parent,  // Set parent reference
+                children: this.formatPermissions(item.childrens, item),
             };
+            return formattedItem;
         });
     }
+
+    onNodeSelect(event: any) {
+        this.selectParentNode(event.node);
+    }
+    
+    onNodeUnselect(event: any) {
+        this.unselectChildNodes(event.node);
+    }
+    
+    // Recursively select parent nodes only if they are not already selected
+    selectParentNode(node: any) {
+        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;  // Get current selected nodes
+        if (node.parent && !selectedPermissions.includes(node.parent)) {
+            // If the parent is not selected, add it to the selected values
+            selectedPermissions.push(node.parent);
+            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);  // Update form control value
+    
+            // Recursively select the next parent up the tree
+            this.selectParentNode(node.parent);
+        }
+    }
+    
+    // Recursively unselect child nodes if necessary
+    unselectChildNodes(node: any) {
+        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;  // Get current selected nodes
+        if (node.children && node.children.length > 0) {
+            node.children.forEach((child: any) => {
+                const index = selectedPermissions.indexOf(child);
+                if (index !== -1) {
+                    selectedPermissions.splice(index, 1);  // Remove the child from the selected list
+                    this.unselectChildNodes(child);  // Recursively unselect child nodes
+                }
+            });
+            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);  // Update form control value
+        }
+    }    
 
     Filters(): void {
         //debugger
@@ -472,6 +515,11 @@ export class GroupRightsComponent implements OnInit {
         const formValue = this.RoleGroupForm2.value;
 
         let hasError = false;
+
+        if (!this.validatePermissions()) {
+            this.showNameError3 = true;
+            hasError = true;
+          }
 
         // if (
         //     !this.rolesControl2?.value ||
