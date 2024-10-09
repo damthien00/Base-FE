@@ -283,16 +283,9 @@
                                         </ng-container>
                                     </ul>
                                 </div>
-                                <div
-                                    *ngIf="
-                                        (rolesControl2?.hasError('required') &&
-                                            rolesControl2?.touched) ||
-                                        showNameError7
-                                    "
-                                    class="error-message"
-                                >
+                                <div *ngIf="!validatePermissions() || showNameError3" class="error-message">
                                     Vui lòng chọn ít nhất một quyền.
-                                </div>
+                                  </div>
                             </div>
                             <div style="margin-bottom: 20px" class="col-lg-12">
                                 <label class="labelip"

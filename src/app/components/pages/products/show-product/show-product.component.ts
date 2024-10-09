@@ -71,6 +71,7 @@ export class ShowProductComponent implements OnInit {
         this.treeCategory = responseGetTreeCategory.data;
         this.products = response.data;
         this.totalRecords = response.totalRecordsCount;
+        this.pageNumber = 1;
         this.updateCurrentPageReport();
         for (let index = 0; index < this.products.length; index++) {
             this.showAllVariants.set(
@@ -316,20 +317,17 @@ export class ShowProductComponent implements OnInit {
         this.optionsFillerProduct.pageSize = event.rows;
         this.pageSize = event.rows;
         this.optionsFillerProduct.pageIndex = event.page + 1;
-
+    
         this.loading = true;
-        let response = await this.productService.FilterProduct(
-            this.optionsFillerProduct
-        );
+        let response = await this.productService.FilterProduct(this.optionsFillerProduct);
         this.loading = false;
-
+    
         this.products = response.data;
         this.totalRecords = response.totalRecordsCount;
+        this.pageNumber = event.page + 1; // Cập nhật pageNumber
+        this.updateCurrentPageReport(); // Gọi hàm để cập nhật thông tin trang
         for (let index = 0; index < this.products.length; index++) {
-            this.showAllVariants.set(
-                this.products[index].id,
-                this.products[index].productVariants.length > 3 ? 1 : 0
-            );
+            this.showAllVariants.set(this.products[index].id, this.products[index].productVariants.length > 3 ? 1 : 0);
         }
     }
 
@@ -401,12 +399,14 @@ export class ShowProductComponent implements OnInit {
 
     updateCurrentPageReport(): void {
         const startRecord = ((this.pageNumber - 1) * this.pageSize) + 1;
-        const endRecord = Math.min(this.pageNumber * this.pageSize, this.totalRecords);
-        if(this.totalRecords === 0){
-          this.currentPageReport = `<strong>0</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`
+        const endRecord = Math.min(startRecord + this.products.length - 1, this.totalRecords);
+        
+        if (this.totalRecords === 0) {
+            this.currentPageReport = `<strong>0</strong> - <strong>0</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
+        } else {
+            this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
         }
-        if(this.totalRecords > 0){
-          this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`
-        }
-      }
+    }
+    
+    
 }

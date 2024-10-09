@@ -495,7 +495,7 @@ export class BranchTransferComponent implements OnInit {
           if (productInCart.frameEngineData && productInCart.frameEngineData.length > 0) {
             productInCart.quantity = 0; // If frameEngineData is available, set quantity to 0
           } else {
-            productInCart.quantity = 1; // If frameEngineData is null or empty, set quantity to 1
+            productInCart.quantity = 0; // If frameEngineData is null or empty, set quantity to 1
           }
         }
 

@@ -41,6 +41,7 @@ export class GroupRightsComponent implements OnInit {
     isSubmitting: boolean = false;
     showNameError: boolean = false;
     showNameError2: boolean = false;
+    showNameError3: boolean = false;
     PageIndex: number = 1;
     PageSize: number = 30;
     PageIndex2: number = 1;
@@ -112,6 +113,10 @@ export class GroupRightsComponent implements OnInit {
         const isValid = !isWhitespace;
         return isValid ? null : { whitespace: true };
     }
+
+    validatePermissions(): boolean {
+        return this.selectedPermissionIds.length > 0;
+      }
 
     truncateDescription(
         description: string,
@@ -510,6 +515,11 @@ export class GroupRightsComponent implements OnInit {
         const formValue = this.RoleGroupForm2.value;
 
         let hasError = false;
+
+        if (!this.validatePermissions()) {
+            this.showNameError3 = true;
+            hasError = true;
+          }
 
         // if (
         //     !this.rolesControl2?.value ||
