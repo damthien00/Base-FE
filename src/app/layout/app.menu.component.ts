@@ -110,7 +110,7 @@ export class AppMenuComponent implements OnInit {
                         icon: 'pi pi-fw pi-box',
                         items: [
                             {
-                                label: 'Sản phẩm',
+                                label: 'Danh sách sản phẩm',
                                 icon: 'pi pi-fw pi-box',
                                 routerLink: ['/pages/products/show-product'],
                             },

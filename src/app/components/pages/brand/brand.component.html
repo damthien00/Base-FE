@@ -66,7 +66,7 @@
                     <!-- <td><p-checkbox [binary]="true" inputId="binary"></p-checkbox></td> -->
                     <td>{{ brand.id }}</td>
                     <td>{{ brand.name }}</td>
-                    <td>{{ this.userCurrent?.name }}</td>
+                    <td>{{ brand.createName }}</td>
                     <td>{{ brand.description }}</td>
                     <td [style.color]="brand.isDeleted === 0 ? 'green' : 'red'">
                       {{ brand.isDeleted === 0 ? 'Hoạt động' : 'Ẩn' }}

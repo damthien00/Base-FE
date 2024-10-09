@@ -56,10 +56,6 @@ export class ShowProductComponent implements OnInit {
     }
 
     async ngOnInit() {
-        this.items = [
-            { icon: 'pi pi-home', route: '/installation' },
-            { label: 'Danh sách sản phẩm' },
-        ];
         this.loading = true;
         let response = await this.productService.FilterProduct(
             this.optionsFillerProduct
@@ -192,14 +188,24 @@ export class ShowProductComponent implements OnInit {
             ? this.statusFilter.value
             : null;
         this.optionsFillerProduct.pageIndex = 1;
-
+    
         this.loading = true;
         await this.productService
             .FilterProduct(this.optionsFillerProduct)
             .then((response) => {
                 this.products = response.data;
                 this.totalRecords = response.totalRecordsCount;
-                
+    
+                // Lọc sản phẩm thỏa mãn điều kiện totalQuantity > 0 và tất cả các variant.quantity > 0
+                this.products = this.products.filter(product => {
+                    // Điều kiện product.totalQuantity > 0
+                    if (product.totalQuantity > 0) {
+                        // Kiểm tra tất cả các variant của product
+                        return product.productVariants.every(variant => variant.quantity > 0);
+                    }
+                    return false;
+                });
+    
                 for (let index = 0; index < this.products.length; index++) {
                     this.showAllVariants.set(
                         this.products[index].id,
@@ -209,6 +215,7 @@ export class ShowProductComponent implements OnInit {
             });
         this.loading = false;
     }
+    
     async SectionMainHead_Click_All(event: Event) {
         const oldheadactive = document.querySelector(
             '.show-product-component .section-main-head .head-active'
@@ -329,6 +336,18 @@ export class ShowProductComponent implements OnInit {
         for (let index = 0; index < this.products.length; index++) {
             this.showAllVariants.set(this.products[index].id, this.products[index].productVariants.length > 3 ? 1 : 0);
         }
+    }
+
+    get startRecord(): number {
+        return (this.pageNumber - 1) * this.pageSize + 1;
+    }
+
+    get endRecord(): number {
+        // Tính toán số bản ghi kết thúc (không vượt quá tổng số bản ghi)
+        const calculatedEnd = (this.pageNumber - 1 + 1) * this.pageSize;
+        return calculatedEnd > this.totalRecords
+            ? this.totalRecords
+            : calculatedEnd;
     }
 
     toggleShowAllVariants(index: number) {
