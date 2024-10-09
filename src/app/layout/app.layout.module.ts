@@ -20,6 +20,7 @@ import { AppLayoutComponent } from './app.layout.component';
 import { MenubarModule } from 'primeng/menubar';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
+import { SharedModule } from '../shared/modules/shared.module';
 
 @NgModule({
     declarations: [
@@ -42,6 +43,7 @@ import { ButtonModule } from 'primeng/button';
         MenuModule,
         BadgeModule,
         RadioButtonModule,
+        SharedModule,
         InputSwitchModule,
         RippleModule,
         RouterModule,

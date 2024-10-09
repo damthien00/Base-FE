@@ -70,9 +70,9 @@ import { AdminGuard } from './core/guards/admin.guard';
                             'src/app/components/pages/warranty/warranty-lookup/warranty-lookup.module'
                         ).then((m) => m.WarrantyLookupModule),
                 },
-                // tny code 
+                // tny code
                 {
-                    path: 'activate-success/:id',
+                    path: 'activate-success',
                     loadChildren: () =>
                         import(
                             'src/app/components/activate-success/activate-success.module'

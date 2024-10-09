@@ -19,6 +19,13 @@ import { RouterModule } from '@angular/router';
                     ),
             },
             {
+                path: 'products/show-inventory-product',
+                loadChildren: () =>
+                    import('./inventory-product/show/show.module').then(
+                        (m) => m.ShowModule
+                    ),
+            },
+            {
                 path: 'warehouse/stock-in',
                 loadChildren: () =>
                     import('./warehouse/stock-in/show/show.module').then(
@@ -138,19 +145,31 @@ import { RouterModule } from '@angular/router';
                     ).then((m) => m.BranchReceivingModule),
             },
             {
+                path: 'customer/show-customer',
+                loadChildren: () =>
+                    import('./list-customer/customer/customer.module').then(
+                        (m) => m.CustomerModule
+                    ),
+            },
+            {
+                path: 'supplier/show-supplier',
+                loadChildren: () =>
+                    import('./supplier/supplier.module').then(
+                        (m) => m.SupplierModule
+                    ),
+            },
+            {
                 path: 'role',
                 loadChildren: () =>
-                    import(
-                        './group-list/update-role/update-role.module'
-                    ).then((m) => m.UpdateRoleModule),
+                    import('./group-list/update-role/update-role.module').then(
+                        (m) => m.UpdateRoleModule
+                    ),
             },
             // end tny code
-
-
 
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],
     exports: [RouterModule],
 })
-export class PagesRoutingModule { }
+export class PagesRoutingModule {}

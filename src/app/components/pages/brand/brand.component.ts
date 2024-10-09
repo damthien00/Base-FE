@@ -5,6 +5,8 @@ import { Table } from 'primeng/table';
 import { BrandService } from 'src/app/core/services/brand.service';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { NgForm } from '@angular/forms';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-brand',
@@ -14,7 +16,7 @@ import { NgForm } from '@angular/forms';
 export class BrandComponent implements OnInit {
   @ViewChild('dataTable', { static: true }) dataTable!: Table;
   @ViewChild('paginator') paginator!: Paginator;
-  brands: any[] = [];
+  brands!: any;
   totalRecordsCount: number = 0;
   pageSize: number = 30;
   pageNumber: number = 1;
@@ -38,10 +40,17 @@ export class BrandComponent implements OnInit {
   value: string | undefined;
   keySearch: string = '';
   savingInProgress = false;
+  public userCurrent: any;
+  items: MenuItem[] | undefined;
 
   private searchTermChanged: Subject<string> = new Subject<string>();
 
-  constructor(private brandService: BrandService) {
+  constructor(
+    private brandService: BrandService,
+    private authService: AuthService,) {
+    this.authService.userCurrent.subscribe((user) => {
+      this.userCurrent = user;
+    });
   }
 
   openDialog() {
@@ -85,6 +94,10 @@ export class BrandComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.items = [
+      { icon: 'pi pi-home', route: '/installation' },
+      { label: 'Danh mục thương hiệu' }
+    ];
     this.searchTermChanged
       .pipe(
         debounceTime(300),
@@ -108,6 +121,7 @@ export class BrandComponent implements OnInit {
         (response: any) => {
           this.brands = response.data;
           this.totalRecordsCount = response.totalRecordsCount;
+          this.updateCurrentPageReport();
         },
         (error: any) => {
           console.error(error);
@@ -138,7 +152,12 @@ export class BrandComponent implements OnInit {
   updateCurrentPageReport(): void {
     const startRecord = ((this.pageNumber - 1) * this.pageSize) + 1;
     const endRecord = Math.min(this.pageNumber * this.pageSize, this.totalRecordsCount);
-    this.currentPageReport = `Hiện ${startRecord} tới ${endRecord} của ${this.totalRecordsCount} bản ghi`;
+    if(this.totalRecordsCount === 0){
+      this.currentPageReport = `<strong>0</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecordsCount}</strong> bản ghi`
+    }
+    if(this.totalRecordsCount > 0){
+      this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecordsCount}</strong> bản ghi`
+    }
   }
 
   checkDescriptionLength() {

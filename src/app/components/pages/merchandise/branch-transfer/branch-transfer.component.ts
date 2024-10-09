@@ -60,12 +60,14 @@ export class BranchTransferComponent implements OnInit {
   public userCurrent: any;
   selectedBranch: any;
   items!: any[];
-  
+  branchError: boolean = false;
+
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
   frameNumber: any;
   engineNumber: any;
+  availableQuantity: any;
 
   imeiData: any[] = [];
   frameEngineData: any[] = [];
@@ -194,7 +196,9 @@ export class BranchTransferComponent implements OnInit {
   loadWarrantyPolicies() {
     this.branchService.getBranchsAll().subscribe((response: any) => {
       this.branch = response.data.items
-        .filter((option: any) => option.id !== this.userCurrent?.branchId) // Filter out the current branch
+        .filter((option: any) =>
+          option.id !== this.userCurrent?.branchId && option.isActive !== 0 // Filter out the current branch and inactive branches
+        )
         .map((option: any) => {
           return {
             ...option,
@@ -203,7 +207,6 @@ export class BranchTransferComponent implements OnInit {
         });
     });
   }
-
 
   shortenName(name: string, maxLength: number): string {
     if (name.length > maxLength) {
@@ -264,11 +267,28 @@ export class BranchTransferComponent implements OnInit {
     }
   }
 
+  toggleEdit(data: any, saveChanges: boolean = false): void {
+    if (saveChanges) {
+      this.validateQuantity(data); // Validate the entered quantity
+    }
+    data.isEditing = !data.isEditing;
+  }
+
+  validateQuantity(data: any): void {
+    if (data.quantity > data.availableQuantity) {
+      data.isValid = true; // Trigger the error message
+      data.isValidMessageQuantity = `Số lượng không được vượt quá ${data.availableQuantity}`;
+      // data.quantity = this.availableQuantity; // Reset quantity to availableQuantity
+    } else {
+      data.isValid = false;
+      data.isValidMessageQuantity = null;
+    }
+  }
 
   async loadProducts() {
     this.optionsFilterProduct.pageIndex = 1;
     this.optionsFilterProduct.pageSize = 10;
-    let response = await this.productService.FilterProduct(
+    let response = await this.productService.FilterProductView(
       this.optionsFilterProduct
     );
 
@@ -293,8 +313,8 @@ export class BranchTransferComponent implements OnInit {
             productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
             price: itemVariant.price,
             unit: item.unitName,
-            mass: itemVariant.sellCounts
-              ? itemVariant.sellCounts
+            mass: itemVariant.quantity
+              ? itemVariant.quantity
               : 0,
             total:
               item.productType === 1 ? 0 : itemVariant.price * 1,
@@ -316,7 +336,7 @@ export class BranchTransferComponent implements OnInit {
           productCode: item.code || '', // Đảm bảo mã sản phẩm
           price: item.sellingPrice,
           unit: item.unitName,
-          mass: item.mass,
+          mass: item.totalQuantity,
           total: item.productType === 1 ? 0 : item.sellingPrice * 1,
           frameNumber: '',
           engineNumber: '',
@@ -364,6 +384,11 @@ export class BranchTransferComponent implements OnInit {
     }
   }
 
+  onBranchChange() {
+    // Ẩn thông báo lỗi khi chi nhánh được chọn
+    this.branchError = !this.selectedBranch; // Nếu không chọn chi nhánh, hiển thị lỗi
+  }
+
   onEnter(dataId: number) {
     const data = this.datas.find((p: any) => p.id === dataId);
     console.log(data);
@@ -401,9 +426,20 @@ export class BranchTransferComponent implements OnInit {
     }
   }
 
+  async fetchAvailableQuantity(productId: number, productVariantId: number, branchId: number) {
+    try {
+      const response = await this.merchandiseService.getCheckQuantity(productId, productVariantId, branchId).toPromise();
+      return response?.data?.quantity || 0; // Trả về số lượng có sẵn
+    } catch (error) {
+      console.error('Error fetching available quantity', error);
+      return 0;
+    }
+  }
+
   addToCart(item: any): void {
     console.log(item);
-    // Kiểm tra xem sản phẩm đã có trong inventoryStockInDetails hay chưa
+
+    // Check if the product already exists in the cart
     const existingDetail = this.stockInReceipt.inventoryStockInDetails.find(
       (detail: any) => {
         console.log(detail, item);
@@ -420,12 +456,14 @@ export class BranchTransferComponent implements OnInit {
     console.log(existingDetail);
 
     if (existingDetail) {
-      // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá
-      existingDetail.quantity += 1;
-      existingDetail.total =
-        existingDetail.quantity * existingDetail.price;
+      // If the product already exists, update the quantity and total price
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Chú ý',
+        detail: 'Sản phẩm đã có trong danh sách',
+      });
     } else {
-      // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
+      // If the product doesn't exist, add a new entry
       const newDetail = {
         productId: item.productId,
         productImage: item.productImage,
@@ -433,7 +471,7 @@ export class BranchTransferComponent implements OnInit {
         productVariantId: item.productVariantId,
         warrantyPolicyId: item.warrantyPolicyId,
         productType: item.productType,
-        quantity: item.productType === 1 ? 0 : 1,
+        quantity: item.productType === 1 ? (item.frameEngineData && item.frameEngineData.length > 0 ? 0 : 1) : 1,  // Adjust quantity if frameEngineData is null or empty
         productCode: item.productCode ? '' : '',
         price: item.price,
         unit: item.unit,
@@ -446,14 +484,43 @@ export class BranchTransferComponent implements OnInit {
       };
 
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
-      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId);
-    }
 
-    // Cập nhật lại các giá trị liên quan
-    this.updatePaymentInfo();
-    this.showProducts = false;
-    this.searchInput.nativeElement.value = '';
-    console.log(this.stockInReceipt);
+      // Fetch IMEI data if product type is 1
+      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
+        const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
+          (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
+        );
+
+        if (productInCart) {
+          if (productInCart.frameEngineData && productInCart.frameEngineData.length > 0) {
+            productInCart.quantity = 0; // If frameEngineData is available, set quantity to 0
+          } else {
+            productInCart.quantity = 0; // If frameEngineData is null or empty, set quantity to 1
+          }
+        }
+
+        // Update related values and refresh UI
+        this.updatePaymentInfo();
+        this.showProducts = false;
+        this.searchInput.nativeElement.value = '';
+        console.log(this.stockInReceipt);
+      });
+
+      this.fetchAvailableQuantity(item.productId, item.productVariantId, this.userCurrent?.branchId).then((availableQuantity) => {
+        const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
+          (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
+        );
+
+        if (productInCart) {
+          productInCart.availableQuantity = availableQuantity; // Gán số lượng có sẵn vào data
+        }
+
+        // Update giao diện và các giá trị khác...
+        this.updatePaymentInfo();
+        this.showProducts = false;
+        this.searchInput.nativeElement.value = '';
+      });
+    }
   }
 
   updateTotal(data: any) {
@@ -581,7 +648,15 @@ export class BranchTransferComponent implements OnInit {
     }
   }
 
+  preventInput(event: KeyboardEvent) {
+    event.preventDefault();
+  }
+
   onSubmit() {
+    if (!this.selectedBranch) {
+      this.branchError = true;
+      return
+    }
     let hasError = false;
 
     this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
@@ -606,52 +681,57 @@ export class BranchTransferComponent implements OnInit {
       return; // Prevents calling the actual onSubmit logic
     }
     this.checkValidity();
-    if (this.isValidForm) {
-      const inventoryStockDetailProductImeiIds = this.stockInReceipt.inventoryStockInDetails
-        .filter(product => product.productType === 1) // Only include products with productType === 1
-        .flatMap(product =>
-          product.frameEngineData
-            .filter(frameEngine => frameEngine.isChecked) // Only take selected frame/engine
-            .map(frameEngine => frameEngine.id) // Get the id of the selected frame/engine
-        );
-
-      const selectedBranch = this.branch.find(option => option.id === this.selectedBranch);
-      const toBranchId = selectedBranch ? selectedBranch.id : 0; // Replace with actual logic if needed
-      const toBranchName = selectedBranch ? selectedBranch.name : 'string';
-
-      const formData = {
-        fromBranchId: this.userCurrent?.branchId, // Get fromBranchId from the current user
-        fromBranchName: this.userCurrent?.branchName, // Get fromBranchName from the current user
-        toBranchId: toBranchId,
-        toBranchName: toBranchName,
-        totalCount: this.stockInReceipt.inventoryStockInDetails.length, // Number of items
-        note: this.stockInReceipt.note || '',
-        isDeleted: 0,
-        iAccepted: 'waiting',
-        recipientNote: 'string',
-        inventoryStockDetailProductImeiIds: inventoryStockDetailProductImeiIds
-      };
-
-      this.merchandiseService.createladingIn(formData).subscribe(
-        (response) => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Thành công',
-            detail: 'Thêm phiếu chuyển hàng thành công',
-          });
-
-          setTimeout(() => {
-            this.router.navigate(['/pages/stock-transfer']);
-          }, 1000); // Thời gian trễ 2 giây
-        },
-        (error) => {
-          // Xử lý khi lỗi
-          console.error('Error creating inventoryStockIn:', error);
-        }
+    const inventoryStockDetailProductImeiIds = this.stockInReceipt.inventoryStockInDetails
+      .filter(product => product.productType === 1) // Only include products with productType === 1
+      .flatMap(product =>
+        product.frameEngineData
+          .filter(frameEngine => frameEngine.isChecked) // Only take selected frame/engine
+          .map(frameEngine => frameEngine.id) // Get the id of the selected frame/engine
       );
-    } else {
-      console.log('Form is invalid, please correct the errors.');
-    }
+
+    const billOfLadingProductNormals = this.stockInReceipt.inventoryStockInDetails
+      .filter(product => product.productType !== 1) // Exclude products with productType === 1
+      .map((product) => ({
+        productId: product.productId,
+        productVariantId: product.productVariantId,
+        quantity: product.quantity, // Get the quantity from the p-inputNumber
+      }));
+
+    const selectedBranch = this.branch.find(option => option.id === this.selectedBranch);
+    const toBranchId = selectedBranch ? selectedBranch.id : 0; // Replace with actual logic if needed
+    const toBranchName = selectedBranch ? selectedBranch.name : 'string';
+
+    const formData = {
+      fromBranchId: this.userCurrent?.branchId, // Get fromBranchId from the current user
+      fromBranchName: this.userCurrent?.branchName, // Get fromBranchName from the current user
+      toBranchId: toBranchId,
+      toBranchName: toBranchName,
+      totalCount: this.stockInReceipt.inventoryStockInDetails.length, // Number of items
+      note: this.stockInReceipt.note || '',
+      isDeleted: 0,
+      iAccepted: 'waiting',
+      recipientNote: 'string',
+      inventoryStockDetailProductImeiIds: inventoryStockDetailProductImeiIds,
+      billOfLadingProductNormals: billOfLadingProductNormals,
+    };
+
+    this.merchandiseService.createladingIn(formData).subscribe(
+      (response) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Thành công',
+          detail: 'Thêm phiếu chuyển hàng thành công',
+        });
+
+        setTimeout(() => {
+          this.router.navigate(['/pages/stock-transfer']);
+        }, 1000); // Thời gian trễ 2 giây
+      },
+      (error) => {
+        // Xử lý khi lỗi
+        console.error('Error creating inventoryStockIn:', error);
+      }
+    );
   }
 
   checkValidity() {
@@ -659,7 +739,7 @@ export class BranchTransferComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Chú ý',
-        detail: 'Phiếu nhập chưa có sản phẩm',
+        detail: 'Phiếu chuyển hàng chưa có sản phẩm',
       });
       this.isValidForm = false;
       return;

@@ -1,3 +1,4 @@
+import { WarrantyService } from 'src/app/core/services/warranty.service';
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { MenuItem } from 'primeng/api';
@@ -9,6 +10,9 @@ import { NodeService } from 'src/app/core/services/node.service';
 import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
 import { Product } from 'src/app/core/models/order';
 import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product';
+import { OptionsFilterWarranty } from 'src/app/core/DTOs/warranty/optionFilterWarranty';
+import { an, dA } from '@fullcalendar/core/internal-common';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 const warrantyOrders = [
     {
@@ -66,7 +70,7 @@ interface WarrantyOrderDetails {
     providers: [MessageService],
 })
 export class WarrantyCertificateComponent implements OnInit {
-    optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
+    optionsFilterWarranty: OptionsFilterWarranty = new OptionsFilterWarranty();
     warrantyOrders: WarrantyOrder[] = warrantyOrders;
     nodes!: any[];
     optionsStatus: any[] = [
@@ -112,62 +116,103 @@ export class WarrantyCertificateComponent implements OnInit {
 
     rowsPerPageOptions = [5, 10, 20];
 
-    pageSize = 30;
-    pageNumber = 1;
     totalRecords = 20;
     treeCategory: any[] = [];
-
+    warranties: any[] = [];
+    pageSize: number = 10;
+    pageNumber: number = 1;
+    totalRecordsCount: any;
+    isLoading: boolean = true;
+    warrantyInfos: any;
+    userCurrent: any;
     constructor(
         private productCateogryService: CategoryService,
         private productService: ProductService,
         private messageService: MessageService,
+        private warrantyService: WarrantyService,
+        private authService: AuthService,
         private nodeService: NodeService
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
-        this.optionsFillerProduct.pageIndex = this.pageNumber;
-        this.optionsFillerProduct.pageSize = this.pageSize;
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+            console.log(this.userCurrent);
+        });
+        this.loadWarranty();
     }
 
     async ngOnInit() {
         this.items = [{ label: 'Danh sách phiếu bảo hành' }];
-        // this.loading = true;
-        let response = await this.productService.FilterProduct(this.optionsFillerProduct
-        );
-        let responseGetTreeCategory =
-            await this.productCateogryService.getTreeCategory();
-        // this.loading = false;
-        console.log(responseGetTreeCategory);
-        this.treeCategory = responseGetTreeCategory.data;
-        this.products = response.data;
-        this.totalRecords = response.totalRecordsCount;
         // console.log(b);
+    }
+
+    loadWarranty() {
+        if (this.optionsFilterWarranty.CustomerKeyword === '') {
+            this.optionsFilterWarranty.CustomerKeyword = null;
+        }
+        if (!this.optionsFilterWarranty.Imei) {
+            // If Imei is null, undefined, or an empty string, reset other properties
+            this.optionsFilterWarranty.Imei = null;
+            this.optionsFilterWarranty.FrameNumber = null;
+            this.optionsFilterWarranty.EngineNumber = null;
+        } else {
+            // If Imei has a value, proceed with splitting
+            const imeiParts = this.optionsFilterWarranty.Imei.split('-');
+            this.optionsFilterWarranty.FrameNumber = imeiParts[0] || null;
+            this.optionsFilterWarranty.EngineNumber = imeiParts[1] || null;
+        }
+
+        if (this.optionsFilterWarranty.ProductName === '') {
+            this.optionsFilterWarranty.ProductName = null;
+        }
+        this.optionsFilterWarranty.pageIndex = this.pageNumber;
+        this.optionsFilterWarranty.pageSize = this.pageSize;
+        this.warrantyService
+            .getWarranties(this.optionsFilterWarranty)
+            .subscribe((data) => {
+                this.totalRecordsCount = data.data.totalRecords;
+                this.warranties = data.data.items;
+            });
+    }
+
+    warrantyRequest(data: any) {
+        console.log(data);
+
+        const formData = new FormData();
+        formData.append('Code', '');
+        formData.append('CustomerId', data.customer.id.toString());
+        formData.append('CustomerName', data.customer.name);
+        formData.append('PhoneNumber', data.customer.phoneNumber);
+        formData.append('BranchId', this.userCurrent.branchId);
+        formData.append('BranchName', this.userCurrent.branchName);
+        formData.append('TotalQuantity', '1');
+
+        this.warrantyInfos = {
+            id: data.id,
+            dueDate: '',
+        };
+
+        const warrantyInfosJson = JSON.stringify(this.warrantyInfos);
+        formData.append('WarrantyInfos', warrantyInfosJson);
+
+        this.warrantyService.createWarrantyClaim(formData).subscribe(
+            (item) => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: 'Tạo phiếu bảo hành hàng lỗi thành công',
+                });
+            },
+            (error) => {
+                console.error('Error:', error);
+            }
+        );
     }
 
     openNew() {
         this.product = {};
         this.submitted = false;
         this.productDialog = true;
-    }
-
-    onClear() {
-        this.optionsFillerProduct.CategoryId = null;
-        let label = document.querySelector(
-            '.category-select .p-treeselect-label'
-        );
-        if (label) {
-            label.innerHTML = 'Chọn danh mục';
-        }
-    }
-
-    onNodeSelect(event: any) {
-        console.log(event);
-        this.optionsFillerProduct.CategoryId = this.selectedNodes?.id;
-        let label = document.querySelector(
-            '.category-select .p-treeselect-label'
-        );
-        if (label) {
-            label.innerHTML = this.selectedNodes?.name || '';
-        }
     }
 
     deleteSelectedProducts() {
@@ -330,38 +375,28 @@ export class WarrantyCertificateComponent implements OnInit {
             life: 3000,
         });
     }
-    async EvenFilter() {
-        this.optionsFillerProduct.Status = this.statusFilter
-            ? this.statusFilter.value
-            : null;
-        this.optionsFillerProduct.pageIndex = 1;
 
-        console.log(this.optionsFillerProduct);
-        // this.loading = true;
-        await this.productService
-            .FilterProduct(this.optionsFillerProduct)
-            .then((response) => {
-                this.products = response.data;
-                this.totalRecords = response.totalRecordsCount;
-                //   for (let index = 0; index < this.products.length; index++) {
-                //     this.showAllVariants.set(this.products[index].id, this.products[index].productVariants.length > 3 ? 1 : 0);
-                //    }
-            });
-        // this.loading = false;
+    //Paganation
+    onPageChange(event: any): void {
+        console.log(event);
+
+        this.pageSize = event.rows;
+        this.pageNumber = event.page + 1;
+        this.loadWarranty();
     }
 
-    checkStartPriceValue() {
-        if (this.optionsFillerProduct.StartPrice != null) {
-            if (this.optionsFillerProduct.StartPrice < 1000) {
-                this.optionsFillerProduct.StartPrice = null;
-            }
+    goToPreviousPage(): void {
+        if (this.pageNumber > 1) {
+            this.pageNumber--;
+            this.loadWarranty();
         }
     }
-    checkEndPriceValue() {
-        if (this.optionsFillerProduct.EndPrice != null) {
-            if (this.optionsFillerProduct.EndPrice < 1000) {
-                this.optionsFillerProduct.EndPrice = null;
-            }
+
+    goToNextPage(): void {
+        const lastPage = Math.ceil(this.totalRecordsCount / this.pageSize);
+        if (this.pageNumber < lastPage) {
+            this.pageNumber++;
+            this.loadWarranty();
         }
     }
 }

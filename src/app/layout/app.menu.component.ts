@@ -1,17 +1,52 @@
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { LayoutService } from './service/app.layout.service';
+import { AuthService } from '../core/services/auth.service';
+import { RefreshTokenService } from '../core/signlrs/refresh-token.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-menu',
     templateUrl: './app.menu.component.html',
+    providers: [MessageService],
 })
 export class AppMenuComponent implements OnInit {
     model: any[] = [];
-
-    constructor(public layoutService: LayoutService) {}
+    authToken: any = null;
+    userCurrent: any;
+    constructor(
+        public layoutService: LayoutService,
+        private refreshTokenService: RefreshTokenService,
+        private authService: AuthService,
+        private messageService: MessageService
+    ) {
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+            // console.log(this.userCurrent);
+        });
+    }
 
     ngOnInit() {
+        this.refreshTokenService.startConnection();
+        this.refreshTokenService.addActivityListener((activity) => {
+            if (activity != null && activity.id == this.userCurrent.id) {
+                // console.log(this.authToken);
+                this.authToken = this.authService.getAuthTokenLocalStorage();
+                this.authService
+                    .refreshToken({ refreshToken: this.authToken.refreshToken })
+                    .subscribe((res) => {
+                        if (res.status == true) {
+                            this.messageService.add({
+                                severity: 'warn',
+                                summary: 'Cảnh báo',
+                                detail: 'Bạn đã bị thay đổi quyền',
+                            });
+
+                            this.authService.setAuthTokenLocalStorage(res.data);
+                        }
+                    });
+            }
+        });
         this.model = [
             {
                 label: '',
@@ -57,6 +92,13 @@ export class AppMenuComponent implements OnInit {
                                 routerLink: ['/pages/products/show-product'],
                             },
                             {
+                                label: 'Sản phẩm tồn',
+                                icon: 'pi pi-fw pi-box',
+                                routerLink: [
+                                    '/pages/products/show-inventory-product',
+                                ],
+                            },
+                            {
                                 label: 'Danh mục sản phẩm',
                                 icon: 'pi pi-fw pi-tags',
                                 routerLink: ['/pages/product-category/show'],
@@ -67,6 +109,26 @@ export class AppMenuComponent implements OnInit {
                                 routerLink: ['/pages/brand/show-brand'],
                             },
                         ],
+                    },
+                ],
+            },
+            {
+                label: '',
+                items: [
+                    {
+                        label: 'Nhà cung cấp',
+                        icon: 'pi pi-fw pi-box',
+                        routerLink: ['/pages/supplier/show-supplier'],
+                    },
+                ],
+            },
+            {
+                label: '',
+                items: [
+                    {
+                        label: 'Khách hàng',
+                        icon: 'pi pi-fw pi-user-plus',
+                        routerLink: ['/pages/customer/show-customer'],
                     },
                 ],
             },
@@ -143,7 +205,7 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Kích hoạt bảo hành',
                         icon: 'pi pi-fw pi-map-marker',
-                        routerLink: ['/activate-warranty'],
+                        routerLink: ['/warranty-mb'],
                     },
                 ],
             },
@@ -157,7 +219,9 @@ export class AppMenuComponent implements OnInit {
                             {
                                 label: 'Nhóm quyền',
                                 icon: 'pi pi-fw pi-circle',
-                                routerLink: ['/pages/group-right/show-group-right']
+                                routerLink: [
+                                    '/pages/group-right/show-group-right',
+                                ],
                             },
                             {
                                 label: 'Quản lý tài khoản',

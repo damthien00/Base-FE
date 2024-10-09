@@ -1,8 +1,7 @@
-
 <form [formGroup]="phoneNumberForm" (ngSubmit)="checkWarranty2()">
     <div class="activate-warranty">
         <div class="banner">
-            <img src="assets/image/banner/banner.png" alt="" />
+            <img src="assets/image/banner/banner.png" alt />
         </div>
         <div class="container">
             <div class="back">
@@ -13,9 +12,7 @@
             </div>
             <div class="title">
                 <h1>TRA CỨU BẢO HÀNH TRỰC TUYẾN</h1>
-                <p>
-                    Tra cứu tình trạng yêu cầu bảo hành, sửa chữa bảo hành
-                </p>
+                <p>Tra cứu tình trạng yêu cầu bảo hành, sửa chữa bảo hành</p>
             </div>
 
             <div class="form grid p-fluid">
@@ -23,82 +20,121 @@
                     <div class="field mb-0">
                         <label
                             style="font-weight: 600; color: #000"
-                            htmlFor="name1"
-                            >Nhập thông tin<span class="red-asterisk"
-                                >*</span
-                            ></label
-                        >
+                            htmlFor="name1">Nhập thông tin<span
+                                class="red-asterisk">*</span></label>
                         <input
                             pInputText
                             id="name1"
                             type="text"
                             formControlName="inputData"
                             spellcheck="false"
-                            placeholder="Nhập số máy hoặc số điện thoại"
-                        />
+                            (input)="removeWhitespace()"
+                            placeholder="Nhập số khung/số máy hoặc số điện thoại" />
+                        <!-- <div *ngIf="showErrors" class="error-message" style="color: red;">
+                            Vui lòng nhập đủ số máy và số khung để kiểm tra!
+                        </div> -->
 
                     </div>
                 </div>
             </div>
             <div class="mt-3">
                 <button
-                style="width: 180px; height: 35px; margin: 0 100px;"
-                pButton
-                pRipple
-                severity="secondary"
-                type="submit"
-                label="Kiểm tra"
-                class="p-button-danger flex-1"
-                ></button>
+                    style="width: 180px; height: 35px; margin: 0 100px"
+                    pButton
+                    pRipple
+                    severity="secondary"
+                    type="submit"
+                    label="Kiểm tra"
+                    class="p-button-danger flex-1"></button>
             </div>
             <div class="mt-5">
                 <div *ngIf="customer">
                     <label>THÔNG TIN KHÁCH HÀNG</label>
-                    <div style="display: flex;">
+                    <div style="display: flex">
                         <div class="info-user">
-                            <p>Họ tên khách hàng: </p>
-                            <p>Số điện thoại: </p>
-                            <p>Địa chỉ: </p>
+                            <p>Họ tên khách hàng:</p>
+                            <p>Số điện thoại:</p>
+                            <p>Địa chỉ:</p>
                         </div>
                         <div class="info-user-detail">
-                            <p> {{ customer.name }}</p>
-                            <p> {{ customer.phoneNumber }} </p>
-                            <p>{{ customer.wardName }}, {{ customer.districtname }}, {{ customer.cityName }}</p>
+                            <p>{{ customer.name }}</p>
+                            <p>{{ customer.phoneNumber }}</p>
+                            <p>
+                                {{ customer.wardName }},
+                                {{ customer.districtname }},
+                                {{ customer.cityName }}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="mt-5">
-                <div *ngIf="warrantyData && warrantyData.length > 0">
+                <div *ngIf="warrantyData.length > 0">
                     <label>THÔNG TIN BẢO HÀNH</label>
                     <div class="warranty-info">
                         <table>
-                          <thead>
-                            <tr>
-                              <th>Thông tin sản phẩm</th>
-                              <th>Bảo hành</th>
-                              <th>Ngày hết hạn</th>
-                            </tr>
-                           </thead>
-                          <tbody>
-                            <tr *ngFor="let product of warrantyData">
-                              <td>
-                                <div>
-                                  <strong>{{ product.product.name }}</strong>
-                                  <p>Số khung: {{ product.inventoryStockDetailProductImei.frameNumber }}</p>
-                                  <p>Số máy: {{ product.inventoryStockDetailProductImei.engineNumber }}</p>
-                                </div>
-                              </td>
-                              <td>{{ product.warrantyPeriod }} tháng</td>
-                              <td>{{ product.expirationDate | date: 'dd/MM/yyyy' }}</td>
-                            </tr>
-                          </tbody>
+                            <thead>
+                                <tr>
+                                    <th>Thông tin sản phẩm</th>
+                                    <th>Bảo hành</th>
+                                    <th>Ngày hết hạn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let product of warrantyData">
+                                    <td>
+                                        <div>
+                                            <strong>{{ product.product.name }}</strong>
+                                            <p>
+                                                Số khung:
+                                                {{ product.inventoryStockDetailProductImei.frameNumber}}
+                                            </p>
+                                            <p>
+                                                Số máy:
+                                                {{ product.inventoryStockDetailProductImei.engineNumber }}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span
+                                            *ngIf="
+                                                !product.product.warrantyPolicy?.term
+                                            ">Không bảo hành
+                                        </span>
+                                        <span>{{  product.product.warrantyPolicy?.term}}
+                                        </span>
+                                        <span
+                                            *ngIf="
+                                                product.product.warrantyPolicy?.termType === 1
+                                            ">ngày</span>
+                                        <span
+                                            *ngIf="
+                                                product.product.warrantyPolicy?.termType === 2
+                                            ">tuần</span>
+                                        <span
+                                            *ngIf="product.product.warrantyPolicy?.termType === 3
+                                            ">tháng</span>
+                                        <span
+                                            *ngIf="product.product.warrantyPolicy?.termType === 4
+                                            ">quý</span>
+                                        <span
+                                            *ngIf="product.product.warrantyPolicy?.termType === 5
+                                            ">năm</span>
+                                    </td>
+                                    <td>
+                                        {{ product.expirationDate| date : "dd/MM/yyyy"}}
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
-                    </div>                  
+                    </div>
                 </div>
             </div>
-            <div class="mt-5" *ngIf="isChecked && warrantyData && warrantyData.length === 0">
-                <label>Không tìm thấy thông tin bảo hành cho số máy đã nhập.</label>
+            <div
+                class="mt-5"
+                *ngIf="isChecked && warrantyData && warrantyData.length === 0">
+                <label>Không tìm thấy thông tin bảo hành cho số máy đã
+                    nhập.</label>
             </div>
         </div>
         <footer class="footer">

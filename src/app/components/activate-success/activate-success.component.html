@@ -1,3 +1,4 @@
+<p-toast />
 <div class="activate-warranty">
     <div class="banner">
         <img src="assets/image/banner/banner.png" alt="" />
@@ -26,7 +27,7 @@
                     <div
                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                     >
-                        {{ warrantyById?.customerName }}
+                        {{ warrantyById[0]?.cusSuccess?.name }}
                     </div>
                 </div>
                 <div class="field grid">
@@ -39,7 +40,7 @@
                     <div
                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                     >
-                        {{ warrantyById?.phoneNumber }}
+                        {{ warrantyById[0]?.cusSuccess?.phoneNumber }}
                     </div>
                 </div>
                 <div class="field grid">
@@ -54,17 +55,17 @@
                     >
                         <ng-container
                             *ngIf="
-                                warrantyById?.wardName ||
-                                    warrantyById?.customer.addressDetail ||
-                                    warrantyById?.districtName ||
-                                    warrantyById?.cityName;
+                                warrantyById[0]?.cusSuccess?.wardName ||
+                                    warrantyById[0]?.cusSuccess.addressDetail ||
+                                    warrantyById[0]?.cusSuccess?.districtName ||
+                                    warrantyById[0]?.cusSuccess?.cityName;
                                 else noInfo
                             "
                         >
-                            {{ warrantyById?.customer?.addressDetail }},
-                            {{ warrantyById?.wardName }},
-                            {{ warrantyById?.districtName }},
-                            {{ warrantyById?.cityName }}
+                            {{ warrantyById[0]?.cusSuccess?.addressDetail }},
+                            {{ warrantyById[0]?.cusSuccess?.wardName }},
+                            {{ warrantyById[0]?.cusSuccess?.districtName }},
+                            {{ warrantyById[0]?.cusSuccess?.cityName }}
                         </ng-container>
                         <ng-template #noInfo> Chưa có thông tin </ng-template>
                     </div>
@@ -72,7 +73,7 @@
             </div>
         </div>
         <div class="mt-3">
-            <p-table [value]="warrantyById?.warrantyProducts">
+            <p-table [value]="warrantyById">
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Mã SP</th>
@@ -82,37 +83,32 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
                     <tr>
-                        <td>{{ product?.productId }}</td>
+                        <td>{{ product?.warrantyProducts[0].productId }}</td>
                         <td>
                             <div class="flex flex-column">
                                 <span>
-                                    {{ product?.product.name }}
                                     {{
-                                        product?.productVariant.valuePropeties1
+                                        product?.warrantyProducts[0]
+                                            ?.productName
                                     }}
+                                    {{ product?.warrantyProducts[0]?.value1 }}
                                     {{
-                                        product?.productVariant.valuePropeties2
+                                        product?.warrantyProducts[0]?.value2
                                     }}</span
                                 >
                                 <span style="font-size: 13px"
                                     ><strong>Số khung:</strong>
-                                    {{
-                                        product?.inventoryStockDetailProductImei
-                                            .frameNumber
-                                    }}</span
+                                    {{ product?.warrantyProducts[0]?.sk }}</span
                                 >
                                 <span style="font-size: 13px"
                                     ><strong>Số máy:</strong>
-                                    {{
-                                        product?.inventoryStockDetailProductImei
-                                            .engineNumber
-                                    }}</span
+                                    {{ product?.warrantyProducts[0]?.sm }}</span
                                 >
                             </div>
                         </td>
                         <td>
                             {{
-                                product.expirationDate
+                                product?.warrantyProducts[0].expirationDate
                                     | date : "dd/MM/yyyy HH:mm:ss"
                             }}
                         </td>
@@ -124,6 +120,7 @@
             <button
                 pButton
                 pRipple
+                (click)="warrantyRequest()"
                 type="button"
                 label="Tạo yêu cầu bảo hành"
                 class="flex-1"

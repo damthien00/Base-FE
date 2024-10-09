@@ -28,14 +28,51 @@
                                 >*</span
                             ></label
                         >
-                        <input
+                        <p-autoComplete
+                            formControlName="branch"
+                            [suggestions]="branchs"
+                            placeholder="Nhập chi nhánh"
+                            [dropdown]="true"
+                            [forceSelection]="true"
+                            (completeMethod)="searchBranch($event)"
+                            field="name"
+                        />
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 py-1">
+                    <div class="field mb-0">
+                        <label
+                            style="font-weight: 600; color: #000"
+                            htmlFor="name1"
+                            >Số điện thoại khách hàng<span class="red-asterisk"
+                                >*</span
+                            ></label
+                        >
+                        <!-- <input
                             pInputText
                             id="name1"
                             type="text"
                             formControlName="phoneNumber"
                             spellcheck="false"
                             placeholder="Nhập số điện thoại"
-                        />
+                        /> -->
+
+                        <p-autoComplete
+                            formControlName="phoneNumber"
+                            [suggestions]="customers"
+                            (completeMethod)="search($event)"
+                            (onSelect)="onSelect($event)"
+                            placeholder="Vui lòng nhập số điện thoại"
+                            [field]="'phoneNumber'"
+                            [forceSelection]="false"
+                        >
+                            <ng-template let-customer pTemplate="item">
+                                <div *ngIf="customer">
+                                    {{ customer.name }} -
+                                    {{ customer.phoneNumber }}
+                                </div>
+                            </ng-template>
+                        </p-autoComplete>
 
                         <div
                             *ngIf="

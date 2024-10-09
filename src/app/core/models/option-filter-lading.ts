@@ -6,6 +6,7 @@ export class OptionsFilterLading {
     bromBranchId: number;
     fromBranchName?: string;
     toBranchName?: string;
-    iAccepted?: number;
+    Code?: string;
+    iAccepted?: string;
 }
   

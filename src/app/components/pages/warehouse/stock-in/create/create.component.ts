@@ -1,3 +1,4 @@
+import { OptionsFilterBranch } from './../../../../../core/DTOs/branch/optionsFilterBranchs';
 import { StockInService } from './../../../../../core/services/stock-in.service';
 import { FunctionService } from 'src/app/core/utils/function.utils';
 import {
@@ -16,6 +17,7 @@ import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { OptionsFilterProductVariant } from 'src/app/core/DTOs/stock-in/optionFilterProductVariant';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { OptionsFilterSupplier } from 'src/app/core/DTOs/supplier/OptionsFilterSupplier';
 
 export interface WarehouseReceipt {
     id?: number;
@@ -55,10 +57,12 @@ export class CreateComponent implements OnInit {
 
     displayDiscountModal = false;
     optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
+    optionsFilterSupplier: OptionsFilterSupplier = new OptionsFilterSupplier();
     frameNumber: any;
     engineNumber: any;
     public userCurrent: any;
-
+    supplierSelected: any;
+    suppliers: any;
     onBarcode: boolean = false;
     constructor(
         private nodeService: NodeService,
@@ -72,7 +76,6 @@ export class CreateComponent implements OnInit {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
         this.authService.userCurrent.subscribe((user) => {
             this.userCurrent = user;
-            console.log(this.userCurrent);
         });
     }
 
@@ -118,6 +121,15 @@ export class CreateComponent implements OnInit {
     //     this.loadProducts();
     // }
 
+    searchSupplier(data: any) {
+        this.optionsFilterSupplier.nameOrPhone = data.query;
+        this.stockInService
+            .getSupplier(this.optionsFilterSupplier)
+            .subscribe((data) => {
+                this.suppliers = data.data;
+            });
+    }
+
     async onProductSearch(event: Event) {
         const input = event.target as HTMLInputElement;
         const searchTerm = input.value.toLowerCase();
@@ -127,13 +139,34 @@ export class CreateComponent implements OnInit {
             this.optionsFilterProduct.KeyWord = '';
             this.optionsFilterProduct.Barcode = searchTerm.toLowerCase();
             try {
-                const response =
-                    await this.stockInReceipt.FilterProductVariants(
-                        this.optionsFilterProduct
-                    );
+                const response = await this.productService.FilterProduct(
+                    this.optionsFilterProduct
+                );
                 if (response.data.length > 0) {
-                    console.log(response.data);
-                    this.addToCart(response.data[0]);
+                    console.log(response.data[0]);
+
+                    const item = {
+                        productId: response.data[0].id,
+                        productImage: response.data[0].productImages[0].link,
+                        productVariantId: 215,
+                        productName: `${response.data[0].name}${
+                            '-' +
+                            response.data[0].productVariants[0].valuePropeties1
+                        }${
+                            '-' +
+                            response.data[0].productVariants[0].valuePropeties2
+                        }`,
+                        productType: response.data[0].productType,
+                        quantity: 1,
+                        productCode: response.data[0].productVariants[0].code,
+                        price: response.data[0].productVariants[0].price,
+                        unit: response.data[0].unitName,
+                        mass: response.data[0].mass,
+                        total: response.data[0].productVariants[0].price,
+                        frameNumber: '',
+                        engineNumber: '',
+                    };
+                    this.addToCart(item);
                 } else {
                     // Hiển thị thông báo sản phẩm không tồn tại
                     this.messageService.add({
@@ -173,7 +206,7 @@ export class CreateComponent implements OnInit {
     async loadProducts() {
         this.optionsFilterProduct.pageIndex = 1;
         this.optionsFilterProduct.pageSize = 10;
-        let response = await this.productService.FilterProduct(
+        let response = await this.productService.FilterProductView(
             this.optionsFilterProduct
         );
 
@@ -197,9 +230,7 @@ export class CreateComponent implements OnInit {
                         productCode: itemVariant.code || '', // Đảm bảo mã sản phẩm
                         price: itemVariant.price,
                         unit: item.unitName,
-                        mass: itemVariant.sellCounts
-                            ? itemVariant.sellCounts
-                            : 0,
+                        mass: itemVariant.quantity ? itemVariant.quantity : 0,
                         total:
                             item.productType === 1 ? 0 : itemVariant.price * 1,
                         frameNumber: '',
@@ -211,7 +242,7 @@ export class CreateComponent implements OnInit {
                     productId: item.id,
                     productImage:
                         item.productImages && item.productImages.length > 0
-                            ? item.productImages[0].link
+                            ? item.productImages[0]?.link
                             : null,
                     productName: item.name,
                     productType: item.productType,
@@ -219,7 +250,7 @@ export class CreateComponent implements OnInit {
                     productCode: item.code || '', // Đảm bảo mã sản phẩm
                     price: item.sellingPrice,
                     unit: item.unitName,
-                    mass: item.mass,
+                    mass: item.totalQuantity,
                     total: item.productType === 1 ? 0 : item.sellingPrice * 1,
                     frameNumber: '',
                     engineNumber: '',
@@ -303,13 +334,17 @@ export class CreateComponent implements OnInit {
                 );
             }
         );
-        console.log(existingDetail);
-
         if (existingDetail) {
             // Nếu sản phẩm đã tồn tại, cập nhật số lượng và tổng giá
-            existingDetail.quantity += 1;
-            existingDetail.total =
-                existingDetail.quantity * existingDetail.price;
+            // existingDetail.quantity += 1;
+            // existingDetail.total =
+            //     existingDetail.quantity * existingDetail.price;
+
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Chú ý',
+                detail: 'Sản phẩm đã có trong danh sách',
+            });
         } else {
             // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào inventoryStockInDetails
             const newDetail = {
@@ -333,7 +368,6 @@ export class CreateComponent implements OnInit {
         this.updatePaymentInfo();
         this.showProducts = false;
         this.searchInput.nativeElement.value = '';
-        console.log(this.stockInReceipt);
     }
 
     updateTotal(data: any) {
@@ -378,7 +412,6 @@ export class CreateComponent implements OnInit {
     removeProduct(index: number) {
         this.stockInReceipt.inventoryStockInDetails.splice(index, 1);
         this.updatePaymentInfo();
-        console.log(this.stockInReceipt);
     }
 
     onDiscountOptionClick(unit: string) {
@@ -408,8 +441,6 @@ export class CreateComponent implements OnInit {
 
     saveDiscount() {
         this.stockInReceipt.totalDiscountAmount = this.calculateTotalDiscount();
-        console.log(this.stockInReceipt.totalDiscountAmount);
-        console.log(this.stockInReceipt);
         this.updatePaymentInfo();
         this.displayDiscountModal = false;
     }
@@ -486,12 +517,14 @@ export class CreateComponent implements OnInit {
                                 ? product.productVariantId
                                 : 1,
                             branchId: this.userCurrent.branchId,
+                            branchName: this.userCurrent.branchName,
                         })) || [];
                     return {
                         productId: product.productId,
                         productVariantId: product.productVariantId
                             ? product.productVariantId
                             : 1,
+                        productVariantName: product.productName,
                         productName: product.productName,
                         productCode: product.productCode,
                         productImage: product.productImage,
@@ -504,10 +537,9 @@ export class CreateComponent implements OnInit {
                     };
                 }
             );
-            console.log(this.userCurrent.branchId);
             const formData = {
-                supplierId: 1,
-                supplierName: 'string',
+                supplierId: this.supplierSelected.id,
+                supplierName: this.supplierSelected.name,
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
                 branchId: this.userCurrent.branchId,
@@ -519,6 +551,7 @@ export class CreateComponent implements OnInit {
                 createName: this.userCurrent.name,
                 inventoryStockInDetails: products,
             };
+            console.log(formData);
 
             this.productService.createStockIn(formData).subscribe(
                 (response) => {
@@ -543,8 +576,27 @@ export class CreateComponent implements OnInit {
         }
     }
 
+    onBarcodeClick() {
+        this.activeBarcode = !this.activeBarcode;
+        if (this.onBarcode) {
+            this.messageService.add({
+                severity: 'success',
+                summary: '',
+                detail: 'Chuyển sang chế độ thường',
+            });
+        } else {
+            this.messageService.add({
+                severity: 'success',
+                summary: '',
+                detail: 'Chuyển sang chế độ barcode',
+            });
+        }
+        this.onBarcode = !this.onBarcode;
+    }
+    // onToggleActiveBarcode() {}
+
     checkValidity() {
-        if (this.stockInReceipt.inventoryStockInDetails.length == 0) {
+        if (this.stockInReceipt.inventoryStockInDetails.length === 0) {
             this.messageService.add({
                 severity: 'error',
                 summary: 'Chú ý',
@@ -567,6 +619,11 @@ export class CreateComponent implements OnInit {
                 'Bằng tiền cần trả nhà cung cấp';
         }
 
+        // Khởi tạo Set để kiểm tra trùng số khung và số máy
+        const frameNumbers = new Set<string>(); // Set cho số khung
+        const engineNumbers = new Set<string>(); // Set cho số máy
+        const duplicateMessages: string[] = [];
+
         // Kiểm tra các sản phẩm và IMEI
         this.stockInReceipt.inventoryStockInDetails.forEach((product) => {
             if (product.quantity === 0) {
@@ -579,6 +636,29 @@ export class CreateComponent implements OnInit {
 
             if (product.productImeis) {
                 product.productImeis.forEach((imei) => {
+                    // Kiểm tra số khung
+                    if (imei.frameNumber) {
+                        if (frameNumbers.has(imei.frameNumber)) {
+                            imei.isValid = true;
+                            imei.isValidMessage = `Số khung ${imei.frameNumber} đã tồn tại trong danh sách`;
+                            duplicateMessages.push(imei.isValidMessage);
+                        } else {
+                            frameNumbers.add(imei.frameNumber);
+                        }
+                    }
+
+                    // Kiểm tra số máy
+                    if (imei.engineNumber) {
+                        if (engineNumbers.has(imei.engineNumber)) {
+                            imei.isValid = true;
+                            imei.isValidMessage = `Số máy ${imei.engineNumber} đã tồn tại trong danh sách`;
+                            duplicateMessages.push(imei.isValidMessage);
+                        } else {
+                            engineNumbers.add(imei.engineNumber);
+                        }
+                    }
+
+                    // Kiểm tra cả hai số khung và số máy chưa được nhập
                     if (!imei.frameNumber || !imei.engineNumber) {
                         imei.isValid = true;
                         if (!imei.frameNumber && !imei.engineNumber) {
@@ -589,9 +669,8 @@ export class CreateComponent implements OnInit {
                         } else if (!imei.engineNumber) {
                             imei.isValidMessage = 'Vui lòng nhập số máy';
                         }
-                        console.log(imei.frameNumber, imei.engineNumber);
                     } else {
-                        // if (!imei.isValid) {
+                        // Kiểm tra số khung và số máy đã tồn tại trong hệ thống chưa
                         this.stockInService
                             .checkExistEngineAndFrame(
                                 imei.frameNumber,
@@ -599,11 +678,13 @@ export class CreateComponent implements OnInit {
                             )
                             .subscribe(
                                 (exists) => {
-                                    console.log(exists);
                                     if (exists.data) {
                                         imei.isValid = true;
                                         imei.isValidMessage =
                                             'Số khung hoặc số máy đã tồn tại';
+                                        duplicateMessages.push(
+                                            imei.isValidMessage
+                                        );
                                     } else {
                                         imei.isValid = false;
                                         delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
@@ -616,9 +697,7 @@ export class CreateComponent implements OnInit {
                                     );
                                 }
                             );
-                        // imei.isValid = false;
                         delete imei.isValidMessage; // Loại bỏ isValidMessage nếu không còn lỗi
-                        // }
                     }
                 });
             }
@@ -641,29 +720,19 @@ export class CreateComponent implements OnInit {
                 return !product.isValid;
             }) && !this.stockInReceipt.isValidMoney;
 
-        if (this.isValidForm) {
-            console.log('Form is valid and ready to submit.');
-        } else {
-            console.log('Form is not valid. Please check the errors.');
+        // Hiển thị thông báo nếu có trùng lặp
+        if (duplicateMessages.length > 0) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: duplicateMessages.join(', '),
+            });
         }
-    }
 
-    onBarcodeClick() {
-        this.activeBarcode = !this.activeBarcode;
-        if (this.onBarcode) {
-            this.messageService.add({
-                severity: 'success',
-                summary: '',
-                detail: 'Chuyển sang chế độ thường',
-            });
+        if (this.isValidForm) {
+            // Form hợp lệ
         } else {
-            this.messageService.add({
-                severity: 'success',
-                summary: '',
-                detail: 'Chuyển sang chế độ barcode',
-            });
+            // Form không hợp lệ
         }
-        this.onBarcode = !this.onBarcode;
     }
-    // onToggleActiveBarcode() {}
 }

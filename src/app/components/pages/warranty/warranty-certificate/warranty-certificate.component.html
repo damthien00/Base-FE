@@ -15,16 +15,12 @@
             <p-table
                 #dt
                 styleClass="p-datatable-striped"
-                [value]="warrantyOrders"
+                [value]="warranties"
                 [columns]="cols"
                 responsiveLayout="scroll"
-                [rows]="10"
-                [paginator]="true"
-                [rowsPerPageOptions]="[10, 20, 30]"
-                [showCurrentPageReport]="true"
-                currentPageReportTemplate="{first} - {last} trong tổng {totalRecords} sản phẩm"
-                [(selection)]="selectedProducts"
-                selectionMode="multiple"
+                [rows]="pageSize"
+                [first]="pageNumber * pageSize"
+                [paginator]="false"
                 [rowHover]="true"
                 dataKey="id"
             >
@@ -44,7 +40,8 @@
                                     pInputText
                                     type="text"
                                     [(ngModel)]="
-                                        this.optionsFillerProduct.KeyWord
+                                        this.optionsFilterWarranty
+                                            .CustomerKeyword
                                     "
                                     placeholder="Tìm kiếm theo tên/SĐT"
                                     style="width: 350px"
@@ -63,7 +60,7 @@
                                     pInputText
                                     type="text"
                                     [(ngModel)]="
-                                        this.optionsFillerProduct.KeyWord
+                                        this.optionsFilterWarranty.Imei
                                     "
                                     placeholder="Tìm kiếm theo số Serial/Imei"
                                     style="width: 250px"
@@ -82,7 +79,7 @@
                                     pInputText
                                     type="text"
                                     [(ngModel)]="
-                                        this.optionsFillerProduct.KeyWord
+                                        this.optionsFilterWarranty.ProductName
                                     "
                                     placeholder="Tìm kiếm theo tên sản phẩm"
                                     style="width: 250px"
@@ -94,7 +91,7 @@
                             pButton
                             pRipple
                             label="Lọc"
-                            (click)="EvenFilter()"
+                            (click)="loadWarranty()"
                         ></button>
                     </div>
                 </ng-template>
@@ -108,7 +105,6 @@
                         <th>Số điện thoại</th>
                         <th pSortableColumn="inventoryStatus">Tên sản phẩm</th>
                         <th pSortableColumn="price">Số Serial/Imei</th>
-                        <th pSortableColumn="category">Mã đơn hàng</th>
                         <th style="width: 13rem">Ngày hết hạn bảo hành</th>
                     </tr>
                 </ng-template>
@@ -120,7 +116,7 @@
                 >
                     <tr>
                         <td>
-                            <div *ngIf="warrantyOrder.details">
+                            <div *ngIf="warrantyOrder.warrantyProducts">
                                 <p-button
                                     type="button"
                                     pRipple
@@ -137,15 +133,41 @@
                             </div>
                         </td>
                         <td>
-                            {{ warrantyOrder.code }}
+                            {{ warrantyOrder.id }}
                         </td>
                         <td>{{ warrantyOrder.customerName }}</td>
                         <td>{{ warrantyOrder.phoneNumber }}</td>
-                        <td>{{ warrantyOrder.productName }}</td>
-                        <td>{{ warrantyOrder.serialNumber }}</td>
-                        <td>{{ warrantyOrder.orderCode }}</td>
                         <td>
-                            {{ warrantyOrder.expiryDate }}
+                            {{
+        warrantyOrder?.warrantyProducts?.[0]?.product?.name || 'N/A'
+                            }}
+                            {{
+        (warrantyOrder?.warrantyProducts?.[0]?.productVariant?.valuePropeties1 
+            ? '-' + warrantyOrder.warrantyProducts[0].productVariant.valuePropeties1 
+            : '')
+                            }}
+                            {{
+        (warrantyOrder?.warrantyProducts?.[0]?.productVariant?.valuePropeties2 
+            ? '-' + warrantyOrder.warrantyProducts[0].productVariant.valuePropeties2 
+            : '')
+                            }}
+                        </td>
+
+                        <td>
+                            {{
+        warrantyOrder?.warrantyProducts?.[0]?.inventoryStockDetailProductImei
+            ? warrantyOrder.warrantyProducts[0].inventoryStockDetailProductImei.frameNumber + '-' +
+              warrantyOrder.warrantyProducts[0].inventoryStockDetailProductImei.engineNumber
+            : 'N/A'
+                            }}
+                        </td>
+
+                        <td>
+                            {{
+        warrantyOrder?.warrantyProducts?.[0]?.expirationDate 
+            ? (warrantyOrder.warrantyProducts[0].expirationDate | date: 'dd/MM/yyyy HH:mm:ss') 
+            : 'N/A'
+                            }}
                         </td>
                     </tr>
                 </ng-template>
@@ -160,27 +182,49 @@
                                                 htmlfor="name3"
                                                 class="col-12 mb-2 md:col-3 md:mb-0"
                                             >
-                                                Mã barcode:
+                                                Tên sản phẩm:
                                             </div>
                                             <div
-                                                htmlfor="name3"
+                                                htmlFor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
-                                                Name
-                                            </div>
-                                        </div>
-                                        <div class="field grid">
-                                            <div
-                                                htmlfor="name3"
-                                                class="col-12 mb-2 md:col-3 md:mb-0"
-                                            >
-                                                Mã đơn hàng:
-                                            </div>
-                                            <div
-                                                htmlfor="name3"
-                                                class="col-12 mb-2 md:col-7 md:mb-0"
-                                            >
-                                                Name
+                                                {{
+                                                    warrantyOrder
+                                                        .warrantyProducts[0]
+                                                        .product.name
+                                                }}
+                                                <span
+                                                    *ngIf="
+                                                        warrantyOrder
+                                                            .warrantyProducts[0]
+                                                            .productVariant
+                                                            .valuePropeties1
+                                                    "
+                                                >
+                                                    -
+                                                    {{
+                                                        warrantyOrder
+                                                            .warrantyProducts[0]
+                                                            .productVariant
+                                                            .valuePropeties1
+                                                    }}
+                                                </span>
+                                                <span
+                                                    *ngIf="
+                                                        warrantyOrder
+                                                            .warrantyProducts[0]
+                                                            .productVariant
+                                                            .valuePropeties2
+                                                    "
+                                                >
+                                                    -
+                                                    {{
+                                                        warrantyOrder
+                                                            .warrantyProducts[0]
+                                                            .productVariant
+                                                            .valuePropeties2
+                                                    }}
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="field grid">
@@ -194,7 +238,17 @@
                                                 htmlfor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
-                                                Name
+                                                {{
+                                                    warrantyOrder
+                                                        .warrantyProducts[0]
+                                                        .inventoryStockDetailProductImei
+                                                        .frameNumber
+                                                }}-{{
+                                                    warrantyOrder
+                                                        .warrantyProducts[0]
+                                                        .inventoryStockDetailProductImei
+                                                        .engineNumber
+                                                }}
                                             </div>
                                         </div>
                                         <div class="field grid">
@@ -208,25 +262,11 @@
                                                 htmlfor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
-                                                Name
+                                                1
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-12 md:col-6">
-                                        <div class="field grid">
-                                            <div
-                                                htmlfor="name3"
-                                                class="col-12 mb-2 md:col-3 md:mb-0"
-                                            >
-                                                Tên sản phẩm:
-                                            </div>
-                                            <div
-                                                htmlfor="name3"
-                                                class="col-12 mb-2 md:col-7 md:mb-0"
-                                            >
-                                                Name
-                                            </div>
-                                        </div>
                                         <div class="field grid">
                                             <div
                                                 htmlfor="name3"
@@ -238,7 +278,9 @@
                                                 htmlfor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
-                                                Name
+                                                {{
+                                                    warrantyOrder.customer.name
+                                                }}
                                             </div>
                                         </div>
                                         <div class="field grid">
@@ -252,7 +294,11 @@
                                                 htmlfor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
-                                                Name
+                                                {{
+                                                    warrantyOrder.createdAt
+                                                        | date
+                                                            : "dd/MM/yyyy HH:mm:ss"
+                                                }}
                                             </div>
                                         </div>
                                         <div class="field grid">
@@ -266,17 +312,19 @@
                                                 htmlfor="name3"
                                                 class="col-12 mb-2 md:col-7 md:mb-0"
                                             >
-                                                Name
+                                                {{ warrantyOrder.branchName }}
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-12 md:col-12">
                                         <!-- [value]="" -->
                                         <p-table
                                             responsiveLayout="scroll"
                                             [rows]="10"
                                             selectionMode="multiple"
+                                            [value]="
+                                                warrantyOrder.warrantyProducts
+                                            "
                                             [rowHover]="true"
                                             dataKey="id"
                                         >
@@ -292,7 +340,10 @@
                                                 </tr>
                                             </ng-template>
 
-                                            <ng-template pTemplate="body">
+                                            <ng-template
+                                                pTemplate="body"
+                                                let-item
+                                            >
                                                 <tr>
                                                     <td
                                                         style="
@@ -304,7 +355,12 @@
                                                             class="p-column-title"
                                                             >STT</span
                                                         >
-                                                        1
+                                                        {{
+                                                            item.product
+                                                                .warrantyPolicy
+                                                                ?.name ||
+                                                                "Sản phẩm không có chính sách bảo hành"
+                                                        }}
                                                     </td>
                                                     <td
                                                         style="
@@ -317,7 +373,73 @@
                                                             >Tên chính
                                                             sách</span
                                                         >
-                                                        Bảo hành 12 tháng
+                                                        <span
+                                                            *ngIf="
+                                                                !item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.term
+                                                            "
+                                                            >Không bảo
+                                                            hành</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.term
+                                                            "
+                                                        >
+                                                            {{
+                                                                item.product
+                                                                    .warrantyPolicy
+                                                                    .term
+                                                            }}
+                                                        </span>
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
+                                                                1
+                                                            "
+                                                            >ngày</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
+                                                                2
+                                                            "
+                                                            >tuần</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
+                                                                3
+                                                            "
+                                                            >tháng</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
+                                                                4
+                                                            "
+                                                            >quý</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.product
+                                                                    ?.warrantyPolicy
+                                                                    ?.termType ===
+                                                                5
+                                                            "
+                                                            >năm</span
+                                                        >
                                                     </td>
                                                     <td
                                                         style="
@@ -330,87 +452,11 @@
                                                             >Kỳ hạn bảo
                                                             hành</span
                                                         >
-                                                        27/3/2024
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td
-                                                        style="
-                                                            width: 5%;
-                                                            min-width: 10rem;
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="p-column-title"
-                                                            >STT</span
-                                                        >
-                                                        2
-                                                    </td>
-                                                    <td
-                                                        style="
-                                                            width: 23%;
-                                                            min-width: 10rem;
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="p-column-title"
-                                                            >Tên chính
-                                                            sách</span
-                                                        >
-                                                        Bảo hành 24 tháng
-                                                    </td>
-                                                    <td
-                                                        style="
-                                                            width: 14%;
-                                                            min-width: 10rem;
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="p-column-title"
-                                                            >Kỳ hạn bảo
-                                                            hành</span
-                                                        >
-                                                        15/8/2024
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td
-                                                        style="
-                                                            width: 5%;
-                                                            min-width: 10rem;
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="p-column-title"
-                                                            >STT</span
-                                                        >
-                                                        3
-                                                    </td>
-                                                    <td
-                                                        style="
-                                                            width: 23%;
-                                                            min-width: 10rem;
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="p-column-title"
-                                                            >Tên chính
-                                                            sách</span
-                                                        >
-                                                        Bảo hành 36 tháng
-                                                    </td>
-                                                    <td
-                                                        style="
-                                                            width: 14%;
-                                                            min-width: 10rem;
-                                                        "
-                                                    >
-                                                        <span
-                                                            class="p-column-title"
-                                                            >Kỳ hạn bảo
-                                                            hành</span
-                                                        >
-                                                        01/01/2025
+                                                        {{
+                                                            item.expirationDate
+                                                                | date
+                                                                    : "dd/MM/yyyy HH:mm:ss"
+                                                        }}
                                                     </td>
                                                 </tr>
                                             </ng-template>
@@ -428,8 +474,11 @@
                                             class="p-button-outlined"
                                         ></button>
                                         <button
-                                            type="submit"
+                                            type="button"
                                             pButton
+                                            (click)="
+                                                warrantyRequest(warrantyOrder)
+                                            "
                                             style="width: 150px"
                                             label="Yêu cầu bảo hành"
                                             class="p-button-primary"
@@ -520,233 +569,16 @@
                     </tr>
                 </ng-template>
             </p-table>
+            <div *ngIf="warranties?.length > 0">
+                <p-paginator
+                    [rows]="pageSize"
+                    (onPageChange)="onPageChange($event)"
+                    [totalRecords]="
+                        totalRecordsCount > 0 ? totalRecordsCount : 1
+                    "
+                    [rowsPerPageOptions]="[10, 20, 30]"
+                ></p-paginator>
+            </div>
         </div>
-
-        <p-dialog
-            [(visible)]="productDialog"
-            [style]="{ width: '450px' }"
-            header="Product Details"
-            [modal]="true"
-            class="p-fluid"
-        >
-            <ng-template pTemplate="content">
-                <img
-                    [src]="'assets/demo/images/product/' + product.image"
-                    [alt]="product.image"
-                    width="150"
-                    class="mt-0 mx-auto mb-5 block shadow-2"
-                    *ngIf="product.image"
-                />
-                <div class="field">
-                    <label for="name">Name</label>
-                    <input
-                        type="text"
-                        pInputText
-                        id="name"
-                        [(ngModel)]="product.name"
-                        required
-                        autofocus
-                        [ngClass]="{
-                            'ng-invalid ng-dirty': submitted && !product.name
-                        }"
-                    />
-                    <small
-                        class="ng-dirty ng-invalid"
-                        *ngIf="submitted && !product.name"
-                        >Name is required.</small
-                    >
-                </div>
-                <div class="field">
-                    <label for="description">Description</label>
-                    <textarea
-                        id="description"
-                        pInputTextarea
-                        [(ngModel)]="product.description"
-                        required
-                        rows="3"
-                        cols="20"
-                    ></textarea>
-                </div>
-                <div class="field">
-                    <label for="status">Inventory Status</label>
-                    <p-dropdown
-                        [(ngModel)]="product.inventoryStatus"
-                        inputId="inventoryStatus"
-                        optionValue="label"
-                        [options]="statuses"
-                        placeholder="Select"
-                    >
-                        <ng-template pTemplate="selectedItem">
-                            <span
-                                *ngIf="product && product.inventoryStatus"
-                                [class]="
-                                    'product-badge status-' +
-                                    product.inventoryStatus
-                                        .toString()
-                                        .toLowerCase()
-                                "
-                                >{{ product.inventoryStatus }}</span
-                            >
-                        </ng-template>
-                        <ng-template let-option pTemplate="item">
-                            <span
-                                [class]="'product-badge status-' + option.value"
-                                >{{ option.label }}</span
-                            >
-                        </ng-template>
-                    </p-dropdown>
-                </div>
-
-                <div class="field">
-                    <label class="mb-3">Category</label>
-                    <div class="formgrid grid">
-                        <div class="field-radiobutton col-6">
-                            <p-radioButton
-                                id="category1"
-                                name="category"
-                                value="Accessories"
-                                [(ngModel)]="product.category"
-                            ></p-radioButton>
-                            <label for="category1">Accessories</label>
-                        </div>
-                        <div class="field-radiobutton col-6">
-                            <p-radioButton
-                                id="category2"
-                                name="category"
-                                value="Clothing"
-                                [(ngModel)]="product.category"
-                            ></p-radioButton>
-                            <label for="category2">Clothing</label>
-                        </div>
-                        <div class="field-radiobutton col-6">
-                            <p-radioButton
-                                id="category3"
-                                name="category"
-                                value="Electronics"
-                                [(ngModel)]="product.category"
-                            ></p-radioButton>
-                            <label for="category3">Electronics</label>
-                        </div>
-                        <div class="field-radiobutton col-6">
-                            <p-radioButton
-                                id="category4"
-                                name="category"
-                                value="Fitness"
-                                [(ngModel)]="product.category"
-                            ></p-radioButton>
-                            <label for="category4">Fitness</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="formgrid grid">
-                    <div class="field col">
-                        <label for="price">Price</label>
-                        <p-inputNumber
-                            id="price"
-                            [(ngModel)]="product.price"
-                            mode="currency"
-                            currency="USD"
-                            locale="en-US"
-                        ></p-inputNumber>
-                    </div>
-                    <div class="field col">
-                        <label for="quantity">Quantity</label>
-                        <p-inputNumber
-                            id="quantity"
-                            [(ngModel)]="product.quantity"
-                        ></p-inputNumber>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template pTemplate="footer">
-                <button
-                    pButton
-                    pRipple
-                    label="Cancel"
-                    icon="pi pi-times"
-                    class="p-button-text"
-                    (click)="hideDialog()"
-                ></button>
-                <button
-                    pButton
-                    pRipple
-                    label="Save"
-                    icon="pi pi-check"
-                    class="p-button-text"
-                    (click)="saveProduct()"
-                ></button>
-            </ng-template>
-        </p-dialog>
-
-        <p-dialog
-            [(visible)]="deleteProductDialog"
-            header="Confirm"
-            [modal]="true"
-            [style]="{ width: '450px' }"
-        >
-            <div class="flex align-items-center justify-content-center">
-                <i
-                    class="pi pi-exclamation-triangle mr-3"
-                    style="font-size: 2rem"
-                ></i>
-                <span *ngIf="product"
-                    >Are you sure you want to delete <b>{{ product.name }}</b
-                    >?</span
-                >
-            </div>
-            <ng-template pTemplate="footer">
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-times"
-                    class="p-button-text"
-                    label="No"
-                    (click)="deleteProductDialog = false"
-                ></button>
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-check"
-                    class="p-button-text"
-                    label="Yes"
-                    (click)="confirmDelete()"
-                ></button>
-            </ng-template>
-        </p-dialog>
-
-        <p-dialog
-            [(visible)]="deleteProductsDialog"
-            header="Confirm"
-            [modal]="true"
-            [style]="{ width: '450px' }"
-        >
-            <div class="flex align-items-center justify-content-center">
-                <i
-                    class="pi pi-exclamation-triangle mr-3"
-                    style="font-size: 2rem"
-                ></i>
-                <span>Are you sure you want to delete selected products?</span>
-            </div>
-            <ng-template pTemplate="footer">
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-times"
-                    class="p-button-text"
-                    label="No"
-                    (click)="deleteProductsDialog = false"
-                ></button>
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-check"
-                    class="p-button-text"
-                    label="Yes"
-                    (click)="confirmDeleteSelected()"
-                ></button>
-            </ng-template>
-        </p-dialog>
     </div>
 </div>

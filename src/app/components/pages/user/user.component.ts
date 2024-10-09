@@ -16,6 +16,7 @@ import { BranchService } from 'src/app/core/services/branch.service';
 import { RoleService } from 'src/app/core/services/role.service';
 import { AddressService } from 'src/app/core/services/address.service';
 import { forkJoin } from 'rxjs';
+import { MenuItem } from 'primeng/api';
 
 @Component({
     selector: 'app-user',
@@ -96,6 +97,8 @@ export class UserComponent implements OnInit {
     showDialog2 = false;
     showDialog3 = false;
     rolesError: boolean = false;
+    items: MenuItem[] | undefined;
+    
 
     formatdate: string = 'dd/mm/yy';
     autoCompleteSubject: any;
@@ -215,6 +218,11 @@ export class UserComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.items = [
+            { icon: 'pi pi-home', route: '/installation' },
+            { label: 'Quản trị hệ thống' },
+            { label: 'Quản lý tài khoản' }
+          ];
         this.getCitiesByCountry(1);
         this.Filters();
         this.getAllFilterRole();
@@ -463,7 +471,8 @@ export class UserComponent implements OnInit {
         this.roleService.getRoleAll(this.PageSize2, this.PageIndex2).subscribe((response: any) => {
             this.Roles2 = response.data.items.map((role: any) => ({
                 label: role.name,  // Tên của role
-                value: role.id     // Giá trị là ID của role
+                value: role.id,
+                normalizedName: role.normalizedName    // Giá trị là ID của role
             }));
         });
     }
@@ -730,7 +739,7 @@ export class UserComponent implements OnInit {
                 districtName: this.districts.find(districts => districts.id === formValues.districtId)?.name || '',
                 wardId: formValues.wardId,
                 wardName: this.wards.find(wards => wards.id === formValues.wardId)?.name || '',
-                role: formValues.roles.map(role => role.name) // Lấy tên của các nhóm quyền
+                roles: formValues.roles.map(role => role.normalizedName)
             };
 
             // Gửi yêu cầu tới API để thêm người dùng
@@ -882,13 +891,14 @@ export class UserComponent implements OnInit {
 
         const roleNames = this.RoleGroupForm2.value.roles.map((roleId: number) => {
             const role = this.Roles2.find((r: any) => r.value === roleId);
-            return role ? role.label : null;
+            return role ? role.normalizedName : null;  // Use normalizedName instead of label
         }).filter((roleName: string) => roleName !== null);
-
+        
         const assignRolesData = {
             userId: this.RoleGroupForm2.value.id,
-            roleNames: roleNames
+            roleNames: roleNames  // Now uses normalizedName
         };
+        
 
         try {
             this.savingInProgress = true;

@@ -20,27 +20,16 @@
         </p-toolbar>
         <div class="card">
             <p-toast></p-toast>
+
             <p-table
                 #dt
-                [value]="products"
+                styleClass="p-datatable-striped"
+                [value]="warrantyClaims"
                 [columns]="cols"
                 responsiveLayout="scroll"
-                [rows]="10"
-                styleClass="p-datatable-striped"
-                [globalFilterFields]="[
-                    'name',
-                    'country.name',
-                    'representative.name',
-                    'status'
-                ]"
-                [paginator]="true"
-                [rowsPerPageOptions]="[10, 20, 30]"
-                [showCurrentPageReport]="true"
-                currentPageReportTemplate="{first} - {last} trong tổng {totalRecords} sản phẩm"
-                [(selection)]="selectedProducts"
-                selectionMode="multiple"
-                (onRowExpand)="onRowExpand($event)"
-                (onRowCollapse)="onRowCollapse($event)"
+                [rows]="pageSize"
+                [first]="pageNumber * pageSize"
+                [paginator]="false"
                 [rowHover]="true"
                 dataKey="id"
             >
@@ -52,7 +41,7 @@
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Tìm kiếm theo sản phẩm:</label
+                                >Tìm tên khách hàng/SĐT:</label
                             >
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search"></i>
@@ -72,7 +61,7 @@
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Ngày tạo:</label
+                                >Ngày tạo yêu cầu:</label
                             >
                             <p-calendar
                                 [showIcon]="true"
@@ -118,7 +107,7 @@
                 </ng-template>
                 <ng-template
                     pTemplate="body"
-                    let-product
+                    let-warranty
                     let-expanded="expanded"
                 >
                     <tr>
@@ -145,31 +134,14 @@
                             </div>
                         </td>
                         <td>
-                            <div
-                                *ngIf="
-                                    product.productImages?.length > 0 &&
-                                        product.productImages[0]?.link;
-                                    else noImage
-                                "
-                            >
-                                <img
-                                    [src]="
-                                        'http://103.153.69.217:5055/api/files/images/' +
-                                        product.productImages[0].link
-                                    "
-                                    [alt]="product.name"
-                                    width="50"
-                                    height="50"
-                                    class="shadow-4"
-                                />
-                            </div>
+                            {{ warranty.code }}
                         </td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.categoryName }}</td>
-                        <td>{{ product.price | currency : "USD" }}</td>
-                        <td>{{ product.totalQuantity }}</td>
+                        <td>{{ warranty.customerName }}</td>
+                        <td>{{ warranty.phoneNumber }}</td>
+                        <td>{{ warranty.branchName }}</td>
+                        <td>{{ warranty.totalQuantity }}</td>
                         <td>
-                            {{ product.totalQuantity }}
+                            {{ warranty.createdAt }}
                         </td>
                     </tr>
                 </ng-template>

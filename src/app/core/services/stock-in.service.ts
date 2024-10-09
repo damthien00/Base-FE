@@ -4,6 +4,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { OptionsFilterStockIn } from '../DTOs/stock-in/optionFilterStockIn';
 import { OptionsFilterProductVariant } from '../DTOs/stock-in/optionFilterProductVariant';
+import { OptionsFilterSupplier } from '../DTOs/supplier/OptionsFilterSupplier';
 @Injectable({
     providedIn: 'root',
 })
@@ -14,6 +15,10 @@ export class StockInService {
     private handleError(error: HttpErrorResponse): Observable<any> {
         console.error('An error occurred:', error);
         return throwError('Something bad happened; please try again later.');
+    }
+
+    getSupplier(formData: OptionsFilterSupplier): Observable<any> {
+        return this.http.post<any>(`${this.url}/api/supplier/filter`, formData);
     }
 
     createStockIn(data: any): Observable<any> {

@@ -29,6 +29,7 @@ export class ShowProductComponent implements OnInit {
     listchecked: boolean[] = [];
     statusFilter: any;
     optionsCategory!: any[];
+    currentPageReport: string = '';
 
     totalRecords = 20;
     pageSize = 30;
@@ -56,7 +57,7 @@ export class ShowProductComponent implements OnInit {
 
     async ngOnInit() {
         this.items = [
-            { label: 'Sản phẩm', route: '/products/show' },
+            { icon: 'pi pi-home', route: '/installation' },
             { label: 'Danh sách sản phẩm' },
         ];
         this.loading = true;
@@ -70,6 +71,8 @@ export class ShowProductComponent implements OnInit {
         this.treeCategory = responseGetTreeCategory.data;
         this.products = response.data;
         this.totalRecords = response.totalRecordsCount;
+        this.pageNumber = 1;
+        this.updateCurrentPageReport();
         for (let index = 0; index < this.products.length; index++) {
             this.showAllVariants.set(
                 this.products[index].id,
@@ -77,6 +80,7 @@ export class ShowProductComponent implements OnInit {
             );
         }
     }
+    
 
     toggleContent() {
         this.showContent = !this.showContent;
@@ -104,6 +108,7 @@ export class ShowProductComponent implements OnInit {
             label.innerHTML = this.selectedNodes.name;
         }
     }
+    
     closeDiaLogDelete() {
         this.showDiaLogDelete = false;
         this.DOMElementDelete = null;
@@ -114,6 +119,7 @@ export class ShowProductComponent implements OnInit {
         this.DOMElementDelete = $event.target as any;
         this.productDelete = product;
     }
+
     async ClickDelete() {
         this.loading = true;
         await this.productService
@@ -149,6 +155,7 @@ export class ShowProductComponent implements OnInit {
                 this.closeDiaLogDelete();
             });
     }
+
     async ClickChangeStatus($event: Event, product: any) {
         if ($event) {
             await this.productService
@@ -179,6 +186,7 @@ export class ShowProductComponent implements OnInit {
                 });
         }
     }
+    
     async EvenFilter() {
         this.optionsFillerProduct.Status = this.statusFilter
             ? this.statusFilter.value
@@ -191,6 +199,7 @@ export class ShowProductComponent implements OnInit {
             .then((response) => {
                 this.products = response.data;
                 this.totalRecords = response.totalRecordsCount;
+                
                 for (let index = 0; index < this.products.length; index++) {
                     this.showAllVariants.set(
                         this.products[index].id,
@@ -308,20 +317,17 @@ export class ShowProductComponent implements OnInit {
         this.optionsFillerProduct.pageSize = event.rows;
         this.pageSize = event.rows;
         this.optionsFillerProduct.pageIndex = event.page + 1;
-
+    
         this.loading = true;
-        let response = await this.productService.FilterProduct(
-            this.optionsFillerProduct
-        );
+        let response = await this.productService.FilterProduct(this.optionsFillerProduct);
         this.loading = false;
-
+    
         this.products = response.data;
         this.totalRecords = response.totalRecordsCount;
+        this.pageNumber = event.page + 1; // Cập nhật pageNumber
+        this.updateCurrentPageReport(); // Gọi hàm để cập nhật thông tin trang
         for (let index = 0; index < this.products.length; index++) {
-            this.showAllVariants.set(
-                this.products[index].id,
-                this.products[index].productVariants.length > 3 ? 1 : 0
-            );
+            this.showAllVariants.set(this.products[index].id, this.products[index].productVariants.length > 3 ? 1 : 0);
         }
     }
 
@@ -375,4 +381,32 @@ export class ShowProductComponent implements OnInit {
         // Allow digits and decimal point
         return /^[0-9.]$/.test(inputChar);
     }
+
+    goToPreviousPage(): void {
+        if (this.pageNumber > 1) {
+            this.pageNumber--;
+            this.EvenFilter();
+        }
+    }
+
+    goToNextPage(): void {
+        const lastPage = Math.ceil(this.totalRecords / this.pageSize);
+        if (this.pageNumber < lastPage) {
+            this.pageNumber++;
+            this.EvenFilter();
+        }
+    }
+
+    updateCurrentPageReport(): void {
+        const startRecord = ((this.pageNumber - 1) * this.pageSize) + 1;
+        const endRecord = Math.min(startRecord + this.products.length - 1, this.totalRecords);
+        
+        if (this.totalRecords === 0) {
+            this.currentPageReport = `<strong>0</strong> - <strong>0</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
+        } else {
+            this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
+        }
+    }
+    
+    
 }

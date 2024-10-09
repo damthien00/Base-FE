@@ -27,6 +27,20 @@ export class MerchandiseService {
     return this.http.get<any>(url);
   }
 
+  getCheckQuantity(productId: number, productVariantId: number, branchId: number): Observable<any> {
+    let url = `${this.url}/api/inventory/check-quantity?ProductId=${productId}`;
+
+    if (productVariantId !== null && productVariantId !== undefined) {
+      url += `&ProductVariantId=${productVariantId}`;
+    }
+
+    if (branchId !== null && branchId !== undefined) {
+      url += `&BranchId=${branchId}`;
+    }
+
+    return this.http.get<any>(url);
+  }
+
   createladingIn(data: any): Observable<any> {
     return this.http
       .post<any>(`${this.url}/api/bill-of-lading/create`, data)
@@ -39,7 +53,7 @@ export class MerchandiseService {
   }
 
 
-  getFilters(PageSize: number, PageIndex: number, FromBranchId?: number, ToBranchId?: number, FromBranchName?: string, ToBranchName?: string): Observable<any> {
+  getFilters(PageSize: number, PageIndex: number, FromBranchId?: number, ToBranchId?: number, FromBranchName?: string, ToBranchName?: string, Code?: string, IAccepted?: string,  ): Observable<any> {
     let params = new HttpParams()
       .set('PageSize', PageSize.toString())
       .set('PageIndex', PageIndex.toString());
@@ -58,6 +72,14 @@ export class MerchandiseService {
 
     if (ToBranchName) {
       params = params.set('ToBranchName', ToBranchName);
+    }
+
+    if (Code) {
+      params = params.set('Code', Code);
+    }
+
+    if (IAccepted) {
+      params = params.set('IAccepted', IAccepted);
     }
 
     return this.http.get<any>(`${this.url}/api/bill-of-lading/paging`, { params: params });

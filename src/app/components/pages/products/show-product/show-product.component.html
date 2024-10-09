@@ -5,19 +5,13 @@
         [closable]="false"
     ></p-messages>
 </div>
-<main id="main" class="main show-product-component">
+<main id="main">
     <div class="pagetitle">
         <div>
             <h3>Quản lý sản phẩm</h3>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="index.html">Admin</a>
-                    </li>
-                    <li class="breadcrumb-item">Sản phẩm</li>
-                    <li class="breadcrumb-item active">Danh sách sản phẩm</li>
-                </ol>
-            </nav>
+            <p-breadcrumb
+            [model]="items">
+            </p-breadcrumb>
         </div>
 
         <div>
@@ -121,36 +115,39 @@
                 >
                     <ng-template pTemplate="header">
                         <tr style="height: 60px" class="n-title-head">
-                            <!-- <th style="width: 5%; padding-left: 20px">
-                  <p-checkbox
-                    [(ngModel)]="checked"
-                    [binary]="true"
-                    inputId="binary"
-                  ></p-checkbox>
-                </th> -->
-                <th style="width: 10%">Ảnh</th>
-                <th style="width: 17%">Sản phẩm</th>
-                <th style="width: 15%">Phân loại hàng</th>
-                <th style="width: 10%; text-align: right">Giá bán</th>
-                <th style="width: 7%; text-align: right">Tồn kho</th>
-                <th style="width: 10%; text-align: center">Trạng thái</th>
-                <th style="width: 12%; text-align: center">Thương hiệu</th>
-                <th style="width: 13%; text-align: center">Ngày tạo</th>
-                <th style="width: 20%; text-align: center">Thao tác</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-product class="row">
-              <tr
-                style="
-                  border-bottom: 1px solid #d9d9d9;
-                  height: 100%;
-                  overflow: visible;
-                  position: relative;
-                "
-              >
-                <!-- <td style="padding-left: 20px">
-                  <p-checkbox [binary]="true" inputId="binary"></p-checkbox>
-                </td> -->
+
+                            <th style="width: 10%">Ảnh</th>
+                            <th style="width: 17%">Sản phẩm</th>
+                            <th style="width: 15%">Phân loại hàng</th>
+                            <th style="width: 10%; text-align: right">
+                                Giá bán
+                            </th>
+                            <!-- <th style="width: 7%; text-align: right">
+                                Tồn kho
+                            </th> -->
+                            <th style="width: 10%; text-align: center">
+                                Trạng thái
+                            </th>
+                            <th style="width: 12%; text-align: center">
+                                Thương hiệu
+                            </th>
+                            <th style="width: 13%; text-align: center">
+                                Ngày tạo
+                            </th>
+                            <th style="width: 20%; text-align: center">
+                                Thao tác
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-product class="row">
+                        <tr
+                            style="
+                                border-bottom: 1px solid #d9d9d9;
+                                height: 100%;
+                                overflow: visible;
+                                position: relative;
+                            "
+                        >
                             <td class="n-image-product">
                                 <img
                                     [src]="
@@ -168,38 +165,14 @@
                                     {{ product.sku }}
                                 </p>
                             </td>
-                            <!-- <td>
-                  <p
-                    style="margin: 15px 0; height: 23px"
-                    *ngFor="
-                      let variant of this.showAllVariants.get(product.id) === 0 ||
-                      this.showAllVariants.get(product.id) === 2
-                        ? product.productVariants
-                        : product.productVariants.slice(0, 3)
-                    "
-                  >
-                    {{ variant.sku }}
-                  </p>
-                  <p *ngIf="product.productVariants.length === 0">
-                    {{ product.sku }}
-                  </p>
-                </td> -->
+
                             <td>
                                 <div
                                     style="margin: 16px 0; height: 23px"
-                                    *ngFor="
-                                        let variant of this.showAllVariants.get(
-                                            product.id
-                                        ) === 0 ||
-                                        this.showAllVariants.get(product.id) ===
-                                            2
+                                    *ngFor="let variant of this.showAllVariants.get(product.id) === 0 ||
+                                        this.showAllVariants.get(product.id) === 2
                                             ? product.productVariants
-                                            : product.productVariants.slice(
-                                                  0,
-                                                  3
-                                              )
-                                    "
-                                >
+                                            : product.productVariants.slice(0, 3)">
                                     <span
                                         >{{ variant.valuePropeties1 }} ,
                                         {{ variant.valuePropeties2 }}</span
@@ -253,7 +226,7 @@
                                     }}
                                 </p>
                             </td>
-                            <td class="quantity-product">
+                            <!-- <td class="quantity-product">
                                 <p
                                     style="margin: 15px 0; height: 23px"
                                     *ngFor="
@@ -282,16 +255,7 @@
                                             : product.totalQuantity
                                     }}
                                 </p>
-                            </td>
-                            <!-- <td class="sellcounts-product">
-                  <p>
-                    {{
-                      product.productVariants.length === 0
-                        ? product.sellCounts
-                        : totalSellCount(product.productVariants)
-                    }}
-                  </p>
-                </td> -->
+                            </td> -->
                             <td
                                 class="n-product-status"
                                 style="
@@ -317,11 +281,12 @@
                                     style="
                                         margin: 15px 0;
                                         width: 90%;
-                                        height: 23px;
+                                        height: 26px;
                                         border: 1px solid #d9d9d9;
                                         border-radius: 15px;
                                         text-align: center;
                                         background-color: red;
+                                        color: white;
                                     "
                                     [style.background-color]="
                                         variant.quantity === 0
@@ -344,11 +309,12 @@
                                     style="
                                         margin: 15px 0;
                                         width: 90%;
-                                        height: 23px;
+                                        height: 26px;
                                         border: 1px solid #d9d9d9;
                                         border-radius: 15px;
                                         text-align: center;
                                         background-color: red;
+                                        color: white;
                                     "
                                     [style.background-color]="
                                         product.totalQuantity === 0
@@ -455,6 +421,12 @@
                         ></p-button>
                     </ng-template>
                 </p-table>
+                <div *ngIf="totalRecords === 0" style="text-align: center">
+                    <strong style="text-align: center; width: 100%"
+                      >Không tìm thấy kết quả phù hợp</strong
+                    >
+                  </div>
+                  <div [innerHTML]="currentPageReport" class="current-page-report"></div>
                 <div class="paginator">
                     <p-paginator
                         [rows]="this.pageSize"

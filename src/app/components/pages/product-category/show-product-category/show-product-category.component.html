@@ -2,13 +2,9 @@
   <div class="pagetitle">
     <div>
       <h3>Quản lý danh mục</h3>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-          <li class="breadcrumb-item">Quản lý</li>
-          <li class="breadcrumb-item active">Quản lý danh mục</li>
-        </ol>
-      </nav>
+      <p-breadcrumb
+      [model]="items">
+      </p-breadcrumb>
     </div>
 
     <div class="btn-add-wrapper">
@@ -74,14 +70,15 @@
                   <!-- <th style="width: 10%">
                     <p-checkbox [binary]="true" inputId="binary"></p-checkbox>
                   </th> -->
-                  <th style="width: 10%">Mã</th>
-                  <th style="width: 20%">Tên danh mục</th>
-                  <th style="width: 15%">Trực thuộc</th>
-                  <th style="width: 10%">Cấp</th>
+                  <th style="width: 5%">Mã</th>
+                  <th style="width: 15%">Tên danh mục</th>
+                  <th style="width: 10%">Trực thuộc</th>
+                  <th style="width: 5%">Cấp</th>
                   <th style="width: 10%">Người tạo</th>
-                  <th style="width: 10%">Trạng thái</th>
-                  <th>Ẩn/Hiện</th>
-                  <th style="width: 8%">Thao tác</th>
+                  <th style="width: 20%">Mô tả</th>
+                  <th style="width: 6%">Trạng thái</th>
+                  <th style="width: 5%">Ẩn/Hiện</th>
+                  <th style="width: 6%">Thao tác</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-category>
@@ -93,7 +90,8 @@
                   <td>{{ category.name }}</td>
                   <td>{{ category.parentName }}</td>
                   <td>{{ category.level }}</td>
-                  <td>{{ category.crateName }}</td>
+                  <td>{{ this.userCurrent?.name }}</td>
+                  <td>{{ category.description }}</td>
                   <td [style.color]="category.status === 1 ? 'green' : 'red'">
                     {{ category.status === 1 ? "Hoạt động" : "Ẩn" }}
                   </td>
@@ -129,13 +127,25 @@
                 </tr>
               </ng-template>
             </p-table>
-            <div>
+            <div *ngIf="totalRecordsCount === 0" style="text-align: center">
+              <strong style="text-align: center; width: 100%"
+                >Không tìm thấy kết quả phù hợp</strong
+              >
+            </div>
+            <div class="paging-bot dg-fix">
+              <div class="paging-info">
+                <div [innerHTML]="currentPageReport"></div>
+              </div>
               <p-paginator
-                [rows]="pageSize"
-                (onPageChange)="onPageChange($event)"
-                [totalRecords]="totalRecordsCount > 0 ? totalRecordsCount : 1"
-                [rowsPerPageOptions]="[10, 20, 30]"
-              ></p-paginator>
+                      [rows]="this.pageSize"
+                      (onPageChange)="onPageChange($event)"
+                      [totalRecords]="totalRecordsCount > 0 ? totalRecordsCount : 1"
+                      [rowsPerPageOptions]="[10, 20, 30]"
+                      [first]="
+                        (this.pageNumber - 1) *
+                        this.pageSize
+                      "
+                    ></p-paginator>
             </div>
           </div>
         </div>
@@ -160,7 +170,7 @@
 
           <form #categoryForm="ngForm" (ngSubmit)="onSubmitAdd(categoryForm)">
             <div class="row mb-12">
-              <label for="inputText" class="col-sm-12 col-form-label"
+              <label style="font-weight: 600;" for="inputText" class="col-sm-12 col-form-label"
                 >Tên danh mục<span class="red-asterisk">*</span></label
               >
               <div class="col-sm-12">
@@ -169,6 +179,7 @@
                   id="name"
                   name="name"
                   [(ngModel)]="categoriess.name"
+                  [style]="{ height: '40px' }"
                   class="form-control"
                   (input)="checkNameLength()"
                   required
@@ -185,35 +196,33 @@
               </div>
             </div>
             <div class="row mb-12">
-              <label class="col-sm-12 col-form-label">Danh mục cha</label>
+              <label style="font-weight: 600;" class="col-sm-12 col-form-label">Danh mục cha</label>
               <div class="col-sm-12">
                 <div class="form-group">
-                  <div class="card flex justify-content-center">
-                    <p-treeSelect
-                      containerStyleClass="w-full"
-                      [options]="categorieandchild"
-                      [(ngModel)]="selectedCategory"
-                      optionLabel="label"
-                      placeholder="Chọn danh mục"
-                      [showClear]="true"
-                      [style]="{ width: '100%' }"
-                      (onNodeSelect)="onNodeSelect($event)"
-                      (onNodeUnselect)="onNodeUnselect($event)"
-                      (onFocus)="onTreeSelectFocus()"
-                    >
-                      <ng-template let-node pTemplate="default">
-                        <span>{{ node.label }}</span>
-                      </ng-template>
-                    </p-treeSelect>
-                    <div *ngIf="showNameError5" class="text-danger">
-                      Danh mục đã vượt quá cấp 5.
-                    </div>
+                  <p-treeSelect
+                    containerStyleClass="w-full"
+                    [options]="categorieandchild"
+                    [(ngModel)]="selectedCategory"
+                    optionLabel="label"
+                    placeholder="Chọn danh mục"
+                    [showClear]="true"
+                    [style]="{ width: '100%' }"
+                    (onNodeSelect)="onNodeSelect($event)"
+                    (onNodeUnselect)="onNodeUnselect($event)"
+                    (onFocus)="onTreeSelectFocus()"
+                  >
+                    <ng-template let-node pTemplate="default">
+                      <span>{{ node.label }}</span>
+                    </ng-template>
+                  </p-treeSelect>
+                  <div *ngIf="showNameError5" class="text-danger">
+                    Danh mục đã vượt quá cấp 5.
                   </div>
                 </div>
               </div>
             </div>
             <div class="row mb-12">
-              <label for="inputDes" class="col-sm-12 col-form-label"
+              <label style="font-weight: 600;" for="inputDes" class="col-sm-12 col-form-label"
                 >Mô tả</label
               >
               <div class="col-sm-12">
@@ -232,13 +241,13 @@
               </div>
             </div>
             <div class="row mb-12">
-              <label for="inputHide" class="col-sm-12 col-form-label"
+              <label style="font-weight: 600;" for="inputHide" class="col-sm-12 col-form-label"
                 >Hiển thị</label
               >
               <div class="col-sm-12">
                 <!-- Trong template của bạn -->
                 <p-inputSwitch
-                  [style]="{ height: '20px' }"
+                  [style]="{ height: '25px' }"
                   [(ngModel)]="checked"
                   (onChange)="onchangeforswitch()"
                   name="switchControl"
@@ -288,7 +297,7 @@
             (ngSubmit)="onSubmitUpdate(categoryForm2)"
           >
             <div class="row mb-12">
-              <label for="name" class="col-sm-12 col-form-label"
+              <label style="font-weight: 600;" for="name" class="col-sm-12 col-form-label"
                 >Tên danh mục<span class="red-asterisk">*</span></label
               >
               <div class="col-sm-12">
@@ -313,36 +322,34 @@
               </div>
             </div>
             <div class="row mb-12">
-              <label class="col-sm-12 col-form-label">Danh mục cha</label>
+              <label style="font-weight: 600;" class="col-sm-12 col-form-label">Danh mục cha</label>
               <div class="col-sm-12">
                 <div class="form-group">
-                  <div class="card flex justify-content-center">
-                    <p-treeSelect
-                      containerStyleClass="w-full"
-                      [options]="treeOptions"
-                      [(ngModel)]="selectCategory.parentId"
-                      [showClear]="isCategorySelected"
-                      placeholder="Chọn danh mục"
-                      name="parent"
-                      (onNodeSelect)="onCategorySelect($event)"
-                      [style]="{ width: '100%' }"
-                    >
-                      <ng-template let-node pTemplate="default">
-                        <span>{{ node.label }}</span>
-                      </ng-template>
-                    </p-treeSelect>
-                    <div *ngIf="showNameError5" class="text-danger">
-                      Danh mục đã vượt quá cấp 5.
-                    </div>
-                    <div *ngIf="errorMessageTree" class="error-message">
-                      {{ errorMessageTree }}
-                    </div>
+                  <p-treeSelect
+                    containerStyleClass="w-full"
+                    [options]="treeOptions"
+                    [(ngModel)]="selectCategory.parentId"
+                    [showClear]="isCategorySelected"
+                    placeholder="Chọn danh mục"
+                    name="parent"
+                    (onNodeSelect)="onCategorySelect($event)"
+                    [style]="{ width: '100%' }"
+                  >
+                    <ng-template let-node pTemplate="default">
+                      <span>{{ node.label }}</span>
+                    </ng-template>
+                  </p-treeSelect>
+                  <div *ngIf="showNameError5" class="text-danger">
+                    Danh mục đã vượt quá cấp 5.
+                  </div>
+                  <div *ngIf="errorMessageTree" class="error-message">
+                    {{ errorMessageTree }}
                   </div>
                 </div>
               </div>
             </div>
             <div class="row mb-12">
-              <label for="inputDes" class="col-sm-12 col-form-label"
+              <label style="font-weight: 600;" for="inputDes" class="col-sm-12 col-form-label"
                 >Mô tả</label
               >
               <div class="col-sm-12">
@@ -357,7 +364,7 @@
               </div>
             </div>
             <div class="row mb-12">
-              <label for="inputHide" class="col-sm-12 col-form-label"
+              <label style="font-weight: 600;" for="inputHide" class="col-sm-12 col-form-label"
                 >Hiển thị</label
               >
               <div class="col-sm-12">

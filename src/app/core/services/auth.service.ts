@@ -21,7 +21,6 @@ export class AuthService {
     ) {}
 
     public url = environment.url;
-
     isLoggedIn(): boolean {
         const token = localStorage.getItem('token');
         if (token) {
@@ -42,6 +41,7 @@ export class AuthService {
     isInitAuth$: Observable<boolean> = this.isInitAuthSubject.asObservable();
     private currentUserSubject = new BehaviorSubject<any>(null);
     public userCurrent = this.currentUserSubject.asObservable();
+
     getUserCurrent() {
         return this.currentUserSubject.value;
     }
@@ -55,7 +55,6 @@ export class AuthService {
         const authToken: AuthToken | null = this.localStorageService.getItem(
             LocalStorage.AuthToken
         );
-
         return authToken;
     }
 
@@ -71,7 +70,6 @@ export class AuthService {
 
     fetchUserCurrent(): Observable<ApiResult<UserCurrent>> {
         let headers = this.httpService.addSkipLoadingHeader();
-
         return this.http.get<ApiResult<UserCurrent>>(
             `${this.url}/api/user/user-info`,
             { headers }

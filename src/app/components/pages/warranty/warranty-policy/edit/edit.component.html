@@ -71,6 +71,7 @@
                             <p-inputNumber
                                 inputId="term"
                                 formControlName="term"
+                                [min]="0"
                             />
                             <p-dropdown
                                 [options]="this.optionsTime"
@@ -81,20 +82,25 @@
                         </div>
                         <div
                             *ngIf="
-                                updateWarrantyPolicyForm.get('warranty_period')
-                                    ?.invalid &&
-                                (updateWarrantyPolicyForm.get('warranty_period')
-                                    ?.dirty ||
-                                    updateWarrantyPolicyForm.get(
-                                        'warranty_period'
-                                    )?.touched)
+                                updateWarrantyPolicyForm.get('term')?.invalid &&
+                                (updateWarrantyPolicyForm.get('term')?.dirty ||
+                                    updateWarrantyPolicyForm.get('term')
+                                        ?.touched)
                             "
                         >
                             <div
-                                *ngIf="updateWarrantyPolicyForm.get('warranty_period')?.errors?.['required']"
+                                *ngIf="updateWarrantyPolicyForm.get('term')?.errors?.['required']"
                                 class="error-message"
                             >
                                 Vui lòng nhập kì hạn bảo hành
+                            </div>
+                            <div
+                                *ngIf="
+                                    updateWarrantyPolicyForm.get('term')?.errors
+                                        ?.negative
+                                "
+                            >
+                                Giá trị không được là số âm.
                             </div>
                         </div>
                     </div>

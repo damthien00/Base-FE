@@ -1,14 +1,10 @@
 <main id="main" class="main">
     <div class="pagetitle">
       <div>
-        <h3>Quản lý thương hiệu</h3>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-          <li class="breadcrumb-item">Quản lý</li>
-          <li class="breadcrumb-item active">Quản lý thương hiệu</li>
-        </ol>
-      </nav>
+        <h3>Quản lý thuơng hiệu</h3>
+        <p-breadcrumb
+        [model]="items">
+        </p-breadcrumb>
       </div>
   
       <div class="btn-add-wrapper">
@@ -56,12 +52,13 @@
                     <!-- <th >
                       <p-checkbox [binary]="true" inputId="binary"></p-checkbox>
                     </th> -->
-                    <th >Mã</th>
-                    <th >Tên thương hiệu</th>
-                    <th >Người tạo</th>
-                    <th >Trạng thái</th>
-                    <th style="width: 15%;">Ẩn/Hiện</th>
-                    <th style="width: 8%;">Thao tác</th>
+                    <th style="width: 3%;">Mã</th>
+                    <th style="width: 8%;">Tên thương hiệu</th>
+                    <th style="width: 5%;">Người tạo</th>
+                    <th style="width: 10%;">Mô tả</th>
+                    <th style="width: 5%;">Trạng thái</th>
+                    <th style="width: 3%;">Ẩn/Hiện</th>
+                    <th style="width: 3%;">Thao tác</th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-brand>
@@ -69,7 +66,8 @@
                     <!-- <td><p-checkbox [binary]="true" inputId="binary"></p-checkbox></td> -->
                     <td>{{ brand.id }}</td>
                     <td>{{ brand.name }}</td>
-                    <td>{{ brand.crateName }}</td>
+                    <td>{{ this.userCurrent?.name }}</td>
+                    <td>{{ brand.description }}</td>
                     <td [style.color]="brand.isDeleted === 0 ? 'green' : 'red'">
                       {{ brand.isDeleted === 0 ? 'Hoạt động' : 'Ẩn' }}
                     </td>
@@ -94,13 +92,25 @@
                   </tr>
                 </ng-template>
               </p-table>
-              <div>
+              <div *ngIf="totalRecordsCount === 0" style="text-align: center">
+                <strong style="text-align: center; width: 100%"
+                  >Không tìm thấy kết quả phù hợp</strong
+                >
+              </div>
+              <div class="paging-bot dg-fix">
+                <div class="paging-info">
+                  <div [innerHTML]="currentPageReport"></div>
+                </div>
                 <p-paginator
-                  [rows]="pageSize"
-                  (onPageChange)="onPageChange($event)"
-                  [totalRecords]="totalRecordsCount > 0 ? totalRecordsCount : 1"
-                  [rowsPerPageOptions]="[10, 20, 30]"
-                ></p-paginator>
+                        [rows]="this.pageSize"
+                        (onPageChange)="onPageChange($event)"
+                        [totalRecords]="totalRecordsCount > 0 ? totalRecordsCount : 1"
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                        [first]="
+                          (this.pageNumber - 1) *
+                          this.pageSize
+                        "
+                      ></p-paginator>
               </div>
           </div>
           </div>
@@ -117,9 +127,9 @@
             <!-- General Form Elements -->
             <form #brandForm="ngForm" (ngSubmit)="createBrand(brandForm)">
               <div class="row mb-12">
-                <label for="inputText" class="col-sm-12 col-form-label">Tên thương hiệu <span class="red-asterisk">*</span></label>
+                <label style="font-weight: 600;" for="inputText" class="col-sm-12 col-form-label">Tên thương hiệu <span class="red-asterisk">*</span></label>
                 <div class="col-sm-12">
-                  <input type="text" class="form-control" id="name" name="name" [(ngModel)]="brand.name" required (input)="checkNameLength()">
+                  <input type="text" style="height: 40px;" class="form-control" id="name" name="name" [(ngModel)]="brand.name" required (input)="checkNameLength()">
                   <div *ngIf="showNameError" class="error-message">
                       Tên thương hiệu không được bỏ trống
                   </div>
@@ -132,7 +142,7 @@
                 </div>
               </div>
               <div class="row mb-12">
-                <label for="inputDes" class="col-sm-12 col-form-label">Mô tả</label>
+                <label style="font-weight: 600;" for="inputDes" class="col-sm-12 col-form-label">Mô tả</label>
                 <div class="col-sm-12">
                   <textarea class="form-control" style="height: 100px" id="description" name="description" [(ngModel)]="brand.description" required (input)="checkDescriptionLength()"></textarea>
                   <div *ngIf="showNameError3" class="error-message">
@@ -141,7 +151,7 @@
                 </div>
               </div>
               <div class="row mb-12">
-                <label for="inputHide" class="col-sm-12 col-form-label">Hiển thị</label>
+                <label style="font-weight: 600;" for="inputHide" class="col-sm-12 col-form-label">Hiển thị</label>
                 <div class="col-sm-12">
                   <!-- Trong template của bạn -->
                   <p-inputSwitch  [style]="{'height':'20px'}" [(ngModel)]="checked" (onChange)="onchangeforswitch()" name="switchControl"></p-inputSwitch>
@@ -168,9 +178,9 @@
             <!-- Form để hiển thị thông tin thương hiệu -->
             <form #brandForm2="ngForm" (ngSubmit)="updateBrand(brandForm2)">
               <div class="row mb-12">
-                <label for="inputText" class="col-sm-12 col-form-label">Tên thương hiệu <span class="red-asterisk">*</span></label>
+                <label style="font-weight: 600;" for="inputText" class="col-sm-12 col-form-label">Tên thương hiệu <span class="red-asterisk">*</span></label>
                 <div class="col-sm-12">
-                  <input type="text" class="form-control" [(ngModel)]="brandbyId.name" name="name" (input)="checkNameLength2()">
+                  <input type="text" style="height: 40px;" class="form-control" [(ngModel)]="brandbyId.name" name="name" (input)="checkNameLength2()">
                   <div *ngIf="showNameError" class="error-message">
                     Tên thương hiệu không được bỏ trống
                 </div>
@@ -184,7 +194,7 @@
                 </div>
               </div>
               <div class="row mb-12">
-                <label for="inputPassword" class="col-sm-12 col-form-label">Mô tả</label>
+                <label style="font-weight: 600;" for="inputPassword" class="col-sm-12 col-form-label">Mô tả</label>
                 <div class="col-sm-12">
                   <textarea class="form-control" style="height: 100px" [(ngModel)]="brandbyId.description" name="brandDescription" (input)="checkDescriptionLength2()"></textarea>
                   <div *ngIf="showNameError3" class="error-message">
@@ -193,7 +203,7 @@
                 </div>
               </div>
               <div class="row mb-12">
-                <label for="inputHide" class="col-sm-12 col-form-label">Hiển thị</label>
+                <label style="font-weight: 600;" for="inputHide" class="col-sm-12 col-form-label">Hiển thị</label>
                 <div class="col-sm-12">
                   <p-inputSwitch name="switchControl" [style]="{'height':'20px'}" [ngModel]="brandbyId.isDeleted === 0 ? true : false" (ngModelChange)="brandbyId.isDeleted = $event ? 0 : 1"></p-inputSwitch>
                 </div>

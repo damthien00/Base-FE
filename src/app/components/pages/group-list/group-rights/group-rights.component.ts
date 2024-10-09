@@ -8,7 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { OptionsFilterCommodities } from 'src/app/core/models/option-filter-commodities';
 import { RoleService } from 'src/app/core/services/role.service';
-import { TreeNode } from 'primeng/api';
+import { MenuItem, TreeNode } from 'primeng/api';
 import { PermissionService } from 'src/app/core/services/permission.service';
 
 @Component({
@@ -41,6 +41,7 @@ export class GroupRightsComponent implements OnInit {
     isSubmitting: boolean = false;
     showNameError: boolean = false;
     showNameError2: boolean = false;
+    showNameError3: boolean = false;
     PageIndex: number = 1;
     PageSize: number = 30;
     PageIndex2: number = 1;
@@ -48,7 +49,8 @@ export class GroupRightsComponent implements OnInit {
     showFullDescription: boolean = false;
     selectedPermissionIds: number[] = [];
     expandedItems: Set<number> = new Set();
-	permissionsTree:any=[];
+    permissionsTree: any = [];
+    items: MenuItem[] | undefined;
 
     optionsFilterCommodities: OptionsFilterCommodities =
         new OptionsFilterCommodities();
@@ -92,11 +94,15 @@ export class GroupRightsComponent implements OnInit {
             ],
             // permissionIds: [[], Validators.required],
             // selectedPermissionIds: [[], Validators.required],
-
         });
     }
 
     ngOnInit() {
+        this.items = [
+            { icon: 'pi pi-home', route: '/installation' },
+            { label: 'Quản trị hệ thống' },
+            { label: 'Nhóm quyền' }
+        ];
         this.Filters();
         this.getAllFilterRole();
         this.getAllFilterRole2();
@@ -108,14 +114,22 @@ export class GroupRightsComponent implements OnInit {
         return isValid ? null : { whitespace: true };
     }
 
+    validatePermissions(): boolean {
+        return this.selectedPermissionIds.length > 0;
+      }
+
     truncateDescription(
         description: string,
         limit: number,
         showFull: boolean
     ): string {
+        if (!description) {
+            return ''; // Trả về chuỗi rỗng nếu description không có dữ liệu
+        }
+
         const parser = new DOMParser();
         const doc = parser.parseFromString(description, 'text/html');
-        const plainText = doc.body.textContent;
+        const plainText = doc.body.textContent || ''; // Xử lý nếu không có nội dung text
 
         if (plainText.length > limit && !showFull) {
             return plainText.substring(0, limit) + '...';
@@ -123,12 +137,13 @@ export class GroupRightsComponent implements OnInit {
         return plainText;
     }
 
+
     getAllFilterRole(): void {
         this.permissionService
             .getPermissionAll(this.PageSize2, this.PageIndex2)
             .subscribe((response: any) => {
                 this.permissions = this.formatPermissions(response.data.items);
-				this.permissionsTree=response.data.items;
+                this.permissionsTree = response.data.items;
             });
     }
 
@@ -148,22 +163,60 @@ export class GroupRightsComponent implements OnInit {
 
     transformToTreeNodes(permissions: any[]): any[] {
         return permissions.map((permission) => ({
-            label: permission.name,
+            label: permission.displayName,
             id: permission.id,
             children: this.transformToTreeNodes(permission.childrens || []),
         }));
     }
 
-    formatPermissions(items: any[]): any[] {
+    formatPermissions(items: any[], parent: any = null): any[] {
         return items.map((item) => {
-            return {
-                label: item.name,
+            const formattedItem = {
+                label: item.displayName,
                 data: item.name,
                 id: item.id,
-                children: this.formatPermissions(item.childrens),
+                parent: parent,  // Set parent reference
+                children: this.formatPermissions(item.childrens, item),
             };
+            return formattedItem;
         });
     }
+
+    onNodeSelect(event: any) {
+        this.selectParentNode(event.node);
+    }
+    
+    onNodeUnselect(event: any) {
+        this.unselectChildNodes(event.node);
+    }
+    
+    // Recursively select parent nodes only if they are not already selected
+    selectParentNode(node: any) {
+        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;  // Get current selected nodes
+        if (node.parent && !selectedPermissions.includes(node.parent)) {
+            // If the parent is not selected, add it to the selected values
+            selectedPermissions.push(node.parent);
+            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);  // Update form control value
+    
+            // Recursively select the next parent up the tree
+            this.selectParentNode(node.parent);
+        }
+    }
+    
+    // Recursively unselect child nodes if necessary
+    unselectChildNodes(node: any) {
+        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;  // Get current selected nodes
+        if (node.children && node.children.length > 0) {
+            node.children.forEach((child: any) => {
+                const index = selectedPermissions.indexOf(child);
+                if (index !== -1) {
+                    selectedPermissions.splice(index, 1);  // Remove the child from the selected list
+                    this.unselectChildNodes(child);  // Recursively unselect child nodes
+                }
+            });
+            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);  // Update form control value
+        }
+    }    
 
     Filters(): void {
         //debugger
@@ -264,7 +317,7 @@ export class GroupRightsComponent implements OnInit {
     }
 
     openDialog2(Id: number): void {
-		this.selectedPermissionIds=[];
+        this.selectedPermissionIds = [];
         this.groupRoleId = Id;
         this.getAllFilterRole2();
         this.roleService.getGroupRoleById(Id).subscribe(
@@ -283,8 +336,7 @@ export class GroupRightsComponent implements OnInit {
                 // console.log(
                 //     this.transformToTreeNodes2(this.groupRoleById.permissions)
                 // );
-				this.getPermissionIds(response.data.permissions);
-
+                this.getPermissionIds(response.data.permissions);
             },
             (error) => {
                 console.error('Error:', error);
@@ -311,7 +363,6 @@ export class GroupRightsComponent implements OnInit {
     get rolesControl2() {
         return this.RoleGroupForm2.get('permissionIds');
         // return this.RoleGroupForm2.get('selectedPermissionIds');
-
     }
 
     checkRolesSelection() {
@@ -465,6 +516,11 @@ export class GroupRightsComponent implements OnInit {
 
         let hasError = false;
 
+        if (!this.validatePermissions()) {
+            this.showNameError3 = true;
+            hasError = true;
+          }
+
         // if (
         //     !this.rolesControl2?.value ||
         //     this.rolesControl2.value.length === 0
@@ -498,7 +554,7 @@ export class GroupRightsComponent implements OnInit {
             // const permissionIds = formValue.permissionIds.map(
             //     (permission) => permission.id
             // );
-			const permissionIds=this.selectedPermissionIds;
+            const permissionIds = this.selectedPermissionIds;
 
             const payload = {
                 id: this.groupRoleById.id || 0, // Use existing id if editing, 0 if creating new
@@ -545,13 +601,12 @@ export class GroupRightsComponent implements OnInit {
         }
     }
 
-
-	getPermissionIds(permissions: any[]) {
-		permissions.forEach(permission => {
-			this.selectedPermissionIds.push(permission.id);
-			if (permission.childrens && permission.childrens.length > 0) {
-				this.getPermissionIds(permission.childrens);
-			}
-		});
-	}
+    getPermissionIds(permissions: any[]) {
+        permissions.forEach((permission) => {
+            this.selectedPermissionIds.push(permission.id);
+            if (permission.childrens && permission.childrens.length > 0) {
+                this.getPermissionIds(permission.childrens);
+            }
+        });
+    }
 }
