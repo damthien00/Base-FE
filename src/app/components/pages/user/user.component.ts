@@ -238,9 +238,17 @@ export class UserComponent implements OnInit {
 
     getAllFilterRole(): void {
         this.roleService.getRoleAll(this.PageSize, this.PageIndex).subscribe((response: any) => {
-            this.Roles = response.data.items;
+          this.Roles = response.data.items;
+      
+          // Check if the "Employee" role with ID 8 exists
+          const employeeRole = this.Roles.find(role => role.id === 8 && role.name === 'Employee');
+          
+          if (employeeRole) {
+            // If found, pre-select the Employee role
+            this.RoleGroupForm.get('roles').setValue([employeeRole]);  // Set as selected in the form control
+          }
         });
-    }
+      }
 
     // getAllFilterRole3(): void {
     //     this.roleService.getRoleAll(this.PageSize2, this.PageIndex2).subscribe((response: any) => {

@@ -90,7 +90,7 @@
                   <td>{{ category.name }}</td>
                   <td>{{ category.parentName }}</td>
                   <td>{{ category.level }}</td>
-                  <td>{{ this.userCurrent?.name }}</td>
+                  <td>{{ category.createName }}</td>
                   <td>{{ category.description }}</td>
                   <td [style.color]="category.status === 1 ? 'green' : 'red'">
                     {{ category.status === 1 ? "Hoạt động" : "Ẩn" }}

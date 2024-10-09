@@ -105,7 +105,7 @@ export class GroupRightsComponent implements OnInit {
         ];
         this.Filters();
         this.getAllFilterRole();
-        this.getAllFilterRole2();
+        // this.getAllFilterRole2();
     }
 
     noWhitespaceValidator(control: any) {
@@ -184,39 +184,60 @@ export class GroupRightsComponent implements OnInit {
 
     onNodeSelect(event: any) {
         this.selectParentNode(event.node);
+        this.updatePartialSelection(event.node);
     }
     
     onNodeUnselect(event: any) {
         this.unselectChildNodes(event.node);
+        this.updatePartialSelection(event.node);
     }
     
     // Recursively select parent nodes only if they are not already selected
     selectParentNode(node: any) {
-        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;  // Get current selected nodes
+        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;
         if (node.parent && !selectedPermissions.includes(node.parent)) {
-            // If the parent is not selected, add it to the selected values
             selectedPermissions.push(node.parent);
-            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);  // Update form control value
+            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);
+            this.selectParentNode(node.parent); // Continue to select the parent
+        }
+    }
     
-            // Recursively select the next parent up the tree
-            this.selectParentNode(node.parent);
+    // Update partial selection state for parents based on child selection
+    updatePartialSelection(node: any) {
+        if (node.parent) {
+            const allChildren = node.parent.children || [];
+            const selectedChildren = allChildren.filter((child: any) =>
+                this.RoleGroupForm.controls['permissionIds'].value.includes(child)
+            );
+            
+            if (selectedChildren.length === 0) {
+                node.parent.partialSelected = false; // No child selected, parent is not selected
+            } else if (selectedChildren.length === allChildren.length) {
+                node.parent.partialSelected = false; // All children selected, parent fully selected
+                this.RoleGroupForm.controls['permissionIds'].value.push(node.parent);
+            } else {
+                node.parent.partialSelected = true; // Some children selected, parent is partially selected
+            }
+    
+            this.updatePartialSelection(node.parent); // Continue checking up the tree
         }
     }
     
     // Recursively unselect child nodes if necessary
     unselectChildNodes(node: any) {
-        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;  // Get current selected nodes
+        const selectedPermissions = this.RoleGroupForm.controls['permissionIds'].value;
         if (node.children && node.children.length > 0) {
             node.children.forEach((child: any) => {
                 const index = selectedPermissions.indexOf(child);
                 if (index !== -1) {
-                    selectedPermissions.splice(index, 1);  // Remove the child from the selected list
-                    this.unselectChildNodes(child);  // Recursively unselect child nodes
+                    selectedPermissions.splice(index, 1);
+                    this.unselectChildNodes(child);
                 }
             });
-            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);  // Update form control value
+            this.RoleGroupForm.controls['permissionIds'].setValue(selectedPermissions);
         }
-    }    
+    }
+        
 
     Filters(): void {
         //debugger
