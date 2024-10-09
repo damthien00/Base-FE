@@ -25,8 +25,11 @@ export class RefreshTokenService {
                 console.log('Error while starting connection: ' + err)
             );
     }
-
+    
     public addActivityListener(callback: (activity: any) => void) {
         this.hubConnection.on('RefreshToken', callback);
+    }
+    public addActivityChangeRoleListener(callback: (activity: any) => void) {
+        this.hubConnection.on('RefreshTokenByRole', callback);
     }
 }

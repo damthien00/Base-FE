@@ -27,9 +27,32 @@ export class AppMenuComponent implements OnInit {
     }
 
     ngOnInit() {
+        console.log(this.userCurrent.roleNames);
         this.refreshTokenService.startConnection();
         this.refreshTokenService.addActivityListener((activity) => {
             if (activity != null && activity.id == this.userCurrent.id) {
+                // console.log(this.authToken);
+                this.authToken = this.authService.getAuthTokenLocalStorage();
+                this.authService
+                    .refreshToken({ refreshToken: this.authToken.refreshToken })
+                    .subscribe((res) => {
+                        if (res.status == true) {
+                            this.messageService.add({
+                                severity: 'warn',
+                                summary: 'Cảnh báo',
+                                detail: 'Bạn đã bị thay đổi quyền',
+                            });
+
+                            this.authService.setAuthTokenLocalStorage(res.data);
+                        }
+                    });
+            }
+        });
+        this.refreshTokenService.addActivityChangeRoleListener((activity) => {
+            console.log(this.userCurrent.roleNames);
+            console.log(activity);
+            console.log('ket qua  '+this.userCurrent.roleNames.includes(activity.normalizedName));
+            if (activity != null && this.userCurrent.roleNames.includes(activity.normalizedName)) {
                 // console.log(this.authToken);
                 this.authToken = this.authService.getAuthTokenLocalStorage();
                 this.authService

@@ -96,7 +96,7 @@ export class AuthService {
             return false;
         }
     }
-
+    
     hasRoleAsync(user: any, role: string): boolean {
         if (!user) {
             return false;
