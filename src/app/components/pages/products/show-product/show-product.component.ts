@@ -193,18 +193,62 @@ export class ShowProductComponent implements OnInit {
         await this.productService
             .FilterProduct(this.optionsFillerProduct)
             .then((response) => {
-                this.products = response.data;
-                this.totalRecords = response.totalRecordsCount;
+                // this.products = response.data;
+                // this.totalRecords = response.totalRecordsCount;
     
-                // Lọc sản phẩm thỏa mãn điều kiện totalQuantity > 0 và tất cả các variant.quantity > 0
-                this.products = this.products.filter(product => {
-                    // Điều kiện product.totalQuantity > 0
-                    if (product.totalQuantity > 0) {
-                        // Kiểm tra tất cả các variant của product
-                        return product.productVariants.every(variant => variant.quantity > 0);
-                    }
-                    return false;
-                });
+                if (this.optionsFillerProduct.Status === 0) {
+                    let filteredProducts = response.data.filter((product) => {
+                        return product.status === 0; // Lọc sản phẩm có status = 0
+                    });
+                    this.products = filteredProducts;
+                    this.totalRecords = filteredProducts.length;
+                }
+
+                if (this.optionsFillerProduct.Status === 1) {
+                    let filteredProducts = response.data.filter((product) => {
+                        if (product.status === 0) {
+                            return false; // Bỏ qua sản phẩm nếu status === 0
+                        }
+                        // Nếu product.totalQuantity > 0 thì giữ lại sản phẩm
+                        if (product.totalQuantity > 0) {
+                            // Nếu có variant nào có variant.quantity > 0, thì giữ lại các variant đó
+                            product.productVariants = product.productVariants.filter(
+                                (variant) => variant.quantity > 0
+                            );
+                            return true; // Giữ lại sản phẩm nếu product.totalQuantity > 0
+                        }
+            
+                        // Loại bỏ sản phẩm nếu product.totalQuantity <= 0
+                        return false;
+                    });
+                    this.products = filteredProducts;
+                    this.totalRecords = filteredProducts.length;
+                }
+
+                if (this.optionsFillerProduct.Status === 2) {
+                    let filteredProducts = this.products.map(product => {
+                        // Điều kiện product.totalQuantity = 0
+                        if (product.totalQuantity === 0) {
+                            return product; // Giữ nguyên nếu totalQuantity = 0
+                        } else {
+                            // Nếu totalQuantity > 0, lọc các variants với quantity = 0
+                            const zeroQuantityVariants = product.productVariants.filter(variant => variant.quantity === 0);
+    
+                            // Chỉ trả về sản phẩm nếu có variants có quantity = 0
+                            if (zeroQuantityVariants.length > 0) {
+                                return {
+                                    ...product,
+                                    productVariants: zeroQuantityVariants // Chỉ giữ lại các variants có quantity = 0
+                                };
+                            } else {
+                                return null; // Bỏ sản phẩm nếu không có variants nào có quantity = 0
+                            }
+                        }
+                    }).filter(product => product !== null); // Bỏ các sản phẩm null
+
+                    this.products = filteredProducts;
+                    this.totalRecords = filteredProducts.length;
+                } 
     
                 for (let index = 0; index < this.products.length; index++) {
                     this.showAllVariants.set(
