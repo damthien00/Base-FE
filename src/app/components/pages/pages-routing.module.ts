@@ -47,6 +47,13 @@ import { RouterModule } from '@angular/router';
                     ).then((m) => m.StockTransferModule),
             },
             {
+                path: 'stock-receive',
+                loadChildren: () =>
+                    import(
+                        './warehouse/stock-receive/stock-receive.module'
+                    ).then((m) => m.StockReceiveModule),
+            },
+            {
                 path: 'branch',
                 loadChildren: () =>
                     import('./branch/show/show.module').then(
