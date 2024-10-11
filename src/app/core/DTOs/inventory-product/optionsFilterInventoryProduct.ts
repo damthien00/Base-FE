@@ -3,7 +3,7 @@ export class OptionsFilterInventoryProduct {
     pageIndex: number | null = 1;
     productName: string | null = null;
     productVariantName: string | null = null;
-    brandId: number | null = null;
+    branchId: number | null = null;
     fromQuantity: number | null = null;
     toQuantity: number | null = null;
 }

@@ -220,6 +220,8 @@ export class ActivateWarrantyComponent implements OnInit {
     }
 
     getDistrictsByCity(cityId: number) {
+        console.log(cityId);
+
         this.addressService
             .getDistrictsByIdCity(cityId)
             .subscribe((districts) => {
@@ -247,7 +249,7 @@ export class ActivateWarrantyComponent implements OnInit {
         console.log(event);
 
         this.selectedCityId = event.value.id || event.value;
-        this.getDistrictsByCity(event.value.id);
+        this.getDistrictsByCity(this.selectedCityId);
         this.districts = [];
         this.wards = [];
         this.createActivateWarranty.get('wardId')?.setValue(null);
@@ -257,7 +259,7 @@ export class ActivateWarrantyComponent implements OnInit {
     onDistrictChange(event: any, districtId: number) {
         console.log(event);
         this.selectedDistrictId = event.value.id || event.value;
-        this.getWardsByDistrict(event.value.id);
+        this.getWardsByDistrict(this.selectedDistrictId);
         this.wards = [];
         this.createActivateWarranty.get('wardId')?.setValue(null);
     }

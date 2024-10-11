@@ -437,7 +437,10 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
                                 >
-                                    Đang trống
+                                    {{ stockInItemDetail?.supplierAddress }}
+                                    {{ stockInItemDetail?.supplierWardName }}
+                                    {{ stockInItemDetail?.supplierDistrictName
+                                    }}{{ stockInItemDetail?.supplierCityName }}
                                 </div>
                             </div>
                         </div>
@@ -462,7 +465,7 @@
                                 <div
                                     class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
                                 >
-                                    Đang trống
+                                    {{ stockInItemDetail?.createName }}
                                 </div>
                             </div>
                         </div>

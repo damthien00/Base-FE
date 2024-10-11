@@ -16,7 +16,7 @@ interface QuantityResponse {
 @Injectable()
 export class ProductService {
     public url = environment.url;
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {}
 
     private handleError(error: HttpErrorResponse): Observable<any> {
         console.error('An error occurred:', error);
@@ -36,10 +36,15 @@ export class ProductService {
         }
     }
 
-    checkQuantity(branchId: number, productId: number, productVariantId: number): Observable<QuantityResponse> {
-        return this.http.get<QuantityResponse>(`https://localhost:44339/api/inventory/check-quantity?BranchId=${branchId}&ProductId=${productId}&ProductVariantId=${productVariantId}`);
+    checkQuantity(
+        branchId: number,
+        productId: number,
+        productVariantId: number
+    ): Observable<QuantityResponse> {
+        return this.http.get<QuantityResponse>(
+            `https://localhost:44339/api/inventory/check-quantity?BranchId=${branchId}&ProductId=${productId}&ProductVariantId=${productVariantId}`
+        );
     }
-
 
     getInventoryProducts(
         optionsFilterInventoryProduct: OptionsFilterInventoryProduct
@@ -49,7 +54,7 @@ export class ProductService {
             pageIndex,
             productName,
             productVariantName,
-            brandId,
+            branchId,
             fromQuantity,
             toQuantity,
         } = optionsFilterInventoryProduct;
@@ -62,8 +67,8 @@ export class ProductService {
         if (productVariantName) {
             url += `&productVariantName=${productVariantName}`;
         }
-        if (brandId) {
-            url += `&brandId=${brandId}`;
+        if (branchId) {
+            url += `&branchId=${branchId}`;
         }
         if (fromQuantity !== null) {
             url += `&fromQuantity=${fromQuantity}`;
@@ -197,14 +202,14 @@ export class ProductService {
 
     CheckBarcode(
         barCode: string
-    ): Observable<{ data: boolean;[key: string]: any }> {
-        return this.http.get<{ data: boolean;[key: string]: any }>(
+    ): Observable<{ data: boolean; [key: string]: any }> {
+        return this.http.get<{ data: boolean; [key: string]: any }>(
             `${this.url}/api/product/checkbarcode?barCode=${barCode}`
         );
     }
 
-    CheckSku(sku: string): Observable<{ data: boolean;[key: string]: any }> {
-        return this.http.get<{ data: boolean;[key: string]: any }>(
+    CheckSku(sku: string): Observable<{ data: boolean; [key: string]: any }> {
+        return this.http.get<{ data: boolean; [key: string]: any }>(
             `${this.url}/api/product/checksku?sku=${sku}`
         );
     }
@@ -217,16 +222,16 @@ export class ProductService {
 
     CheckBarcodeVariant(
         barCodeVr: string
-    ): Observable<{ data: boolean;[key: string]: any }> {
-        return this.http.get<{ data: boolean;[key: string]: any }>(
+    ): Observable<{ data: boolean; [key: string]: any }> {
+        return this.http.get<{ data: boolean; [key: string]: any }>(
             `${this.url}/api/productvariants/checkbarcodevariant?barCodeVr=${barCodeVr}`
         );
     }
 
     CheckBarcodeSku(
         sku: string
-    ): Observable<{ data: boolean;[key: string]: any }> {
-        return this.http.get<{ data: boolean;[key: string]: any }>(
+    ): Observable<{ data: boolean; [key: string]: any }> {
+        return this.http.get<{ data: boolean; [key: string]: any }>(
             `${this.url}/api/productvariants/checksku?sku=${sku}`
         );
     }
