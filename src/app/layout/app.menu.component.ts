@@ -172,6 +172,11 @@ export class AppMenuComponent implements OnInit {
                                 icon: 'pi pi-fw pi-truck',
                                 routerLink: ['/pages/stock-transfer'],
                             },
+                            {
+                                label: 'Nhận hàng',
+                                icon: 'fa-solid fa-receipt',
+                                routerLink: ['/pages/stock-receive'],
+                            },
                         ],
                     },
                 ],
