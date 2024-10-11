@@ -15,6 +15,7 @@ import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product
 import { OptionsFilterInventoryProduct } from 'src/app/core/DTOs/inventory-product/optionsFilterInventoryProduct';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
     templateUrl: './show.component.html',
@@ -72,15 +73,21 @@ export class ShowComponent implements OnInit {
     branchs: any[] = [];
     selectedBranch: any;
     brandIdSelected: any;
+    userCurrent: any;
     constructor(
         private productCateogryService: CategoryService,
         private productService: ProductService,
         private messageService: MessageService,
         private nodeService: NodeService,
-        private branchService: BranchService
+        private branchService: BranchService,
+        private authService: AuthService
     ) {
         this.optionsFillerProduct.pageIndex = this.pageNumber;
         this.optionsFillerProduct.pageSize = this.pageSize;
+        this.authService.userCurrent.subscribe((user) => {
+            this.userCurrent = user;
+            console.log(this.userCurrent);
+        });
     }
 
     async ngOnInit() {

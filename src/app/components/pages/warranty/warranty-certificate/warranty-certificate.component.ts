@@ -19,7 +19,7 @@ const warrantyOrders = [
         id: 1,
         code: 'PBH001',
         customerName: 'Bùi Thị Bảo Anh',
-        phoneNumber: '0961462860',
+        phoneNumber: '0973952732 - 0915317043',
         productName: 'Máy cắt cỏ trục băm (Quạt cỏ) Honda TL662',
         serialNumber: 'LI42T5008',
         orderCode: 'DH0001',
