@@ -130,11 +130,19 @@ export class ActivateWarrantyComponent implements OnInit {
         const selectedCustomer = event.value; // Dữ liệu khách hàng đã chọn
         console.log(selectedCustomer);
 
+        this.districts = this.getDistrictsByCity(
+            Number(selectedCustomer.cityId)
+        );
+
+        this.wards = this.getWardsByDistrict(
+            Number(selectedCustomer.districtId)
+        );
+
         this.createActivateWarranty.patchValue({
             phoneNumber: selectedCustomer.phoneNumber.trim(),
             customerName: selectedCustomer.name,
-            cityId: selectedCustomer.cityId || null,
-            districtId: selectedCustomer.districtId || null,
+            cityId: Number(selectedCustomer.cityId) || null,
+            districtId: Number(selectedCustomer.districtId) || null,
             wardId: selectedCustomer.wardId || null,
             address: selectedCustomer.addressDetail || null,
         });
@@ -236,7 +244,9 @@ export class ActivateWarrantyComponent implements OnInit {
     }
 
     onCityChange(event: any, cityId: number) {
-        this.selectedCityId = event.value.id;
+        console.log(event);
+
+        this.selectedCityId = event.value.id || event.value;
         this.getDistrictsByCity(event.value.id);
         this.districts = [];
         this.wards = [];
@@ -246,7 +256,7 @@ export class ActivateWarrantyComponent implements OnInit {
 
     onDistrictChange(event: any, districtId: number) {
         console.log(event);
-        this.selectedDistrictId = event.value.id;
+        this.selectedDistrictId = event.value.id || event.value;
         this.getWardsByDistrict(event.value.id);
         this.wards = [];
         this.createActivateWarranty.get('wardId')?.setValue(null);

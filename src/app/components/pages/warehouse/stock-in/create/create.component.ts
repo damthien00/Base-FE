@@ -391,7 +391,7 @@ export class CreateComponent implements OnInit {
 
         // Cập nhật chiết khấu và tổng số tiền
         this.stockInReceipt.totalAmountPaid =
-            totalPrice - this.stockInReceipt.totalDiscountAmount;
+            totalPrice - Math.round(this.stockInReceipt.totalDiscountAmount);
 
         // Tính toán số tiền hoàn trả nếu khách hàng trả dư
         this.stockInReceipt.moneyReturn =

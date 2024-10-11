@@ -24,9 +24,7 @@
                         <label
                             style="font-weight: 600; color: #000"
                             htmlFor="name1"
-                            >Số điện thoại khách hàng<span class="red-asterisk"
-                                >*</span
-                            ></label
+                            >Chi nhánh<span class="red-asterisk">*</span></label
                         >
                         <p-autoComplete
                             formControlName="branch"
@@ -162,6 +160,7 @@
                             [showClear]="true"
                             placeholder="Chọn Tỉnh/Thành"
                             formControlName="cityId"
+                            optionValue="id"
                             (onChange)="onCityChange($event, $event.value)"
                             (onClear)="onClearCity()"
                         ></p-dropdown>
@@ -184,6 +183,7 @@
                             (onClear)="onClearDistrict()"
                             [emptyMessage]="'Vui lòng chọn tỉnh trước!'"
                             formControlName="districtId"
+                            optionValue="id"
                         ></p-dropdown>
                     </div>
                 </div>
@@ -198,6 +198,7 @@
                             [options]="wards"
                             [style]="{ width: '100%' }"
                             optionLabel="name"
+                            optionValue="id"
                             [showClear]="true"
                             placeholder="Chọn Xã/Phường"
                             (onClear)="onClearWard()"
@@ -342,7 +343,8 @@
             <h1 class="name-company">CÔNG TY TNHH TMDV & XNK TIẾN LINH</h1>
             <span>Địa chỉ: Mễ Hạ, Yên Phú, Yên Mỹ, Hưng Yên</span>
             <span>Email: tienlinhgroups&#64;gmail.com</span>
-            <span>SĐT:0961462860</span>
+            <span>SĐT:0973952732 - 0915317043</span>
+            <!-- 0973952732 - 0915317043 -->
         </footer>
     </div>
 </form>

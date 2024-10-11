@@ -319,7 +319,7 @@
                                     </div>
                                 </td>
                                 <td style="width: 12.5%; text-align: center">
-                                    {{ data.total }}
+                                    {{ data.total | number : "1.0-0" }}
                                 </td>
                                 <td style="width: 7%; text-align: center">
                                     <i
@@ -492,7 +492,10 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                 >
-                                    {{ stockInReceipt.totalPrice }}
+                                    {{
+                                        stockInReceipt.totalPrice
+                                            | number : "1.0-0"
+                                    }}
                                 </div>
                             </div>
 
@@ -523,7 +526,10 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end total_amount_paid"
                                 >
-                                    {{ stockInReceipt.totalAmountPaid }}
+                                    {{
+                                        stockInReceipt.totalAmountPaid
+                                            | number : "1.0-0"
+                                    }}
                                 </div>
                             </div>
 
