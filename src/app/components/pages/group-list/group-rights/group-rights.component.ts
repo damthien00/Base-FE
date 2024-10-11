@@ -583,7 +583,7 @@ export class GroupRightsComponent implements OnInit {
                 description: formValue.description,
                 permissionIds: permissionIds,
             };
-
+            // console.log('haha'+permissionIds);
             // Gửi yêu cầu tới API để thêm người dùng
             this.roleService.saveGroupRole(payload).subscribe(
                 (response) => {
@@ -629,5 +629,11 @@ export class GroupRightsComponent implements OnInit {
                 this.getPermissionIds(permission.childrens);
             }
         });
+    }
+    onPermissionsChange(updatedPermissions: any[]) {
+
+        // console.log("change nhe" +updatedPermissions);
+
+        this.selectedPermissionIds = updatedPermissions;
     }
 }

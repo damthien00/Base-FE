@@ -112,8 +112,11 @@ export class PermissionItemComponent implements OnInit {
 		} else {
 			this.removePermission(permission);
 		}
+		// console.log(checked);
+		// console.log(this.selectedPermissions);
+		// this.selectedPermissionsChange.emit(this.selectedPermissions);
+		// this.selectedPermissionsChange.emit([...this.selectedPermissions]); 
 
-		this.selectedPermissionsChange.emit(this.selectedPermissions);
 	}
 
 	// Thêm quyền và các quyền con vào danh sách đã chọn
@@ -126,6 +129,9 @@ export class PermissionItemComponent implements OnInit {
 		if (permission.childrens && permission.childrens.length > 0) {
 			permission.childrens.forEach((child: any) => this.addPermission(child));
 		}
+
+		this.selectedPermissionsChange.emit([...this.selectedPermissions]); 
+
 	}
 
 	// Bỏ chọn quyền và các quyền con
@@ -136,6 +142,8 @@ export class PermissionItemComponent implements OnInit {
 		if (permission.childrens && permission.childrens.length > 0) {
 			permission.childrens.forEach((child: any) => this.removePermission(child));
 		}
+		this.selectedPermissionsChange.emit([...this.selectedPermissions]); 
+
 	}
 
 	// Đệ quy chọn tất cả quyền cha khi chọn quyền con
@@ -165,4 +173,11 @@ export class PermissionItemComponent implements OnInit {
 		}
 		return null;
 	}
+
+	onChildPermissionsChange(updatedPermissions: any[]) {
+		this.selectedPermissions = updatedPermissions;
+	
+		this.selectedPermissionsChange.emit(updatedPermissions);
+	}
+	
 }

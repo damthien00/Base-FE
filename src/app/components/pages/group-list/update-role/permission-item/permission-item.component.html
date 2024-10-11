@@ -44,7 +44,9 @@
 		<app-permission-item 
 		  [permission]="child" 
 		  [permissionsTree]="permissionsTree"
-		  [(selectedPermissions)]="selectedPermissions">
+		  [(selectedPermissions)]="selectedPermissions"
+		  (selectedPermissionsChange)="onChildPermissionsChange($event)">
+		  >
 		</app-permission-item>
 	  </ng-container>
 	</ul>
