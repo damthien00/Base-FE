@@ -86,7 +86,6 @@ export class ShowComponent implements OnInit {
         this.optionsFillerProduct.pageSize = this.pageSize;
         this.authService.userCurrent.subscribe((user) => {
             this.userCurrent = user;
-            console.log(this.userCurrent);
         });
     }
 
@@ -95,6 +94,8 @@ export class ShowComponent implements OnInit {
             { label: 'Sản phẩm', route: '/products/show' },
             { label: 'Danh sách sản phẩm tồn' },
         ];
+
+        this.loadBranchs();
         // this.loading = true;
         // let response = await this.productService.FilterProduct(
         //     this.optionsFillerProduct
@@ -106,6 +107,17 @@ export class ShowComponent implements OnInit {
         // this.products = response.data;
         // this.totalRecords = response.totalRecordsCount;
         // console.log(b);
+
+        // this.brandIdSelected = this.userCurrent.branchId;
+        const branch = this.branchs.find(
+            (branch) => branch.id === this.userCurrent.branchId
+        );
+
+        if (branch) {
+            this.brandIdSelected = branch;
+        } else {
+        }
+
         this.loadProduct();
     }
 
@@ -113,17 +125,16 @@ export class ShowComponent implements OnInit {
         this.branchService
             .getBranchs(this.optionsFilterBranch)
             .subscribe((data) => {
-                console.log(data);
                 this.branchs = data.data.items;
-                console.log(this.branchs);
             });
     }
 
     loadProduct() {
-        console.log(this.optionsFilterInventoryProduct);
-        this.optionsFilterInventoryProduct.brandId = this.brandIdSelected?.id;
+        this.optionsFilterInventoryProduct.branchId =
+            this.brandIdSelected?.id || this.brandIdSelected;
         this.optionsFilterInventoryProduct.pageIndex = this.pageNumber;
         this.optionsFilterInventoryProduct.pageSize = this.pageSize;
+
         this.productService
             .getInventoryProducts(this.optionsFilterInventoryProduct)
             .subscribe((response) => {
@@ -180,8 +191,6 @@ export class ShowComponent implements OnInit {
     }
     async EvenFilter() {
         this.optionsFillerProduct.pageIndex = 1;
-
-        console.log(this.optionsFillerProduct);
         // this.loading = true;
         await this.productService
             .FilterProduct(this.optionsFillerProduct)
