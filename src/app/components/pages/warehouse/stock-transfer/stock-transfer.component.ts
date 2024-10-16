@@ -4,11 +4,15 @@ import { OptionsFilterLading } from 'src/app/core/models/option-filter-lading';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { MerchandiseService } from 'src/app/core/services/merchandise.service';
+import { DatePipe } from '@angular/common';
+
 
 @Component({
     selector: 'app-stock-transfer',
     templateUrl: './stock-transfer.component.html',
     styleUrls: ['./stock-transfer.component.css'],
+    providers: [DatePipe]
+
 })
 export class StockTransferComponent implements OnInit {
     items: MenuItem[] | undefined;
@@ -22,9 +26,11 @@ export class StockTransferComponent implements OnInit {
     selectedBranch: any;
     selectedFromBranchName!: string;
     selectedCode!: string;
+    selectedCreatedAt!: string;
     selectedBranchId!: number;
     selectedIAccepted: { label: string; value: string } | null = null;
     Code!: string;
+    CreatedAt!: string;
     IAccepted!: string;
     branch: any[] = [];
     ladigns: any[] = [];
@@ -42,6 +48,7 @@ export class StockTransferComponent implements OnInit {
         private merchandiService: MerchandiseService,
         private branchService: BranchService,
         private authService: AuthService,
+        private datePipe: DatePipe
     ) {
         this.authService.userCurrent.subscribe((user) => {
             this.userCurrent = user;
@@ -75,9 +82,23 @@ export class StockTransferComponent implements OnInit {
         return name;
     }
 
+    onDateSelect(event: any) {
+        // Định dạng ngày theo ý muốn, ví dụ "YYYY-MM-DD" (có thể dùng moment.js hoặc DatePipe của Angular)
+        this.CreatedAt = this.formatDateToString(event);
+    }
+    
+    // Ví dụ sử dụng DatePipe của Angular để định dạng ngày:
+    formatDateToString(date: Date): string {
+        return this.datePipe.transform(date, 'yyyy-MM-dd'); // Sử dụng DatePipe
+    }
+
+    onDateClear() {
+        this.CreatedAt = null; // Xóa dữ liệu trong this.CreatedAt
+    }
+    
     Filters(): void {
         //debugger
-        this.merchandiService.getFilters(this.PageSize, this.PageIndex, this.FromBranchId = this.userCurrent?.branchId, this.ToBranchId, this.FromBranchName, this.ToBranchName, this.Code, this.IAccepted)
+        this.merchandiService.getFilters(this.PageSize, this.PageIndex, this.FromBranchId = this.userCurrent?.branchId, this.ToBranchId, this.FromBranchName, this.ToBranchName, this.Code, this.IAccepted, this.CreatedAt)
             .subscribe(
                 response => {
                     this.ladigns = response.data.items;
@@ -111,7 +132,7 @@ export class StockTransferComponent implements OnInit {
     }
 
     clickButtonFilter() {
-        if (this.selectedCode) {
+        if (this.selectedCode && this.CreatedAt) {
             this.Code = this.selectedCode.trim();
             this.ToBranchId = this.selectedBranchId;
             this.IAccepted = this.selectedIAccepted?.value || null;
@@ -148,7 +169,7 @@ export class StockTransferComponent implements OnInit {
             });
             this.Filters();
         }
-        this.Filters();
+        // this.Filters();
     }
 
     onPageChange(event: any): void {

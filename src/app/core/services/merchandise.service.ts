@@ -53,7 +53,7 @@ export class MerchandiseService {
   }
 
 
-  getFilters(PageSize: number, PageIndex: number, FromBranchId?: number, ToBranchId?: number, FromBranchName?: string, ToBranchName?: string, Code?: string, IAccepted?: string,  ): Observable<any> {
+  getFilters(PageSize: number, PageIndex: number, FromBranchId?: number, ToBranchId?: number, FromBranchName?: string, ToBranchName?: string, Code?: string, IAccepted?: string, CreatedAt?: string  ): Observable<any> {
     let params = new HttpParams()
       .set('PageSize', PageSize.toString())
       .set('PageIndex', PageIndex.toString());
@@ -80,6 +80,10 @@ export class MerchandiseService {
 
     if (IAccepted) {
       params = params.set('IAccepted', IAccepted);
+    }
+
+    if (CreatedAt) {
+      params = params.set('CreatedAt', CreatedAt);
     }
 
     return this.http.get<any>(`${this.url}/api/bill-of-lading/paging`, { params: params });
