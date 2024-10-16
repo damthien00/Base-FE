@@ -446,17 +446,18 @@
                         <div class="col-12 md:col-12">
                             <div class="field grid">
                                 <div class="col-12 mb-2 md:col-6 md:mb-0">
-                                    Nhân viên: {{ this.userCurrent?.name }}
+                                    <span style="font-weight: 600;">Nhân viên:</span>
+                                    <span> {{ this.userCurrent?.name }}</span>            
                                 </div>
                                 <div
                                     class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end"
                                 >
-                                    {{ this.stockInReceipt?.createdAt }}
+                                    {{ this.ladingData?.createdAt | date : "dd/MM/yyyy HH:mm:ss"}}
                                 </div>
                             </div>
 
                             <div class="field grid">
-                                <div class="col-12 mb-2 md:col-6 md:mb-0">
+                                <div style="font-weight: 600;" class="col-12 mb-2 md:col-6 md:mb-0">
                                     Mã chuyển hàng:
                                 </div>
                                 <div
@@ -469,11 +470,11 @@
                             <div class="field grid">
                                 <!-- Tổng số sản phẩm -->
 
-                                <div class="col-12 mb-2 md:col-6 md:mb-0">
+                                <div style="font-weight: 600;" class="col-12 mb-2 md:col-6 md:mb-0">
                                     Chi nhánh nhận:
                                 </div>
                                 <div
-                                style="padding-left: 65px;"
+                                style="padding-left: 81px;"
                                     class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end"
                                 >
                                     {{ this.ladingData?.toBranchName }}
@@ -482,18 +483,21 @@
                             
                             <div class="field grid">
                                 <!-- Tổng số sản phẩm -->
-                                <div class="col-12 mb-2 md:col-6 md:mb-0">
+                                <div style="font-weight: 600;" class="col-12 mb-2 md:col-6 md:mb-0">
                                     Trạng thái:
                                 </div>
                                 <div class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end">
-                                    {{ this.ladingData?.iAccepted === 'waiting' ? 'Đang chuyển' : (this.ladingData?.iAccepted === 'accept' ? 'Chuyển thành công' : this.ladingData?.iAccepted) }}
+                                    {{ this.ladingData?.iAccepted === 'waiting' ? 'Đang chuyển' 
+                                    : this.ladingData?.iAccepted === 'accept' ? 'Chuyển thành công' 
+                                    : this.ladingData?.iAccepted === 'reject' ? 'Hủy chuyển hàng' 
+                                    : this.ladingData?.iAccepted }}
                                 </div>
                             </div>
 
                             <div class="field grid">
                                 <!-- Tổng số sản phẩm -->
 
-                                <div class="col-12 mb-2 md:col-6 md:mb-0">
+                                <div style="font-weight: 600;" class="col-12 mb-2 md:col-6 md:mb-0">
                                     SL chuyển:
                                 </div>
                                 <div
@@ -505,7 +509,7 @@
                             <div class="field grid">
                                 <!-- Tổng số sản phẩm -->
 
-                                <div class="col-12 mb-2 md:col-6 md:mb-0">
+                                <div style="font-weight: 600;" class="col-12 mb-2 md:col-6 md:mb-0">
                                     SL nhận:
                                 </div>
                                 <div
@@ -516,7 +520,7 @@
 
                             <div class="field" *ngIf="!isAccept">
                                 <!-- Ghi chú -->
-                                <label htmlFor="email1">Ghi chú</label>
+                                <label style="font-weight: 600;" htmlFor="email1">Ghi chú</label>
                                 <textarea
                                     [(ngModel)]="recipientNote"
                                     pInputTextarea
@@ -526,7 +530,7 @@
 
                             <div class="field" *ngIf="isAccept">
                                 <!-- Ghi chú -->
-                                <label htmlFor="email1">Ghi chú</label>
+                                <label style="font-weight: 600;" htmlFor="email1">Ghi chú</label>
                                 <textarea
                                     [(ngModel)]="this.ladingData.note"
                                     pInputTextarea
@@ -538,9 +542,9 @@
                                 pButton
                                 pRipple
                                 icon="pi pi-check"
-                                [label]="isAccept ? 'Đã chuyển hàng' : 'Nhận hàng'"
+                                [label]="isAccept ? 'Đã chuyển hàng' : isRejected ? 'Đã hủy chuyển hàng' : 'Nhận hàng'"
                                 type="button"
-                                [disabled]="isAccept"
+                                [disabled]="isAccept || isRejected"
                                 (click)="showConfirmDialog()"
                             ></button>
                         </div>

@@ -524,7 +524,7 @@ export class BranchTransferComponent implements OnInit {
   }
 
   updateTotal(data: any) {
-    data.total = data.price * data.quantity;
+    data.total = data.price * data.quantity || data.price;
     this.checkValidity();
     this.updatePaymentInfo();
   }
@@ -646,6 +646,8 @@ export class BranchTransferComponent implements OnInit {
       data.isValidMessage = '';
       data.isValidMessage2 = '';
     }
+
+    this.updateTotal(data);
   }
 
   preventInput(event: KeyboardEvent) {

@@ -56,6 +56,11 @@ export class ShowProductComponent implements OnInit {
     }
 
     async ngOnInit() {
+        this.items = [
+            { icon: 'pi pi-home', route: '/installation' },
+            { label: 'Sản phẩm' },
+            { label: 'Danh sách sản phẩm' }
+          ];
         this.loading = true;
         let response = await this.productService.FilterProduct(
             this.optionsFillerProduct
@@ -193,8 +198,8 @@ export class ShowProductComponent implements OnInit {
         await this.productService
             .FilterProduct(this.optionsFillerProduct)
             .then((response) => {
-                // this.products = response.data;
-                // this.totalRecords = response.totalRecordsCount;
+                this.products = response.data;
+                this.totalRecords = response.totalRecordsCount;
     
                 if (this.optionsFillerProduct.Status === 0) {
                     let filteredProducts = response.data.filter((product) => {

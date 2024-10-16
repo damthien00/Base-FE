@@ -383,7 +383,7 @@
                         </div>
                         <div class="card-body-1" *ngIf="showProperties1Section">
                             <div class="col-lg-12 mt-3">
-                                <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeshowProperties1()"></i>
+                                <!-- <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeshowProperties1()"></i> -->
                                 <div class="col-lg-6 mt-3 mb-2">
                                   <input
                                     type="text"
@@ -478,7 +478,8 @@
                         </div>                      
                         <div class="card-body-1" *ngIf="addVariants">
                             <div class="col-lg-12 mt-3">
-                                <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeAddVariants()"></i>
+                              
+                                <!-- <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeAddVariants()"></i> -->
                                 <div class="col-lg-6 mt-3 mb-2">
                                   <input
                                     type="text"
@@ -552,7 +553,7 @@
                         </div>
                         <div class="card-body-1" *ngIf="showProperties1Section2">
                             <div class="col-lg-12 mt-3">
-                              <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeshowProperties2()"></i>
+                              <!-- <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeshowProperties2()"></i> -->
                               <div class="col-lg-6 mt-3">
                                 <input
                                   type="text"
@@ -593,7 +594,7 @@
                         </div>
                         <div class="card-body-1" *ngIf="addVariants2">
                             <div class="col-lg-12 mt-3">
-                                <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeAddVariants2()"></i>
+                                <!-- <i style="float: right; color: red; cursor: pointer;" class="pi pi-times" (click)="closeAddVariants2()"></i> -->
                                 <div class="col-lg-6 mt-3 mb-2">
                                     <input
                                         type="text"
@@ -656,7 +657,7 @@
                                           let-i="rowIndex"
                                         >                       
                                           <tr *ngFor="let value2 of valueProperties2Array.controls; let j = index">
-                                            <td>1</td>
+                                            <td>{{i + 1}}</td>
                                             <td>
                                                 <div style="display: flex;">
                                                     <img

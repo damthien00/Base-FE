@@ -82,6 +82,7 @@ export class BranchReceivingComponent {
   frameEngineData: any[] = [];
   filteredDatas: any[] = [];
   isAccept: boolean = false;
+  isRejected: boolean = false;
 
   onBarcode: boolean = false;
   constructor(
@@ -223,8 +224,11 @@ export class BranchReceivingComponent {
     this.httpClient.get(`${this.url}/api/bill-of-lading/get-by-id?Id=${id}`)
       .subscribe((response: any) => {
         if (response && response.data) {
-          this.ladingData = response.data; // Gán dữ liệu vào biến `ladingData`
+          this.ladingData = response.data;
+
           this.isAccept = this.ladingData.iAccepted === 'accept';
+          this.isRejected = this.ladingData.iAccepted === 'reject';
+
           const groupedProducts = this.groupProductsByVariant(this.ladingData.inventoryStockDetailProductImeis);
           this.displayedProducts = groupedProducts; 
 

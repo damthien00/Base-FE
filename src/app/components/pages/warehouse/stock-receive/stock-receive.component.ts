@@ -4,11 +4,13 @@ import { OptionsFilterLading } from 'src/app/core/models/option-filter-lading';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { MerchandiseService } from 'src/app/core/services/merchandise.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-stock-receive',
   templateUrl: './stock-receive.component.html',
-  styleUrl: './stock-receive.component.scss'
+  styleUrl: './stock-receive.component.scss',
+  providers: [DatePipe]
 })
 export class StockReceiveComponent implements OnInit {
   items: MenuItem[] | undefined;
@@ -17,6 +19,7 @@ export class StockReceiveComponent implements OnInit {
   FromBranchId!: number;
   ToBranchId!: number;
   FromBranchName!: string;
+  CreatedAt!: string;
   ToBranchName!: string;
   totalRecords: number = 0;
   selectedBranch: any;
@@ -42,6 +45,7 @@ export class StockReceiveComponent implements OnInit {
     private merchandiService: MerchandiseService,
     private branchService: BranchService,
     private authService: AuthService,
+    private datePipe: DatePipe
   ) {
     this.authService.userCurrent.subscribe((user) => {
       this.userCurrent = user;
@@ -75,6 +79,21 @@ export class StockReceiveComponent implements OnInit {
     return name;
   }
 
+  onDateSelect(event: any) {
+    // Định dạng ngày theo ý muốn, ví dụ "YYYY-MM-DD" (có thể dùng moment.js hoặc DatePipe của Angular)
+    this.CreatedAt = this.formatDateToString(event);
+  }
+
+  // Ví dụ sử dụng DatePipe của Angular để định dạng ngày:
+  formatDateToString(date: Date): string {
+    return this.datePipe.transform(date, 'yyyy-MM-dd'); // Sử dụng DatePipe
+  }
+
+  onDateClear() {
+    this.CreatedAt = null; // Xóa dữ liệu trong this.CreatedAt
+  }
+
+
   Filters(): void {
     //debugger
     this.merchandiService.getFilters(this.PageSize, this.PageIndex, this.FromBranchId, this.ToBranchId = this.userCurrent?.branchId, this.FromBranchName, this.ToBranchName, this.Code, this.IAccepted)
@@ -98,12 +117,11 @@ export class StockReceiveComponent implements OnInit {
       case 'accept':
         return 'Nhận hàng thành công';
       case 'reject':
-        return 'Hủy nhận hàng';
+        return 'Đã hủy chuyển hàng';
       default:
         return 'Trạng thái không xác định';
     }
   }
-
 
   getStatusLabel(statusValue: string): string {
     const status = this.statuses.find((s) => s.value === statusValue);

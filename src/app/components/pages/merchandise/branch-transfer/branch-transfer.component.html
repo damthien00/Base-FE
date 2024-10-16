@@ -266,7 +266,7 @@
                                     <span *ngIf="!data.isEditing && data.productType === 0" 
                                         style="cursor: pointer;" 
                                         (click)="toggleEdit(data)">
-                                        {{ data.quantity }} / {{ data.availableQuantity }}
+                                        {{ data.quantity || 0 }} / {{ data.availableQuantity }}
                                     </span>
 
                                     <p-inputNumber
@@ -276,7 +276,7 @@
                                         (ngModelChange)="updateTotal(data); validateQuantity(data)"
                                         (onFocus)="functionService.handleFocusPrice($event)"
                                         (onBlur)="toggleEdit(data, true)"
-                                        (onKeydown.enter)="toggleEdit(data, true)"
+                                        (onKeydown.enter)="toggleEdit(data, true)"  
                                         buttonLayout="horizontal"
                                         inputId="horizontal"
                                         spinnerMode="horizontal"
@@ -365,7 +365,8 @@
                         <div class="col-12 md:col-12">
                             <div class="field grid">
                                 <div class="col-12 mb-2 md:col-6 md:mb-0">
-                                    Nhân viên: {{ this.userCurrent?.name }}
+                                    <span style="font-weight: 600;">Nhân viên:</span>
+                                    <span> {{ this.userCurrent?.name }}</span>                                     
                                 </div>
                                 <div
                                     class="col-12 mb-2 md:col-6 md:mb-0 flex justify-content-end"
@@ -377,7 +378,7 @@
                             <div class="field grid">
                                 <!-- Tổng số sản phẩm -->
 
-                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                <div style="font-weight: 600;" class="col-12 mb-2 md:col-5 md:mb-0">
                                     Tổng số sản phẩm:
                                 </div>
                                 <div class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end">
@@ -390,15 +391,15 @@
                             <div class="field grid">
                                 <!-- Tổng số sản phẩm -->
 
-                                <div class="col-12 mb-2 md:col-5 md:mb-0">
-                                    Chuyển tới chi nhánh:
+                                <div style="font-weight: 600" class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Chuyển tới chi nhánh
                                 </div>
-                                <div class="col-12 mb-2 md:col-7 ">
+                                <div class="col-12 mb-2">
                                     <p-dropdown
                                         [options]="branch" 
                                         optionLabel="shortenedName" 
                                         [(ngModel)]="selectedBranch"
-                                        [style]="{ height: '40px', width: '100%' }"
+                                        [style]="{ height: '40px', width: '100%', 'margin-top': '10px' }"
                                         optionValue="id"
                                         [showClear]="true"
                                         placeholder="Chọn chi nhánh"
@@ -413,7 +414,7 @@
 
                             <div class="field">
                                 <!-- Ghi chú -->
-                                <label htmlFor="email1">Ghi chú</label>
+                                <label style="font-weight: 600;" htmlFor="email1">Ghi chú</label>
                                 <textarea
                                     [(ngModel)]="stockInReceipt.note"
                                     pInputTextarea
@@ -424,7 +425,7 @@
                                 pButton
                                 pRipple
                                 icon="pi pi-plus"
-                                label="Lưu"
+                                label="Tạo phiếu chuyển hàng"
                                 (click)="onSubmit()"
                             ></button>
                         </div>
