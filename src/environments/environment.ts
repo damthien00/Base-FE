@@ -19,6 +19,7 @@ export const environment = {
     imageUrl: `${url}/api/files/images/`,
 };
 
+// tny
 // const url = 'http://103.153.69.217:5059';
 // const urlPro = 'http://103.153.69.217:5057';
 // export const environment = {
