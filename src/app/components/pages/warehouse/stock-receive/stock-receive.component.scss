@@ -1,0 +1,23 @@
+/* Common button styles */
+.status-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 8px; /* Rounded corners */
+    border: none;
+    color: rgb(255, 243, 243); /* White text for all buttons */
+    cursor: pointer;
+  }
+  
+  /* Button colors for different statuses */
+  .status-waiting {
+    background-color: #ffc107; /* Yellow for 'waiting' */
+  }
+  
+  .status-accept {
+    background-color: #44ef6c; /* Green for 'accept' */
+  }
+  
+  .status-reject {
+    background-color: #dc3545; /* Red for 'reject' */
+  }
+  

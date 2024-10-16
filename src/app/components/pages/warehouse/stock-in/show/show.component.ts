@@ -67,8 +67,6 @@ export class ShowComponent implements OnInit {
     }
 
     showStockInDetail(stockIn: any) {
-        console.log(stockIn);
-
         this.stockInService.getStockInById(stockIn.id).subscribe((response) => {
             this.stockInItemDetail = response.data;
         });
