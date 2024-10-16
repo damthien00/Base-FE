@@ -13,8 +13,8 @@ export class MerchandiseService {
   public url = environment.url;
   constructor(private http: HttpClient) { }
 
-  getProductDetails(productId: number, productVariantId: number, branchId: number, IsPurchased: number = 0): Observable<any> {
-    let url = `${this.url}/api/inventory-stock-detail-product-imei/get-paging?ProductId=${productId}&IsPurchased=${IsPurchased}`;
+  getProductDetails(productId: number, productVariantId: number, branchId: number, IsPurchased: number = 0, IsBillOfLading: number = 0): Observable<any> {
+    let url = `${this.url}/api/inventory-stock-detail-product-imei/get-paging?ProductId=${productId}&IsPurchased=${IsPurchased}&IsBillOfLading=${IsBillOfLading}`;
 
     if (productVariantId !== null && productVariantId !== undefined) {
       url += `&ProductVariantId=${productVariantId}`;

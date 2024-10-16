@@ -322,8 +322,8 @@ export class BranchReceivingComponent {
     this.onSubmitUpdate(false); // Chỉ gọi API đầu tiên khi reject
   }
 
-  onSubmitUpdate(callSecondApi: boolean = true): void {
-    // Tạo dữ liệu cho API /api/bill-of-lading/confilm
+  onSubmitUpdate(callSecondApi: boolean = true): void { 
+    // Prepare common data
     const updateLadingData = {
       id: this.ladingId,
       iAccepted: this.ladingData.iAccepted,
@@ -347,66 +347,49 @@ export class BranchReceivingComponent {
         quantity: item.quantity
       }))
     };
-
-    // Tạo dữ liệu cho API /api/inventory-stock-detail-product-imei/update-branch
-    const inventoryUpdateData = {
-      inventoryStockDetailProductImeiIds: this.ladingData.inventoryStockDetailProductImeis.map((item: any) => item.id),
-      branchId: this.ladingData.toBranchId,
-      branchName: this.ladingData.toBranchName
-    };
-
-    // Gọi API /api/bill-of-lading/confilm
-    this.httpClient.put(`${this.url}/api/bill-of-lading/confilm`, updateLadingData)
-      .subscribe(
-        (response1) => {
-          console.log('Cập nhật bill of lading thành công', response1);
-          this.messageService.add({
-            severity: 'success',
-            summary: '',
-            detail: 'Cập nhật thành công',
-            life: 3000,
-          });
-          setTimeout(() => {
-            this.router.navigate(['/pages/stock-transfer']);
-          }, 3000);
-
-          // Chỉ gọi API thứ hai nếu người dùng nhấn "Xác nhận" (callSecondApi = true)
-          if (callSecondApi) {
-            this.httpClient.put(`${this.url}/api/inventory-stock-detail-product-imei/update-branch`, inventoryUpdateData)
-              .subscribe(
-                (response2) => {
-                  console.log('Cập nhật inventory thành công', response2);
-                  // this.messageService.add({
-                  //   severity: 'success',
-                  //   summary: '',
-                  //   detail: 'Nhận hàng thành công',
-                  //   life: 3000
-                  // });
-                  // setTimeout(() => {
-                  //   this.router.navigate(['/pages/stock-transfer']);
-                  // }, 3000);
-                  this.hideConfirmDialog(); // Ẩn dialog sau khi cập nhật thành công
-                },
-                (error2) => {
-                  console.error('Lỗi cập nhật inventory', error2);
-                }
-              );
-          } else {
-            this.hideConfirmDialog(); // Ẩn dialog sau khi từ chối
+  
+    if (callSecondApi) {
+      // Call the update API
+      this.httpClient.put(`${this.url}/api/bill-of-lading/confilm`, updateLadingData)
+        .subscribe(
+          (response1) => {
+            console.log('Cập nhật bill of lading thành công', response1);
+            this.hideConfirmDialog();
             this.messageService.add({
-              severity: 'error',
+              severity: 'success',
               summary: '',
-              detail: 'Bạn đã hủy chuyển hàng',
+              detail: 'Cập nhật thành công',
+              life: 3000,
             });
             setTimeout(() => {
               this.router.navigate(['/pages/stock-transfer']);
-            }, 1000);
+            }, 2000);
+          },
+          (error1) => {
+            console.error('Lỗi cập nhật bill of lading', error1);
           }
-        },
-        (error1) => {
-          console.error('Lỗi cập nhật bill of lading', error1);
-        }
-      );
+        );
+    } else {
+      // Call the reject API
+      this.httpClient.put(`${this.url}/api/bill-of-lading/reject`, updateLadingData)
+        .subscribe(
+          (response2) => {
+            console.log('Đã hủy đơn chuyển hàng', response2);
+            this.hideConfirmDialog();
+            this.messageService.add({
+              severity: 'warn',
+              summary: '',
+              detail: 'Đơn chuyển hàng đã bị hủy',
+              life: 3000,
+            });
+            setTimeout(() => {
+              this.router.navigate(['/pages/stock-transfer']);
+            }, 2000);
+          },
+          (error2) => {
+            console.error('Lỗi khi hủy đơn chuyển hàng', error2);
+          }
+        );
+    }
   }
-  
 }

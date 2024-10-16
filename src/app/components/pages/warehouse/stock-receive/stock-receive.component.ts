@@ -113,7 +113,7 @@ export class StockReceiveComponent implements OnInit {
   getStatus(iAccepted: string): string {
     switch (iAccepted) {
       case 'waiting':
-        return 'Đang nhận hàng';
+        return 'Đang chuyển hàng';
       case 'accept':
         return 'Nhận hàng thành công';
       case 'reject':

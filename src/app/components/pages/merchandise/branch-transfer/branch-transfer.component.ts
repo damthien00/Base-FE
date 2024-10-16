@@ -287,7 +287,7 @@ export class BranchTransferComponent implements OnInit {
 
   async loadProducts() {
     this.optionsFilterProduct.pageIndex = 1;
-    this.optionsFilterProduct.pageSize = 10;
+    this.optionsFilterProduct.pageSize = 100000;
     let response = await this.productService.FilterProductView(
       this.optionsFilterProduct
     );
@@ -301,6 +301,7 @@ export class BranchTransferComponent implements OnInit {
             productId: item.id,
             productImage: itemVariant.linkImage, // Lấy hình ảnh từ itemVariant
             productVariantId: itemVariant.id,
+            name: item.name,
             productName:
               item.name +
               '-' +
@@ -467,6 +468,7 @@ export class BranchTransferComponent implements OnInit {
       const newDetail = {
         productId: item.productId,
         productImage: item.productImage,
+        name: item.name,
         productName: item.productName,
         productVariantId: item.productVariantId,
         warrantyPolicyId: item.warrantyPolicyId,
@@ -683,12 +685,18 @@ export class BranchTransferComponent implements OnInit {
       return; // Prevents calling the actual onSubmit logic
     }
     this.checkValidity();
-    const inventoryStockDetailProductImeiIds = this.stockInReceipt.inventoryStockInDetails
+    const inventoryStockDetailProductImeis = this.stockInReceipt.inventoryStockInDetails
       .filter(product => product.productType === 1) // Only include products with productType === 1
       .flatMap(product =>
         product.frameEngineData
           .filter(frameEngine => frameEngine.isChecked) // Only take selected frame/engine
-          .map(frameEngine => frameEngine.id) // Get the id of the selected frame/engine
+          .map(frameEngine => ({
+            inventoryStockDetailProductImeiId: frameEngine.id, // frameEngine ID
+            productId: product.productId, // Add productId
+            productVariantId: product.productVariantId, // Add productVariantId
+            productName: product.name || product.productName, // Add productName
+            productVariantName: product.productName // Add productVariantName
+          }))
       );
 
     const billOfLadingProductNormals = this.stockInReceipt.inventoryStockInDetails
@@ -696,7 +704,9 @@ export class BranchTransferComponent implements OnInit {
       .map((product) => ({
         productId: product.productId,
         productVariantId: product.productVariantId,
-        quantity: product.quantity, // Get the quantity from the p-inputNumber
+        productName: product.name || product.productName,
+        productVariantName: product.productName,
+        quantity: product.quantity,
       }));
 
     const selectedBranch = this.branch.find(option => option.id === this.selectedBranch);
@@ -713,7 +723,7 @@ export class BranchTransferComponent implements OnInit {
       isDeleted: 0,
       iAccepted: 'waiting',
       recipientNote: 'string',
-      inventoryStockDetailProductImeiIds: inventoryStockDetailProductImeiIds,
+      inventoryStockDetailProductImeis: inventoryStockDetailProductImeis,
       billOfLadingProductNormals: billOfLadingProductNormals,
     };
 
