@@ -149,13 +149,23 @@ export class PermissionItemComponent implements OnInit {
 	// Đệ quy chọn tất cả quyền cha khi chọn quyền con
 	addParentPermissions(permission: any) {
 		if (permission.parentPermissionId) {
+			// console.log("hi")
 			// Tìm quyền cha của permission
 			const parent = this.findParentPermission(permission.parentPermissionId, this.permissionsTree);
+			// console.log("hi"+JSON.stringify(parent));
 			if (parent && !this.isSelected(parent)) {
+				// console.log("hah"+JSON.stringify(parent));
 				this.selectedPermissions.push(parent.id);
 				this.addParentPermissions(parent); // Đệ quy chọn cha của cha
 			}
+			this.selectedPermissionsChange.emit([...this.selectedPermissions]); 
+
 		}
+		
+
+		// console.log("12"+JSON.stringify(permission))
+		// console.log("dd"+JSON.stringify(this.permissionsTree))
+		// console.log("hihi");
 	}
 
 	// Hàm tìm kiếm quyền cha dựa trên parentPermissionId
