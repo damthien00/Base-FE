@@ -216,6 +216,7 @@ export class CreateComponent implements OnInit {
                 item.productVariants.forEach((itemVariant) => {
                     listP.push({
                         productId: item.id,
+                        name: item.name,
                         productImage: itemVariant.linkImage, // Lấy hình ảnh từ itemVariant
                         productVariantId: itemVariant.id,
                         productName:
@@ -239,6 +240,7 @@ export class CreateComponent implements OnInit {
             } else {
                 listP.push({
                     productId: item.id,
+                    name: item.name,
                     productImage:
                         item.productImages && item.productImages.length > 0
                             ? item.productImages[0]?.link
@@ -519,13 +521,13 @@ export class CreateComponent implements OnInit {
                             branchName: this.userCurrent.branchName,
                         })) || [];
 
-                    const createProductCodeNomalRequest = {
+                    const createProductCodeNomalRequests = [{
                         branchId: this.userCurrent.branchId,
                         branchName: this.userCurrent.branchName,
                         productId: product.productId,
-                        productVariantId: product.productVariantId ? product.productVariantId : 0,
-                        quantity: product.quantity
-                    };
+                        productVariantId: product.productVariantId ? product.productVariantId : 1,
+                        quantity: product.quantity,
+                    }];
 
                     return {
                         productId: product.productId,
@@ -533,7 +535,7 @@ export class CreateComponent implements OnInit {
                             ? product.productVariantId
                             : 1,
                         productVariantName: product.productName,
-                        productName: product.productName,
+                        productName: product.name || product.productName,
                         productCode: product.productCode,
                         productImage: product.productImage,
                         unit: product.unit,
@@ -542,10 +544,11 @@ export class CreateComponent implements OnInit {
                         totail: product.total,
                         code: 'string',
                         inventoryStockDetailProductImeis: productImeis,
-                        createProductCodeNomalRequest: createProductCodeNomalRequest
+                        createProductCodeNomalRequests
                     };
                 }
             );
+
             const formData = {
                 supplierId: this.supplierSelected.id,
                 supplierName: this.supplierSelected.name,
@@ -559,6 +562,7 @@ export class CreateComponent implements OnInit {
                 note: this.stockInReceipt.note,
                 // createName: this.userCurrent.name,
                 inventoryStockInDetails: products,
+
             };
             console.log(formData);
 
