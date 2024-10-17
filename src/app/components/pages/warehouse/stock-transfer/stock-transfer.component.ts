@@ -86,7 +86,7 @@ export class StockTransferComponent implements OnInit {
         // Định dạng ngày theo ý muốn, ví dụ "YYYY-MM-DD" (có thể dùng moment.js hoặc DatePipe của Angular)
         this.CreatedAt = this.formatDateToString(event);
     }
-    
+
     // Ví dụ sử dụng DatePipe của Angular để định dạng ngày:
     formatDateToString(date: Date): string {
         return this.datePipe.transform(date, 'yyyy-MM-dd'); // Sử dụng DatePipe
@@ -95,7 +95,7 @@ export class StockTransferComponent implements OnInit {
     onDateClear() {
         this.CreatedAt = null; // Xóa dữ liệu trong this.CreatedAt
     }
-    
+
     Filters(): void {
         //debugger
         this.merchandiService.getFilters(this.PageSize, this.PageIndex, this.FromBranchId = this.userCurrent?.branchId, this.ToBranchId, this.FromBranchName, this.ToBranchName, this.Code, this.IAccepted, this.CreatedAt)
@@ -115,7 +115,7 @@ export class StockTransferComponent implements OnInit {
     getStatus(iAccepted: string): string {
         switch (iAccepted) {
             case 'waiting':
-                return 'Đang chuyển';
+                return 'Đang chuyển hàng';
             case 'accept':
                 return 'Chuyển thành công';
             case 'reject':

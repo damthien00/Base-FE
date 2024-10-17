@@ -66,6 +66,7 @@ export class BranchReceivingComponent {
   totalQuantity2!: number;
   totalQuantityProduct!: number;
   displayConfirmation: boolean = false; 
+  displayConfirmation2: boolean = false; 
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
@@ -77,6 +78,8 @@ export class BranchReceivingComponent {
   ladingData: any = {};
   groupedByProductId: any[] = [];
   groupedByProductVariantId: any[] = [];
+  FromBranchId!: number;
+  ToBranchId!: number;
 
   imeiData: any[] = [];
   frameEngineData: any[] = [];
@@ -219,6 +222,14 @@ export class BranchReceivingComponent {
     this.displayConfirmation = false;
   }
 
+  showConfirmDialog2(): void {
+    this.displayConfirmation2 = true;
+  }
+
+  hideConfirmDialog2(): void {
+    this.displayConfirmation2 = false;
+  }
+
   FillDataById(): void {
     const id = this.ladingId; // Lấy ID từ URL
     this.httpClient.get(`${this.url}/api/bill-of-lading/get-by-id?Id=${id}`)
@@ -228,6 +239,9 @@ export class BranchReceivingComponent {
 
           this.isAccept = this.ladingData.iAccepted === 'accept';
           this.isRejected = this.ladingData.iAccepted === 'reject';
+
+          this.FromBranchId = this.ladingData?.fromBranchId;
+          this.ToBranchId = this.ladingData?.toBranchId;
 
           const groupedProducts = this.groupProductsByVariant(this.ladingData.inventoryStockDetailProductImeis);
           this.displayedProducts = groupedProducts; 
@@ -354,11 +368,11 @@ export class BranchReceivingComponent {
         .subscribe(
           (response1) => {
             console.log('Cập nhật bill of lading thành công', response1);
-            this.hideConfirmDialog();
+            this.hideConfirmDialog2();
             this.messageService.add({
               severity: 'success',
               summary: '',
-              detail: 'Cập nhật thành công',
+              detail: 'Chuyển hàng thành công',
               life: 3000,
             });
             setTimeout(() => {

@@ -18,7 +18,7 @@ export class AuthService {
         private http: HttpClient,
         private localStorageService: LocalStorageService,
         private httpService: HttpService
-    ) {}
+    ) { }
 
     public url = environment.url;
     isLoggedIn(): boolean {
@@ -96,7 +96,7 @@ export class AuthService {
             return false;
         }
     }
-    
+
     hasRoleAsync(user: any, role: string): boolean {
         if (!user) {
             return false;

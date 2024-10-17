@@ -149,13 +149,11 @@ export class CreateComponent implements OnInit {
                         productId: response.data[0].id,
                         productImage: response.data[0].productImages[0].link,
                         productVariantId: 215,
-                        productName: `${response.data[0].name}${
-                            '-' +
+                        productName: `${response.data[0].name}${'-' +
                             response.data[0].productVariants[0].valuePropeties1
-                        }${
-                            '-' +
+                            }${'-' +
                             response.data[0].productVariants[0].valuePropeties2
-                        }`,
+                            }`,
                         productType: response.data[0].productType,
                         quantity: 1,
                         productCode: response.data[0].productVariants[0].code,
@@ -206,7 +204,7 @@ export class CreateComponent implements OnInit {
     async loadProducts() {
         this.optionsFilterProduct.pageIndex = 1;
         this.optionsFilterProduct.pageSize = 100000;
-        
+
         let response = await this.productService.FilterProductView(
             this.optionsFilterProduct
         );
@@ -520,6 +518,15 @@ export class CreateComponent implements OnInit {
                             branchId: this.userCurrent.branchId,
                             branchName: this.userCurrent.branchName,
                         })) || [];
+
+                    const createProductCodeNomalRequest = {
+                        branchId: this.userCurrent.branchId,
+                        branchName: this.userCurrent.branchName,
+                        productId: product.productId,
+                        productVariantId: product.productVariantId ? product.productVariantId : 0,
+                        quantity: product.quantity
+                    };
+
                     return {
                         productId: product.productId,
                         productVariantId: product.productVariantId
@@ -535,6 +542,7 @@ export class CreateComponent implements OnInit {
                         totail: product.total,
                         code: 'string',
                         inventoryStockDetailProductImeis: productImeis,
+                        createProductCodeNomalRequest: createProductCodeNomalRequest
                     };
                 }
             );
@@ -549,7 +557,7 @@ export class CreateComponent implements OnInit {
                 version: 0,
                 code: 'string',
                 note: this.stockInReceipt.note,
-                createName: this.userCurrent.name,
+                // createName: this.userCurrent.name,
                 inventoryStockInDetails: products,
             };
             console.log(formData);

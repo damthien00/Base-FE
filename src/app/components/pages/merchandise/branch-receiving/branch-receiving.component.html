@@ -539,13 +539,24 @@
                                 ></textarea>
                             </div>
                             <button
+                                *ngIf="userCurrent?.id === this.FromBranchId"
+                                pButton
+                                pRipple
+                                icon="pi pi-check"
+                                [label]="isAccept ? 'Đã chuyển hàng' : isRejected ? 'Đã hủy chuyển hàng' : 'Hủy chuyển hàng'"
+                                type="button"
+                                [disabled]="isAccept || isRejected"
+                                (click)="showConfirmDialog()"
+                            ></button>
+                            <button
+                                *ngIf="userCurrent?.id === this.ToBranchId"
                                 pButton
                                 pRipple
                                 icon="pi pi-check"
                                 [label]="isAccept ? 'Đã chuyển hàng' : isRejected ? 'Đã hủy chuyển hàng' : 'Nhận hàng'"
                                 type="button"
                                 [disabled]="isAccept || isRejected"
-                                (click)="showConfirmDialog()"
+                                (click)="showConfirmDialog2()"
                             ></button>
                         </div>
                     </div>
@@ -555,13 +566,26 @@
     </div>
 </div>
 
-<p-dialog [(visible)]="displayConfirmation" [modal]="true" [closable]="false" header="Xác nhận chuyển hàng">
-    <p>Bạn muốn xác nhận đơn chuyển hàng này chứ ?</p>
-    <div style="position: absolute; top: 18px; right: 20px; color: red; cursor: pointer;" (click)="this.hideConfirmDialog()">
+<p-dialog *ngIf="userCurrent?.id === this.FromBranchId"
+    [(visible)]="displayConfirmation" [modal]="true" [closable]="false" header="Xác nhận chuyển hàng">
+    <p>Bạn muốn xác nhận hủy đơn chuyển hàng này chứ ?</p>
+    <!-- <div style="position: absolute; top: 18px; right: 20px; color: red; cursor: pointer;" (click)="this.hideConfirmDialog()">
         <i class="pi pi-times"></i>
-    </div>
+    </div> -->
     <p-footer>
-      <button style="margin: 0 20px;" pButton type="button" label="Hủy" (click)="onReject()" icon="pi pi-times" class="ui-button-secondary"></button>
+      <button style="margin: 0 20px;" pButton type="button" label="Hủy" (click)="this.hideConfirmDialog()" icon="pi pi-times" class="ui-button-secondary"></button>
+      <button style="margin: 0 20px;" pButton type="button" label="Xác nhận" (click)="onReject()" icon="pi pi-check"></button>
+    </p-footer>
+</p-dialog>
+
+<p-dialog *ngIf="userCurrent?.id === this.ToBranchId"
+    [(visible)]="displayConfirmation2" [modal]="true" [closable]="false" header="Xác nhận chuyển hàng">
+    <p>Bạn muốn xác nhận đơn chuyển hàng này chứ ?</p>
+    <!-- <div style="position: absolute; top: 18px; right: 20px; color: red; cursor: pointer;" (click)="this.hideConfirmDialog2()">
+        <i class="pi pi-times"></i>
+    </div> -->
+    <p-footer>
+      <button style="margin: 0 20px;" pButton type="button" label="Hủy" (click)="this.hideConfirmDialog2()" icon="pi pi-times" class="ui-button-secondary"></button>
       <button style="margin: 0 20px;" pButton type="button" label="Xác nhận" (click)="onConfirm()"  icon="pi pi-check"></button>
     </p-footer>
 </p-dialog>
