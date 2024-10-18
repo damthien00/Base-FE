@@ -184,32 +184,34 @@ export class ActivateWarrantyComponent implements OnInit {
 
             // this.key
             if (this.keywords) {
-                this.productImeiService
-                    .getProoductByEmei(this.keywords)
-                    .subscribe(
-                        (data) => {
-                            const product = data?.data;
+                setTimeout(() => {
+                    this.productImeiService
+                        .getProoductByEmei(this.keywords)
+                        .subscribe(
+                            (data) => {
+                                const product = data?.data;
 
-                            if (product) {
-                                const isProductExists =
-                                    this.productListSelected.some(
-                                        (p) => p.id === product.id // So sánh theo ID hoặc một thuộc tính duy nhất của sản phẩm
-                                    );
-                                if (!isProductExists && product.term) {
-                                    this.productListSelected.push(product);
+                                if (product) {
+                                    const isProductExists =
+                                        this.productListSelected.some(
+                                            (p) => p.id === product.id // So sánh theo ID hoặc một thuộc tính duy nhất của sản phẩm
+                                        );
+                                    if (!isProductExists && product.term) {
+                                        this.productListSelected.push(product);
+                                    } else {
+                                        console.log(
+                                            'Product already exists in the list'
+                                        );
+                                    }
                                 } else {
-                                    console.log(
-                                        'Product already exists in the list'
-                                    );
+                                    console.error('No product found');
                                 }
-                            } else {
-                                console.error('No product found');
+                            },
+                            (error) => {
+                                console.error('Error fetching product:', error);
                             }
-                        },
-                        (error) => {
-                            console.error('Error fetching product:', error);
-                        }
-                    );
+                        );
+                }, 1000);
             } else {
                 console.error(
                     'Invalid input format. Please provide FrameNumber-EngineNumber'
