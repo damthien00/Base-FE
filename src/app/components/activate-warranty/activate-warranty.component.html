@@ -19,7 +19,7 @@
             </div>
 
             <div class="form grid p-fluid">
-                <div class="col-12 md:col-12 py-1">
+                <!-- <div class="col-12 md:col-12 py-1">
                     <div class="field mb-0">
                         <label
                             style="font-weight: 600; color: #000"
@@ -36,7 +36,7 @@
                             field="name"
                         />
                     </div>
-                </div>
+                </div> -->
                 <div class="col-12 md:col-12 py-1">
                     <div class="field mb-0">
                         <label
@@ -257,6 +257,7 @@
                             xmlns="http://www.w3.org/2000/svg"
                             [attr.stroke]="'#cccbcc'"
                             [attr.fill]="'#cccbcc'"
+                            (click)="toggleScanner()"
                         >
                             <path
                                 _ngcontent-ng-c955548431=""
@@ -348,3 +349,13 @@
         </footer>
     </div>
 </form>
+
+<div *ngIf="isScannerEnabled">
+    <zxing-scanner
+        #scanner
+        [start]="true"
+        (scanSuccess)="handleQrCodeResult($event)"
+    >
+    </zxing-scanner>
+</div>
+<p *ngIf="qrResult">Result: {{ qrResult }}</p>

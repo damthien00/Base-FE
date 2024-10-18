@@ -21,6 +21,8 @@ import { MenubarModule } from 'primeng/menubar';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { SharedModule } from '../shared/modules/shared.module';
+import { ToastService } from '../core/services/toast.service';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
     declarations: [
@@ -50,5 +52,6 @@ import { SharedModule } from '../shared/modules/shared.module';
         // AppConfigModule
     ],
     exports: [AppLayoutComponent],
+    providers: [MessageService, ToastService],
 })
 export class AppLayoutModule {}

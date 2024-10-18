@@ -24,6 +24,7 @@ export class ActivateWarrantyComponent implements OnInit {
     countries: any[] | undefined;
     filteredCountries: any[] | undefined;
     createActivateWarranty: FormGroup;
+    isSubmitting: boolean = false;
     customers: any;
     userCurrent: any;
     constructor(
@@ -37,7 +38,7 @@ export class ActivateWarrantyComponent implements OnInit {
         private authService: AuthService
     ) {
         this.createActivateWarranty = this.formBuilder.group({
-            branch: [null, [Validators.required]],
+            branch: [null],
             phoneNumber: [
                 null,
                 [Validators.required, Validators.pattern('^\\d{10}$')],
@@ -76,6 +77,9 @@ export class ActivateWarrantyComponent implements OnInit {
     optionsFilterBranch: OptionsFilterBranch = new OptionsFilterBranch();
 
     selectedBranch: any;
+
+    qrResult: string;
+    isScannerEnabled = false;
     // brandIdSelected: any;
     ngOnInit() {
         this.getCitiesByCountry(1);
@@ -163,26 +167,34 @@ export class ActivateWarrantyComponent implements OnInit {
     //     this.listCart = [];
     // }
 
+    toggleScanner() {
+        this.isScannerEnabled = !this.isScannerEnabled;
+    }
+
+    handleQrCodeResult(result: string) {
+        this.qrResult = result;
+        this.isScannerEnabled = false; // Tắt máy quét sau khi quét thành công
+    }
+
     onSearchProductEmei() {
         if (this.keywords) {
-            const keywordsArray = this.keywords.split('-');
-            const FrameNumber = keywordsArray[0]?.trim();
-            const EngineNumber = keywordsArray[1]?.trim();
+            // const keywordsArray = this.keywords.split('-');
+            // const FrameNumber = keywordsArray[0]?.trim();
+            // const EngineNumber = keywordsArray[1]?.trim();
 
-            if (FrameNumber && EngineNumber) {
+            // this.key
+            if (this.keywords) {
                 this.productImeiService
-                    .getProoductByEmei(FrameNumber, EngineNumber)
+                    .getProoductByEmei(this.keywords)
                     .subscribe(
                         (data) => {
                             const product = data?.data;
-                            console.log(product);
 
                             if (product) {
                                 const isProductExists =
                                     this.productListSelected.some(
                                         (p) => p.id === product.id // So sánh theo ID hoặc một thuộc tính duy nhất của sản phẩm
                                     );
-
                                 if (!isProductExists && product.term) {
                                     this.productListSelected.push(product);
                                 } else {
@@ -220,8 +232,6 @@ export class ActivateWarrantyComponent implements OnInit {
     }
 
     getDistrictsByCity(cityId: number) {
-        console.log(cityId);
-
         this.addressService
             .getDistrictsByIdCity(cityId)
             .subscribe((districts) => {
@@ -737,7 +747,9 @@ export class ActivateWarrantyComponent implements OnInit {
 
     onSubmit() {
         console.log(this.createActivateWarranty.value);
-
+        if (this.isSubmitting) {
+            return; // Nếu đang gửi form, chặn không cho gửi tiếp
+        }
         console.log(this.selectedBranch);
         if (this.createActivateWarranty.valid) {
             // Tạo thông tin khách hàng
@@ -760,13 +772,11 @@ export class ActivateWarrantyComponent implements OnInit {
                 .createCustomer(formDataCus)
                 .pipe(
                     switchMap((item) => {
-                        // Lấy ID của khách hàng vừa tạo
                         this.customerId = item.data.id;
-                        // Khởi tạo mảng để lưu tất cả các phiếu bảo hành
                         const allWarranties = [];
-                        // Tạo mảng các observable cho từng sản phẩm, mỗi sản phẩm sẽ có 1 phiếu bảo hành riêng
                         const observables = this.productListSelected.map(
                             (product) => {
+                                console.log(1, product);
                                 // Tạo thông tin bảo hành cho từng sản phẩm
                                 const warrantyProduct = {
                                     productId: product.productId,
@@ -799,12 +809,8 @@ export class ActivateWarrantyComponent implements OnInit {
                                     customerName:
                                         this.createActivateWarranty.value
                                             .customerName || 'string',
-                                    branchId:
-                                        this.createActivateWarranty.value.branch
-                                            .id || 1,
-                                    branchName:
-                                        this.createActivateWarranty.value.branch
-                                            .name || 'Chi nhánh Khoái Châu',
+                                    branchId: product.branchId || 1,
+                                    branchName: product.branchName || '',
                                     phoneNumber:
                                         this.createActivateWarranty.value
                                             .phoneNumber || 'string',
@@ -833,12 +839,18 @@ export class ActivateWarrantyComponent implements OnInit {
                         // Sử dụng forkJoin để gọi song song tất cả các API tạo phiếu bảo hành
                         return forkJoin(observables).pipe(
                             switchMap((responses) => {
-                                const inventoryStockDetailProductImeiIds =
-                                    this.productListSelected.map(
-                                        (product) => product.id
-                                    );
+                                const updateRequests =
+                                    this.productListSelected.map((product) => ({
+                                        inventoryStockDetailProductImeiId:
+                                            product.id, // Lấy id từ danh sách sản phẩm đã chọn
+
+                                        //Để tạm null
+                                        warrantyStartDate: null,
+                                        warrantyEndDate: null,
+                                    }));
+
                                 const formData1 = {
-                                    inventoryStockDetailProductImeiIds,
+                                    updateRequests,
                                 };
                                 // Sau khi tạo phiếu bảo hành, cập nhật trạng thái Purchased cho tất cả sản phẩm
                                 return this.warrantyService.updatePurchased(
@@ -862,9 +874,11 @@ export class ActivateWarrantyComponent implements OnInit {
                 .subscribe(
                     (response) => {
                         // Xử lý thành công
+                        this.isSubmitting = false;
                         this.router.navigate(['/activate-success']);
                     },
                     (error) => {
+                        this.isSubmitting = false;
                         console.error('Error during the process:', error);
                     }
                 );

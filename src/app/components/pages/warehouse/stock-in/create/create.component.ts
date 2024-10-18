@@ -206,7 +206,7 @@ export class CreateComponent implements OnInit {
     async loadProducts() {
         this.optionsFilterProduct.pageIndex = 1;
         this.optionsFilterProduct.pageSize = 100000;
-        
+
         let response = await this.productService.FilterProductView(
             this.optionsFilterProduct
         );
@@ -509,6 +509,8 @@ export class CreateComponent implements OnInit {
         if (this.isValidForm) {
             const products = this.stockInReceipt.inventoryStockInDetails.map(
                 (product) => {
+                    console.log(product);
+                    // let productNomal;
                     const productImeis =
                         product.productImeis?.map((imei) => ({
                             ...imei,
@@ -520,6 +522,18 @@ export class CreateComponent implements OnInit {
                             branchId: this.userCurrent.branchId,
                             branchName: this.userCurrent.branchName,
                         })) || [];
+
+                    // if (product.productType == 0) {
+                    //     productNomal = {
+                    //         branchId: this.userCurrent.branchId,
+                    //         branchName: this.userCurrent.branchName,
+                    //         productId: product.productId,
+                    //         productVariantId: product.productVariantId
+                    //             ? product.productVariantId
+                    //             : 1,
+                    //         quantity: product.quantity,
+                    //     };
+                    // }
                     return {
                         productId: product.productId,
                         productVariantId: product.productVariantId
@@ -535,12 +549,13 @@ export class CreateComponent implements OnInit {
                         totail: product.total,
                         code: 'string',
                         inventoryStockDetailProductImeis: productImeis,
+                        // createProductCodeNomalRequest: productNomal,
                     };
                 }
             );
             const formData = {
-                supplierId: this.supplierSelected.id,
-                supplierName: this.supplierSelected.name,
+                supplierId: this.supplierSelected?.id || null,
+                supplierName: this.supplierSelected?.name || null,
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
                 branchId: this.userCurrent.branchId,
@@ -552,7 +567,6 @@ export class CreateComponent implements OnInit {
                 createName: this.userCurrent.name,
                 inventoryStockInDetails: products,
             };
-            console.log(formData);
 
             this.productService.createStockIn(formData).subscribe(
                 (response) => {

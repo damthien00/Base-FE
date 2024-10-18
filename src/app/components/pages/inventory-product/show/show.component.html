@@ -38,16 +38,17 @@
                                     type="text"
                                     [(ngModel)]="
                                         this.optionsFilterInventoryProduct
-                                            .productVariantName
+                                            .productName
                                     "
-                                    placeholder="Nhập tên sản phẩm/biến thể"
+                                    spellcheck="false"
+                                    placeholder="Nhập tên sản phẩm"
                                     style="width: 350px"
                                     class="sm:"
                                 />
                             </span>
                         </div>
 
-                        <div class="flex flex-column">
+                        <!-- <div class="flex flex-column">
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
@@ -58,7 +59,7 @@
                                     (blur)="checkStartPriceValue()"
                                     [(ngModel)]="
                                         this.optionsFilterInventoryProduct
-                                            .toQuantity
+                                            .fromQuantity
                                     "
                                     mode="decimal"
                                     placeholder="Từ:"
@@ -71,7 +72,7 @@
                                     (blur)="checkEndPriceValue()"
                                     [(ngModel)]="
                                         this.optionsFilterInventoryProduct
-                                            .fromQuantity
+                                            .toQuantity
                                     "
                                     mode="decimal"
                                     placeholder="Đến:"
@@ -80,7 +81,7 @@
                                     [max]="10000000"
                                 />
                             </div>
-                        </div>
+                        </div> -->
                         <div
                             *ngIf="userCurrent.branchId == 1"
                             class="flex flex-column"
@@ -88,16 +89,18 @@
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Tìm kiếm theo chi nhánh:</label
+                                >Chọn chi nhánh:</label
                             >
                             <p-autoComplete
                                 [(ngModel)]="brandIdSelected"
                                 [suggestions]="branchs"
                                 placeholder="Nhập chi nhánh"
                                 [dropdown]="true"
+                                [ngStyle]="{ width: '300px' }"
                                 [forceSelection]="true"
                                 (completeMethod)="searchBranch($event)"
                                 field="name"
+                                [showClear]="true"
                             />
                         </div>
                         <button
@@ -115,6 +118,8 @@
                         <th style="width: 25rem" pSortableColumn="name">
                             Sản phẩm
                         </th>
+                        <th>Kiểu sản phẩm</th>
+                        <th>Đơn vị tính</th>
                         <th>Chi nhánh</th>
                         <th>Tồn kho</th>
                     </tr>
@@ -150,6 +155,7 @@
                         <td>
                             <div>
                                 <img
+                                    *ngIf="product.productImages != null"
                                     [src]="imageUrl + product.productImage"
                                     [alt]="product.productName"
                                     width="50"
@@ -157,7 +163,7 @@
                                     class="shadow-4"
                                 />
                                 <svg
-                                    *ngIf="product.productImages?.length === 0"
+                                    *ngIf="product.productImages == null"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -180,8 +186,16 @@
                                 </svg>
                             </div>
                         </td>
-
                         <td>{{ product.productName }}</td>
+                        <td>
+                            <span *ngIf="product.productType == 0"
+                                >Sản phẩm thường</span
+                            >
+                            <span *ngIf="product.productType == 1"
+                                >Sản phẩm Emei</span
+                            >
+                        </td>
+                        <td>{{ product.unitName }}</td>
                         <td>{{ product.branchName }}</td>
                         <td>{{ product.quantity }}</td>
                     </tr>
@@ -198,8 +212,9 @@
                                         <tr>
                                             <th pSortableColumn="id">Ảnh</th>
                                             <th pSortableColumn="customer">
-                                                Phiên bản
+                                                Phiên bản sản phẩm
                                             </th>
+                                            <th>Đơn vị</th>
                                             <th pSortableColumn="date">
                                                 Tồn kho
                                             </th>
@@ -255,11 +270,16 @@
                                                         style="font-size: 15px"
                                                     >
                                                         {{
+                                                            product.productName +
+                                                                "-"
+                                                        }}
+                                                        {{
                                                             variant.productVariantName
                                                         }}
                                                     </h6>
                                                 </div>
                                             </td>
+                                            <td>{{ variant.unitName }}</td>
                                             <td>{{ variant.quantity }}</td>
                                         </tr>
                                     </ng-template>

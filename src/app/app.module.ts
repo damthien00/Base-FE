@@ -17,9 +17,12 @@ import { NodeService } from './core/services/node.service';
 import { PhotoService } from './core/services/photo.service';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthenticationMiddlewareService } from 'src/app/core/interceptors/token.interceptor';
+import { MessageService } from 'primeng/api';
+import { ToastService } from './core/services/toast.service';
+import { SharedModule } from './shared/modules/shared.module';
 @NgModule({
     declarations: [AppComponent, NotfoundComponent],
-    imports: [AppRoutingModule, AppLayoutModule],
+    imports: [AppRoutingModule, AppLayoutModule, SharedModule],
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         CountryService,
@@ -29,6 +32,8 @@ import { AuthenticationMiddlewareService } from 'src/app/core/interceptors/token
         NodeService,
         PhotoService,
         ProductService,
+        MessageService,
+        ToastService,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthenticationMiddlewareService,
