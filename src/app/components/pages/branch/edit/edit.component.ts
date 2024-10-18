@@ -14,6 +14,8 @@ import { BranchService } from 'src/app/core/services/branch.service';
 import { ValidationService } from 'src/app/core/utils/validation.utils';
 import { MessageService } from 'primeng/api';
 import { dE } from '@fullcalendar/core/internal-common';
+import { catchError, of } from 'rxjs';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
     selector: 'app-edit',
@@ -83,7 +85,8 @@ export class EditComponent implements OnInit {
         private validationService: ValidationService,
         private addressService: AddressService,
         private branchService: BranchService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private toastService: ToastService
     ) {
         console.log(this.branch);
         this.updateBranchForm = this.formBuilder.group({
@@ -197,23 +200,35 @@ export class EditComponent implements OnInit {
                 wardName: this.updateBranchForm.value.wardID.name,
                 isActive: this.updateBranchForm.value.isActive ? 1 : 0,
             };
-            console.log(formData);
-            this.branchService.updateBranch(formData).subscribe(
-                (response) => {
-                    this.displayModal = false;
-                    this.updateBranchForm.reset();
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Thành công',
-                        detail: 'Sửa chi nhánh thành công',
-                    });
-                    this.loadBranchs.emit();
-                },
-                (error) => {
-                    // Xử lý khi lỗi
-                    console.error('Error creating branch:', error);
-                }
-            );
+            this.branchService
+                .updateBranch(formData)
+                .pipe(
+                    catchError((error) => {
+                        if (error.status === 403) {
+                            this.toastService.showError(
+                                'Chú ý',
+                                'Bạn không có quyền truy cập!'
+                            );
+                        }
+                        return of(null); // Trả về giá trị null để tiếp tục dòng chảy của Observable
+                    })
+                )
+                .subscribe(
+                    (response) => {
+                        this.displayModal = false;
+                        this.updateBranchForm.reset();
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Thành công',
+                            detail: 'Sửa chi nhánh thành công',
+                        });
+                        this.loadBranchs.emit();
+                    },
+                    (error) => {
+                        // Xử lý khi lỗi
+                        console.error('Error creating branch:', error);
+                    }
+                );
         } else {
             this.updateBranchForm.markAllAsTouched();
         }

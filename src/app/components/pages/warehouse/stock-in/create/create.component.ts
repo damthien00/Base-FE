@@ -149,11 +149,13 @@ export class CreateComponent implements OnInit {
                         productId: response.data[0].id,
                         productImage: response.data[0].productImages[0].link,
                         productVariantId: 215,
-                        productName: `${response.data[0].name}${'-' +
+                        productName: `${response.data[0].name}${
+                            '-' +
                             response.data[0].productVariants[0].valuePropeties1
-                            }${'-' +
+                        }${
+                            '-' +
                             response.data[0].productVariants[0].valuePropeties2
-                            }`,
+                        }`,
                         productType: response.data[0].productType,
                         quantity: 1,
                         productCode: response.data[0].productVariants[0].code,
@@ -509,6 +511,8 @@ export class CreateComponent implements OnInit {
         if (this.isValidForm) {
             const products = this.stockInReceipt.inventoryStockInDetails.map(
                 (product) => {
+                    console.log(product);
+                    // let productNomal;
                     const productImeis =
                         product.productImeis?.map((imei) => ({
                             ...imei,
@@ -521,13 +525,17 @@ export class CreateComponent implements OnInit {
                             branchName: this.userCurrent.branchName,
                         })) || [];
 
-                    const createProductCodeNomalRequests = [{
-                        branchId: this.userCurrent.branchId,
-                        branchName: this.userCurrent.branchName,
-                        productId: product.productId,
-                        productVariantId: product.productVariantId ? product.productVariantId : 1,
-                        quantity: product.quantity,
-                    }];
+                    const createProductCodeNomalRequests = [
+                        {
+                            branchId: this.userCurrent.branchId,
+                            branchName: this.userCurrent.branchName,
+                            productId: product.productId,
+                            productVariantId: product.productVariantId
+                                ? product.productVariantId
+                                : 1,
+                            quantity: product.quantity,
+                        },
+                    ];
 
                     return {
                         productId: product.productId,
@@ -544,14 +552,14 @@ export class CreateComponent implements OnInit {
                         totail: product.total,
                         code: 'string',
                         inventoryStockDetailProductImeis: productImeis,
-                        createProductCodeNomalRequests
+                        createProductCodeNomalRequests,
                     };
                 }
             );
 
             const formData = {
-                supplierId: this.supplierSelected.id,
-                supplierName: this.supplierSelected.name,
+                supplierId: this.supplierSelected?.id || null,
+                supplierName: this.supplierSelected?.name || null,
                 subQuantity: this.stockInReceipt.inventoryStockInDetails.length,
                 totalDiscount: this.stockInReceipt.totalDiscountAmount,
                 branchId: this.userCurrent.branchId,
@@ -562,9 +570,7 @@ export class CreateComponent implements OnInit {
                 note: this.stockInReceipt.note,
                 // createName: this.userCurrent.name,
                 inventoryStockInDetails: products,
-
             };
-            console.log(formData);
 
             this.productService.createStockIn(formData).subscribe(
                 (response) => {

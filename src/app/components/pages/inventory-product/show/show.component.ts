@@ -96,6 +96,23 @@ export class ShowComponent implements OnInit {
         ];
 
         this.loadBranchs();
+        console.log(this.branchs);
+        const branch = this.branchs.find(
+            (branch) => branch.id === this.userCurrent.branchId
+        );
+        console.log(branch);
+
+        if (branch) {
+            console.log(branch);
+
+            this.brandIdSelected = branch;
+        } else {
+            console.log('');
+        }
+
+        //  || this.brandIdSelected;
+        this.loadProduct();
+
         // this.loading = true;
         // let response = await this.productService.FilterProduct(
         //     this.optionsFillerProduct
@@ -109,16 +126,6 @@ export class ShowComponent implements OnInit {
         // console.log(b);
 
         // this.brandIdSelected = this.userCurrent.branchId;
-        const branch = this.branchs.find(
-            (branch) => branch.id === this.userCurrent.branchId
-        );
-
-        if (branch) {
-            this.brandIdSelected = branch;
-        } else {
-        }
-
-        this.loadProduct();
     }
 
     loadBranchs() {
@@ -126,6 +133,7 @@ export class ShowComponent implements OnInit {
             .getBranchs(this.optionsFilterBranch)
             .subscribe((data) => {
                 this.branchs = data.data.items;
+                // this.branchs.unshift({ name: 'Chọn chi nhánh', id: 'null' });
             });
     }
 
@@ -140,7 +148,6 @@ export class ShowComponent implements OnInit {
             .subscribe((response) => {
                 this.products = response.data.items;
                 this.totalRecordsCount = response.data.totalRecords;
-                console.log(this.product);
             });
     }
 

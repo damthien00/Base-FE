@@ -13,6 +13,8 @@ import { DropdownFilterOptions } from 'primeng/dropdown';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { ValidationService } from 'src/app/core/utils/validation.utils';
 import { MessageService } from 'primeng/api';
+import { catchError, of } from 'rxjs';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
     selector: 'app-create',
@@ -49,7 +51,8 @@ export class CreateComponent implements OnInit {
         private validationService: ValidationService,
         private addressService: AddressService,
         private branchService: BranchService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private toastService: ToastService
     ) {
         this.createBranchForm = this.formBuilder.group({
             name: [null, [Validators.required]],
@@ -144,7 +147,6 @@ export class CreateComponent implements OnInit {
 
     onSubmit() {
         if (this.createBranchForm.valid) {
-            console.log(this.createBranchForm.value);
             const formData = {
                 name: this.createBranchForm.value.name,
                 phoneNumber: this.createBranchForm.value.phoneNumber,
@@ -158,22 +160,37 @@ export class CreateComponent implements OnInit {
                 wardName: this.createBranchForm.value.wardID.name,
                 isActive: this.createBranchForm.value.isActive ? 1 : 0,
             };
-            this.branchService.createBranch(formData).subscribe(
-                (response) => {
-                    this.displayModal = false;
-                    this.createBranchForm.reset();
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Thành công',
-                        detail: 'Thêm chi nhánh thành công',
-                    });
-                    this.loadBranchs.emit();
-                },
-                (error) => {
-                    // Xử lý khi lỗi
-                    console.error('Error creating branch:', error);
-                }
-            );
+            this.branchService
+                .createBranch(formData)
+                .pipe(
+                    catchError((error) => {
+                        if (error.status === 403) {
+                            // alert('Bạn không có quyền truy cập tài nguyên này.');
+
+                            this.toastService.showError(
+                                'Chú ý',
+                                'Bạn không có quyền truy cập!'
+                            );
+                        }
+                        return of(null); // Trả về giá trị null để tiếp tục dòng chảy của Observable
+                    })
+                )
+                .subscribe(
+                    (response) => {
+                        this.displayModal = false;
+                        this.createBranchForm.reset();
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Thành công',
+                            detail: 'Thêm chi nhánh thành công',
+                        });
+                        this.loadBranchs.emit();
+                    },
+                    (error) => {
+                        // Xử lý khi lỗi
+                        console.error('Error creating branch:', error);
+                    }
+                );
         } else {
             this.createBranchForm.markAllAsTouched();
         }

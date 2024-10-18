@@ -15,13 +15,15 @@ import { OptionsFilterCommodities } from 'src/app/core/models/option-filter-comm
 import { BranchService } from 'src/app/core/services/branch.service';
 import { RoleService } from 'src/app/core/services/role.service';
 import { AddressService } from 'src/app/core/services/address.service';
-import { forkJoin } from 'rxjs';
-import { MenuItem } from 'primeng/api';
+import { catchError, forkJoin, of } from 'rxjs';
+import { MenuItem, MessageService } from 'primeng/api';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
     selector: 'app-user',
     templateUrl: './user.component.html',
     styleUrl: './user.component.scss',
+    providers: [MessageService],
 })
 export class UserComponent implements OnInit {
     filterForm!: FormGroup;
@@ -68,7 +70,8 @@ export class UserComponent implements OnInit {
     initialPhoneNumber: string = '';
     initialEmail: string = '';
 
-    optionsFilterCommodities: OptionsFilterCommodities = new OptionsFilterCommodities();
+    optionsFilterCommodities: OptionsFilterCommodities =
+        new OptionsFilterCommodities();
 
     autoCompleteCustomer: any;
     autoCompleteEmployeeDraw: any;
@@ -98,7 +101,6 @@ export class UserComponent implements OnInit {
     showDialog3 = false;
     rolesError: boolean = false;
     items: MenuItem[] | undefined;
-    
 
     formatdate: string = 'dd/mm/yy';
     autoCompleteSubject: any;
@@ -110,33 +112,50 @@ export class UserComponent implements OnInit {
         private branchService: BranchService,
         private roleService: RoleService,
         private addressService: AddressService,
+        private messageService: MessageService,
+        private toastService: ToastService,
         private router: Router,
         private fb: FormBuilder
     ) {
         this.RoleGroupForm = this.fb.group({
-            name: ['', Validators.compose([
-                Validators.required,
-                Validators.minLength(6),
-                Validators.maxLength(100),
-                this.noWhitespaceValidator
-            ])],
-            phoneNumber: ['', [Validators.required, this.noWhitespaceValidator,
-            Validators.minLength(10),
-            Validators.maxLength(10),]],
+            name: [
+                '',
+                Validators.compose([
+                    Validators.required,
+                    Validators.minLength(6),
+                    Validators.maxLength(100),
+                    this.noWhitespaceValidator,
+                ]),
+            ],
+            phoneNumber: [
+                '',
+                [
+                    Validators.required,
+                    this.noWhitespaceValidator,
+                    Validators.minLength(10),
+                    Validators.maxLength(10),
+                ],
+            ],
             branchId: [null, Validators.required],
             roles: [[], Validators.required],
             branchName: [null, Validators.required],
-            email: ['', Validators.compose([
-                Validators.required,
-                Validators.email,
-                this.noWhitespaceValidator
-            ])],
-            password: ['', Validators.compose([
-                Validators.required,
-                Validators.minLength(6),
-                Validators.maxLength(100),
-                this.noWhitespaceValidator
-            ])],
+            email: [
+                '',
+                Validators.compose([
+                    Validators.required,
+                    Validators.email,
+                    this.noWhitespaceValidator,
+                ]),
+            ],
+            password: [
+                '',
+                Validators.compose([
+                    Validators.required,
+                    Validators.minLength(6),
+                    Validators.maxLength(100),
+                    this.noWhitespaceValidator,
+                ]),
+            ],
             address: [null, Validators.required],
             wardId: [null],
             cityId: [null],
@@ -144,30 +163,45 @@ export class UserComponent implements OnInit {
         });
         this.RoleGroupForm2 = this.fb.group({
             id: [''],
-            name: ['', Validators.compose([
-                Validators.required,
-                Validators.minLength(6),
-                Validators.maxLength(100),
-                this.noWhitespaceValidator
-            ])],
-            phoneNumber: ['', [Validators.required, this.noWhitespaceValidator,
-            Validators.minLength(10),
-            Validators.maxLength(10),]],
+            name: [
+                '',
+                Validators.compose([
+                    Validators.required,
+                    Validators.minLength(6),
+                    Validators.maxLength(100),
+                    this.noWhitespaceValidator,
+                ]),
+            ],
+            phoneNumber: [
+                '',
+                [
+                    Validators.required,
+                    this.noWhitespaceValidator,
+                    Validators.minLength(10),
+                    Validators.maxLength(10),
+                ],
+            ],
             branchId: [null, Validators.required],
             roles: [[], Validators.required],
             branchName: [null, Validators.required],
-            email: ['', Validators.compose([
-                Validators.required,
-                Validators.minLength(6),
-                Validators.maxLength(100),
-                this.noWhitespaceValidator
-            ])],
-            password: ['', Validators.compose([
-                Validators.required,
-                Validators.minLength(6),
-                Validators.maxLength(100),
-                this.noWhitespaceValidator
-            ])],
+            email: [
+                '',
+                Validators.compose([
+                    Validators.required,
+                    Validators.minLength(6),
+                    Validators.maxLength(100),
+                    this.noWhitespaceValidator,
+                ]),
+            ],
+            password: [
+                '',
+                Validators.compose([
+                    Validators.required,
+                    Validators.minLength(6),
+                    Validators.maxLength(100),
+                    this.noWhitespaceValidator,
+                ]),
+            ],
             address: [null, Validators.required],
             wardId: [null],
             cityId: [null],
@@ -204,14 +238,16 @@ export class UserComponent implements OnInit {
 
     checkRolesSelection2() {
         // Kiểm tra nếu trường chưa có giá trị
-        if (!this.rolesControl2?.value || this.rolesControl2.value.length === 0) {
+        if (
+            !this.rolesControl2?.value ||
+            this.rolesControl2.value.length === 0
+        ) {
             this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
             this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
         } else {
             this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
         }
     }
-
 
     get username() {
         return this.RoleGroupForm.get('username');
@@ -221,8 +257,8 @@ export class UserComponent implements OnInit {
         this.items = [
             { icon: 'pi pi-home', route: '/installation' },
             { label: 'Quản trị hệ thống' },
-            { label: 'Quản lý tài khoản' }
-          ];
+            { label: 'Quản lý tài khoản' },
+        ];
         this.getCitiesByCountry(1);
         this.Filters();
         this.getAllFilterRole();
@@ -237,18 +273,22 @@ export class UserComponent implements OnInit {
     }
 
     getAllFilterRole(): void {
-        this.roleService.getRoleAll(this.PageSize, this.PageIndex).subscribe((response: any) => {
-          this.Roles = response.data.items;
-      
-          // Check if the "Employee" role with ID 8 exists
-          const employeeRole = this.Roles.find(role => role.id === 8 && role.name === 'Employee');
-          
-          if (employeeRole) {
-            // If found, pre-select the Employee role
-            this.RoleGroupForm.get('roles').setValue([employeeRole]);  // Set as selected in the form control
-          }
-        });
-      }
+        this.roleService
+            .getRoleAll(this.PageSize, this.PageIndex)
+            .subscribe((response: any) => {
+                this.Roles = response.data.items;
+
+                // Check if the "Employee" role with ID 8 exists
+                const employeeRole = this.Roles.find(
+                    (role) => role.id === 8 && role.name === 'Employee'
+                );
+
+                if (employeeRole) {
+                    // If found, pre-select the Employee role
+                    this.RoleGroupForm.get('roles').setValue([employeeRole]); // Set as selected in the form control
+                }
+            });
+    }
 
     // getAllFilterRole3(): void {
     //     this.roleService.getRoleAll(this.PageSize2, this.PageIndex2).subscribe((response: any) => {
@@ -257,23 +297,26 @@ export class UserComponent implements OnInit {
     // }
 
     getCitiesByCountry(countryId: number) {
-        this.addressService.getCitiesByIdCountry(countryId)
-            .subscribe(cities => {
+        this.addressService
+            .getCitiesByIdCountry(countryId)
+            .subscribe((cities) => {
                 this.cities = cities.data;
                 //console.log(cities)
             });
     }
 
     getDistrictsByCity(cityId: number) {
-        this.addressService.getDistrictsByIdCity(cityId)
-            .subscribe(districts => {
+        this.addressService
+            .getDistrictsByIdCity(cityId)
+            .subscribe((districts) => {
                 this.districts = districts.data;
             });
     }
 
     getWardsByDistrict(districtId: number) {
-        this.addressService.getWardsByIdDistrict(districtId)
-            .subscribe(wards => {
+        this.addressService
+            .getWardsByIdDistrict(districtId)
+            .subscribe((wards) => {
                 this.wards = wards.data;
             });
     }
@@ -314,25 +357,47 @@ export class UserComponent implements OnInit {
         this.RoleGroupForm.get('wardId')?.setValue(null);
     }
 
-
     Filters(): void {
         //debugger
-        this.usersService.getFilters(this.PageSize, this.PageIndex, this.Name, this.PhoneNumber, this.Address)
+        this.usersService
+            .getFilters(
+                this.PageSize,
+                this.PageIndex,
+                this.Name,
+                this.PhoneNumber,
+                this.Address
+            )
+            // .pipe(
+            //     catchError((error) => {
+            //         if (error.status === 403) {
+            //             // alert('Bạn không có quyền truy cập tài nguyên này.');
+
+            //             this.toastService.showError(
+            //                 'Chú ý',
+            //                 'Bạn không có quyền truy cập!'
+            //             );
+            //         }
+            //         return of(null); // Trả về giá trị null để tiếp tục dòng chảy của Observable
+            //     })
+            // )
             .subscribe(
-                response => {
+                (response) => {
                     this.users = response.data.items;
                     this.totalRecords = response.data.totalRecords;
                     this.updateCurrentPageReport();
-                    //console.log(this.users)
                 },
-                error => {
+                (error) => {
                     console.error('Error fetching filtered customers:', error);
                 }
             );
     }
 
     clickButtonFilter() {
-        if (this.selectedName || this.selectedPhoneNumber || this.selectedAddress) {
+        if (
+            this.selectedName ||
+            this.selectedPhoneNumber ||
+            this.selectedAddress
+        ) {
             this.Name = this.selectedName?.trim();
             this.PhoneNumber = this.selectedPhoneNumber?.trim();
             this.Address = this.selectedAddress?.trim();
@@ -375,7 +440,6 @@ export class UserComponent implements OnInit {
     onInputChange(event: any) {
         const input = event.target;
         let trimmedValue = input.value.trim();
-
         if (trimmedValue.length > this.maxLength) {
             input.value = trimmedValue.substring(0, this.maxLength);
         }
@@ -476,18 +540,22 @@ export class UserComponent implements OnInit {
     }
 
     getAllFilterRole2(): void {
-        this.roleService.getRoleAll(this.PageSize2, this.PageIndex2).subscribe((response: any) => {
-            this.Roles2 = response.data.items.map((role: any) => ({
-                label: role.name,  // Tên của role
-                value: role.id,
-                normalizedName: role.normalizedName    // Giá trị là ID của role
-            }));
-        });
+        this.roleService
+            .getRoleAll(this.PageSize2, this.PageIndex2)
+            .subscribe((response: any) => {
+                this.Roles2 = response.data.items.map((role: any) => ({
+                    label: role.name, // Tên của role
+                    value: role.id,
+                    normalizedName: role.normalizedName, // Giá trị là ID của role
+                }));
+            });
     }
 
     maskPassword(password: string): string {
         // Nếu password quá dài, chỉ lấy 8 dấu sao
-        return password.length > 8 ? '*******************' : '*******************'.slice(0, password.length);
+        return password.length > 8
+            ? '*******************'
+            : '*******************'.slice(0, password.length);
     }
 
     openDialog2(userId: number): void {
@@ -498,11 +566,14 @@ export class UserComponent implements OnInit {
                 this.employessById = response.data;
                 this.getDistrictsByCity(this.employessById.cityId);
                 this.getWardsByDistrict(this.employessById.districtId);
-                const userRoleIds = this.employessById.roles.map((role: any) => role.id);
+                const userRoleIds = this.employessById.roles.map(
+                    (role: any) => role.id
+                );
                 this.passwordHash = this.employessById.passwordHash;
                 this.showDialog2 = true;
                 if (this.employessById.phoneNumber !== null) {
-                    const phonNumberTrim = this.employessById.phoneNumber.trim();
+                    const phonNumberTrim =
+                        this.employessById.phoneNumber.trim();
                     this.employessById.phoneNumber = phonNumberTrim;
                 }
                 this.RoleGroupForm2.patchValue({
@@ -521,14 +592,14 @@ export class UserComponent implements OnInit {
                     wardId: this.employessById.wardId,
                     wardName: this.employessById.wardName,
                     // branchGroup: this.branch.find(branch => branch.id === this.employessById.branchId),
-                    roles: userRoleIds
+                    roles: userRoleIds,
                 });
 
                 this.initialPhoneNumber = this.employessById.phoneNumber;
                 this.initialEmail = this.employessById.email;
             },
-            error => {
-                console.error("Error:", error);
+            (error) => {
+                console.error('Error:', error);
             }
         );
     }
@@ -610,24 +681,34 @@ export class UserComponent implements OnInit {
         const formValues = this.RoleGroupForm.value;
 
         // Gọi service để kiểm tra sự tồn tại của người dùng
-        this.usersService.checkUserExists(formValues.phoneNumber, formValues.email).subscribe(response => {
-            if (response.data === true) {
-                // Người dùng tồn tại, hiển thị thông báo lỗi
-                // this.messages.add({ severity: 'error', summary: 'Lỗi', detail: 'Số điện thoại hoặc email đã tồn tại!' });
-                this.messages = [{
-                    severity: 'warn',
-                    summary: 'Lỗi',
-                    detail: 'Số điện thoại hoặc email đã tồn tại!',
-                    life: 3000
-                }];
-            } else {
-                // Người dùng không tồn tại, gọi hàm onSubmit để tiếp tục
-                this.onSubmit();
-            }
-        }, error => {
-            // Xử lý lỗi khi gọi API
-            console.error('Có lỗi xảy ra khi kiểm tra tồn tại người dùng', error);
-        });
+        this.usersService
+            .checkUserExists(formValues.phoneNumber, formValues.email)
+            .subscribe(
+                (response) => {
+                    if (response.data === true) {
+                        // Người dùng tồn tại, hiển thị thông báo lỗi
+                        // this.messages.add({ severity: 'error', summary: 'Lỗi', detail: 'Số điện thoại hoặc email đã tồn tại!' });
+                        this.messages = [
+                            {
+                                severity: 'warn',
+                                summary: 'Lỗi',
+                                detail: 'Số điện thoại hoặc email đã tồn tại!',
+                                life: 3000,
+                            },
+                        ];
+                    } else {
+                        // Người dùng không tồn tại, gọi hàm onSubmit để tiếp tục
+                        this.onSubmit();
+                    }
+                },
+                (error) => {
+                    // Xử lý lỗi khi gọi API
+                    console.error(
+                        'Có lỗi xảy ra khi kiểm tra tồn tại người dùng',
+                        error
+                    );
+                }
+            );
     }
 
     onPageChange(event: any): void {
@@ -659,7 +740,6 @@ export class UserComponent implements OnInit {
         this.currentPageReport = `<strong>${startRecord}</strong> - <strong>${endRecord}</strong> trong <strong>${this.totalRecords}</strong> bản ghi`;
     }
 
-
     async onSubmit() {
         if (this.savingInProgress) {
             return;
@@ -678,11 +758,14 @@ export class UserComponent implements OnInit {
             this.rolesControl.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
         }
 
-        if (this.emailControl.invalid && this.emailControl.touched && this.emailControl.value) {
+        if (
+            this.emailControl.invalid &&
+            this.emailControl.touched &&
+            this.emailControl.value
+        ) {
             this.showNameError6 = true;
             hasError = true;
         }
-
 
         if (!formValues.name || formValues.name.length === 0) {
             this.showNameError = true;
@@ -714,62 +797,90 @@ export class UserComponent implements OnInit {
         // }
 
         if (hasError) {
-            this.messages = [{
-                severity: 'error',
-                summary: 'Không thể lưu vì:',
-                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-                life: 5000
-            }];
+            this.messages = [
+                {
+                    severity: 'error',
+                    summary: 'Không thể lưu vì:',
+                    detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                    life: 5000,
+                },
+            ];
             this.isSubmitting = false;
-            return
+            return;
         }
         try {
             this.savingInProgress = true;
-            const selectedCity = this.cities.find(city => city.id === formValues.cityId)?.name || '';
-            const selectedDistrict = this.districts.find(district => district.id === formValues.districtId)?.name || '';
-            const selectedWard = this.wards.find(ward => ward.id === formValues.wardId)?.name || '';
+            const selectedCity =
+                this.cities.find((city) => city.id === formValues.cityId)
+                    ?.name || '';
+            const selectedDistrict =
+                this.districts.find(
+                    (district) => district.id === formValues.districtId
+                )?.name || '';
+            const selectedWard =
+                this.wards.find((ward) => ward.id === formValues.wardId)
+                    ?.name || '';
 
             // Tạo chuỗi địa chỉ bằng cách nối các giá trị lại với nhau
-            const address = `${selectedCity} - ${selectedDistrict} - ${selectedWard}`.trim();
+            const address =
+                `${selectedCity} - ${selectedDistrict} - ${selectedWard}`.trim();
 
             const userData = {
                 name: formValues.name,
                 branchId: formValues.branchId,
-                branchName: this.branch.find(branch => branch.id === formValues.branchId)?.name || '',
+                branchName:
+                    this.branch.find(
+                        (branch) => branch.id === formValues.branchId
+                    )?.name || '',
                 email: formValues.email,
                 phoneNumber: formValues.phoneNumber,
                 password: formValues.password,
                 address: address,
-                status: true,  // Hoặc giá trị khác nếu cần
+                status: true, // Hoặc giá trị khác nếu cần
                 cityId: formValues.cityId,
-                cityName: this.cities.find(cities => cities.id === formValues.cityId)?.name || '',
+                cityName:
+                    this.cities.find(
+                        (cities) => cities.id === formValues.cityId
+                    )?.name || '',
                 districtId: formValues.districtId,
-                districtName: this.districts.find(districts => districts.id === formValues.districtId)?.name || '',
+                districtName:
+                    this.districts.find(
+                        (districts) => districts.id === formValues.districtId
+                    )?.name || '',
                 wardId: formValues.wardId,
-                wardName: this.wards.find(wards => wards.id === formValues.wardId)?.name || '',
-                roles: formValues.roles.map(role => role.normalizedName)
+                wardName:
+                    this.wards.find((wards) => wards.id === formValues.wardId)
+                        ?.name || '',
+                roles: formValues.roles.map((role) => role.normalizedName),
             };
 
             // Gửi yêu cầu tới API để thêm người dùng
-            this.usersService.createUser(userData).subscribe(response => {
-                console.log('Người dùng đã được tạo thành công', response);
-                this.messages = [{
-                    severity: 'success',
-                    summary: 'Thành công',
-                    detail: 'Khách hàng đã được thêm thành công',
-                    life: 3000
-                }];
-                this.closeDialog();  // Đóng dialog sau khi thêm thành công              
-            }, error => {
-                console.error('Có lỗi xảy ra khi thêm người dùng', error);
-            });
+            this.usersService.createUser(userData).subscribe(
+                (response) => {
+                    console.log('Người dùng đã được tạo thành công', response);
+                    this.messages = [
+                        {
+                            severity: 'success',
+                            summary: 'Thành công',
+                            detail: 'Khách hàng đã được thêm thành công',
+                            life: 3000,
+                        },
+                    ];
+                    this.closeDialog(); // Đóng dialog sau khi thêm thành công
+                },
+                (error) => {
+                    console.error('Có lỗi xảy ra khi thêm người dùng', error);
+                }
+            );
         } catch (error) {
-            this.messages = [{
-                severity: 'error',
-                summary: 'Không thể lưu vì:',
-                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-                life: 3000
-            }];
+            this.messages = [
+                {
+                    severity: 'error',
+                    summary: 'Không thể lưu vì:',
+                    detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                    life: 3000,
+                },
+            ];
             // this.filterCustomers();
         } finally {
             this.savingInProgress = false;
@@ -779,31 +890,44 @@ export class UserComponent implements OnInit {
     checkUserExistsAndSubmit2() {
         const formValues = this.RoleGroupForm2.value;
 
-        if (formValues.phoneNumber === this.initialPhoneNumber || formValues.email === this.initialEmail) {
+        if (
+            formValues.phoneNumber === this.initialPhoneNumber ||
+            formValues.email === this.initialEmail
+        ) {
             // Nếu không thay đổi, gọi hàm onSubmit để tiếp tục
             this.onUpdateSubmit();
             return;
         }
 
         // Gọi service để kiểm tra sự tồn tại của người dùng
-        this.usersService.checkUserExists(formValues.phoneNumber, formValues.email).subscribe(response => {
-            if (response.data === true) {
-                // Người dùng tồn tại, hiển thị thông báo lỗi
-                // this.messages.add({ severity: 'error', summary: 'Lỗi', detail: 'Số điện thoại hoặc email đã tồn tại!' });
-                this.messages = [{
-                    severity: 'warn',
-                    summary: 'Lỗi',
-                    detail: 'Số điện thoại hoặc email đã tồn tại!',
-                    life: 3000
-                }];
-            } else {
-                // Người dùng không tồn tại, gọi hàm onSubmit để tiếp tục
-                this.onUpdateSubmit();
-            }
-        }, error => {
-            // Xử lý lỗi khi gọi API
-            console.error('Có lỗi xảy ra khi kiểm tra tồn tại người dùng', error);
-        });
+        this.usersService
+            .checkUserExists(formValues.phoneNumber, formValues.email)
+            .subscribe(
+                (response) => {
+                    if (response.data === true) {
+                        // Người dùng tồn tại, hiển thị thông báo lỗi
+                        // this.messages.add({ severity: 'error', summary: 'Lỗi', detail: 'Số điện thoại hoặc email đã tồn tại!' });
+                        this.messages = [
+                            {
+                                severity: 'warn',
+                                summary: 'Lỗi',
+                                detail: 'Số điện thoại hoặc email đã tồn tại!',
+                                life: 3000,
+                            },
+                        ];
+                    } else {
+                        // Người dùng không tồn tại, gọi hàm onSubmit để tiếp tục
+                        this.onUpdateSubmit();
+                    }
+                },
+                (error) => {
+                    // Xử lý lỗi khi gọi API
+                    console.error(
+                        'Có lỗi xảy ra khi kiểm tra tồn tại người dùng',
+                        error
+                    );
+                }
+            );
     }
 
     async onUpdateSubmit() {
@@ -816,7 +940,10 @@ export class UserComponent implements OnInit {
 
         let hasError = false;
 
-        if (!this.rolesControl2?.value || this.rolesControl2.value.length === 0) {
+        if (
+            !this.rolesControl2?.value ||
+            this.rolesControl2.value.length === 0
+        ) {
             this.rolesControl2.setErrors({ required: true }); // Đặt lỗi required
             this.rolesControl2.markAsTouched(); // Đánh dấu trường là touched
             hasError = true;
@@ -824,11 +951,14 @@ export class UserComponent implements OnInit {
             this.rolesControl2.setErrors(null); // Xóa lỗi nếu đã chọn giá trị
         }
 
-        if (this.emailControl.invalid && this.emailControl.touched && this.emailControl.value) {
+        if (
+            this.emailControl.invalid &&
+            this.emailControl.touched &&
+            this.emailControl.value
+        ) {
             this.showNameError6 = true;
             hasError = true;
         }
-
 
         if (!formValues.name || formValues.name.length === 0) {
             this.showNameError = true;
@@ -856,26 +986,36 @@ export class UserComponent implements OnInit {
         }
 
         if (hasError) {
-            this.messages = [{
-                severity: 'error',
-                summary: 'Không thể lưu vì:',
-                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-                life: 5000
-            }];
+            this.messages = [
+                {
+                    severity: 'error',
+                    summary: 'Không thể lưu vì:',
+                    detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                    life: 5000,
+                },
+            ];
             this.isSubmitting = false;
-            return
+            return;
         }
 
-        const selectedBranch = this.branch.find(branch => branch.id === formValues.branchId);
+        const selectedBranch = this.branch.find(
+            (branch) => branch.id === formValues.branchId
+        );
         const branchName = selectedBranch ? selectedBranch.name : '';
 
-        const selectedCity = this.cities.find((city: any) => city.id === formValues.cityId);
+        const selectedCity = this.cities.find(
+            (city: any) => city.id === formValues.cityId
+        );
         const cityName = selectedCity ? selectedCity.name : '';
 
-        const selectedDistrict = this.districts.find((dis: any) => dis.id === formValues.districtId);
+        const selectedDistrict = this.districts.find(
+            (dis: any) => dis.id === formValues.districtId
+        );
         const districName = selectedDistrict ? selectedDistrict.name : '';
 
-        const selectedWard = this.wards.find((war: any) => war.id === formValues.wardId);
+        const selectedWard = this.wards.find(
+            (war: any) => war.id === formValues.wardId
+        );
         const districWard = selectedWard ? selectedWard.name : '';
 
         const address = `${districWard} - ${districName} - ${cityName}`.trim();
@@ -897,48 +1037,55 @@ export class UserComponent implements OnInit {
             wardName: districWard,
         };
 
-        const roleNames = this.RoleGroupForm2.value.roles.map((roleId: number) => {
-            const role = this.Roles2.find((r: any) => r.value === roleId);
-            return role ? role.normalizedName : null;  // Use normalizedName instead of label
-        }).filter((roleName: string) => roleName !== null);
-        
+        const roleNames = this.RoleGroupForm2.value.roles
+            .map((roleId: number) => {
+                const role = this.Roles2.find((r: any) => r.value === roleId);
+                return role ? role.normalizedName : null; // Use normalizedName instead of label
+            })
+            .filter((roleName: string) => roleName !== null);
+
         const assignRolesData = {
             userId: this.RoleGroupForm2.value.id,
-            roleNames: roleNames  // Now uses normalizedName
+            roleNames: roleNames, // Now uses normalizedName
         };
-        
 
         try {
             this.savingInProgress = true;
-            const RoleResponse = this.usersService.assignRolesToUser(assignRolesData);
+            const RoleResponse =
+                this.usersService.assignRolesToUser(assignRolesData);
             const updateResponse = this.usersService.updateUser(userInfo);
             forkJoin([RoleResponse, updateResponse]).subscribe(
                 ([RoleResponse, updateResponse]) => {
-                    console.log('Cập nhật thông tin người dùng thành công:', RoleResponse);
+                    console.log(
+                        'Cập nhật thông tin người dùng thành công:',
+                        RoleResponse
+                    );
                     console.log('Gán nhóm quyền thành công:', updateResponse);
-                    this.messages = [{
-                        severity: 'success',
-                        summary: 'Thành công',
-                        detail: 'Tài khoản đã được cập nhật thành công',
-                        life: 3000
-                    }];
+                    this.messages = [
+                        {
+                            severity: 'success',
+                            summary: 'Thành công',
+                            detail: 'Tài khoản đã được cập nhật thành công',
+                            life: 3000,
+                        },
+                    ];
                     this.RoleGroupForm2.reset();
                     this.closeDialog2();
-                    
                 },
                 (error) => {
                     console.error('Lỗi khi cập nhật:', error);
                     // Xử lý lỗi
                 }
             );
-
         } catch (error) {
-            this.messages = [{
-                severity: 'error',
-                summary: 'Không thể lưu vì:',
-                detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
-                life: 3000
-            }];
+            this.messages = [
+                {
+                    severity: 'error',
+                    summary: 'Không thể lưu vì:',
+                    detail: 'Thông tin đang có lỗi cần được chỉnh sửa',
+                    life: 3000,
+                },
+            ];
             // this.openDialog2(this.employessId2);
             this.Filters();
         } finally {

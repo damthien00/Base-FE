@@ -4,6 +4,8 @@ import { MenuItem } from 'primeng/api';
 import { CreateComponent } from '../create/create.component';
 import { EditComponent } from '../edit/edit.component';
 import { OptionsFilterBranch } from 'src/app/core/DTOs/branch/optionsFilterBranchs';
+import { catchError, of } from 'rxjs';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
     selector: 'app-show',
@@ -21,7 +23,10 @@ export class ShowComponent implements OnInit {
     pageNumber: number;
     totalRecordsCount: number;
 
-    constructor(private branchService: BranchService) {}
+    constructor(
+        private branchService: BranchService,
+        private toastService: ToastService
+    ) {}
 
     ngOnInit() {
         this.items = [{ label: 'Danh sách chi nhánh' }];
@@ -37,6 +42,17 @@ export class ShowComponent implements OnInit {
         }
         this.branchService
             .getBranchs(this.optionsFilterBranch)
+            // .pipe(
+            //     catchError((error) => {
+            //         if (error.status === 403) {
+            //             this.toastService.showError(
+            //                 'Chú ý',
+            //                 'Bạn không có quyền truy cập!'
+            //             );
+            //         }
+            //         return of(null); // Trả về giá trị null để tiếp tục dòng chảy của Observable
+            //     })
+            // )
             .subscribe((data) => {
                 this.branchs = data.data.items;
             });
