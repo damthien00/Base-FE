@@ -211,7 +211,7 @@ export class ActivateWarrantyComponent implements OnInit {
                                 console.error('Error fetching product:', error);
                             }
                         );
-                }, 1000);
+                }, 500);
             } else {
                 console.error(
                     'Invalid input format. Please provide FrameNumber-EngineNumber'
