@@ -21,6 +21,7 @@ import { MerchandiseService } from 'src/app/core/services/merchandise.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { HttpClient } from '@angular/common/http';
+import { BillOfLadingService } from 'src/app/core/services/bill-of-lading.service';
 
 export interface WarehouseReceipt {
   id?: number;
@@ -65,8 +66,8 @@ export class BranchReceivingComponent {
   totalQuantity!: number;
   totalQuantity2!: number;
   totalQuantityProduct!: number;
-  displayConfirmation: boolean = false; 
-  displayConfirmation2: boolean = false; 
+  displayConfirmation: boolean = false;
+  displayConfirmation2: boolean = false;
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
@@ -95,7 +96,7 @@ export class BranchReceivingComponent {
     public functionService: FunctionService,
     private messageService: MessageService,
     private warrantyService: WarrantyPolicyService,
-    private merchandiseService: MerchandiseService,
+    private billOfLadingService: BillOfLadingService,
     private authService: AuthService,
     private branchService: BranchService,
     private route: ActivatedRoute,
@@ -232,7 +233,7 @@ export class BranchReceivingComponent {
 
   FillDataById(): void {
     const id = this.ladingId; // Lấy ID từ URL
-    this.httpClient.get(`${this.url}/api/bill-of-lading/get-by-id?Id=${id}`)
+    this.billOfLadingService.getLadingById(id)
       .subscribe((response: any) => {
         if (response && response.data) {
           this.ladingData = response.data;
@@ -243,11 +244,11 @@ export class BranchReceivingComponent {
           this.FromBranchId = this.ladingData?.fromBranchId;
           this.ToBranchId = this.ladingData?.toBranchId;
 
-          const groupedProducts = this.groupProductsByVariant(this.ladingData.inventoryStockDetailProductImeis);
-          this.displayedProducts = groupedProducts; 
+          const groupedProducts = this.groupProductsByVariant(this.ladingData?.inventoryStockDetailProductImeis);
+          this.displayedProducts = groupedProducts;
 
-          const groupedProducts2 = this.groupProductsByVariant2(this.ladingData.billOfLadingProductNormals);
-          this.displayedProducts2 = groupedProducts2; 
+          const groupedProducts2 = this.groupProductsByVariant2(this.ladingData?.productCodes);
+          this.displayedProducts2 = groupedProducts2;
 
           this.totalQuantity = this.calculateTotalQuantity(groupedProducts);
           this.totalQuantity2 = this.calculateTotalQuantity(groupedProducts2);
@@ -260,7 +261,7 @@ export class BranchReceivingComponent {
 
   groupProductsByVariant(products: any[]): any[] {
     const productMap = new Map<string, any>();
-  
+
     products.forEach(product => {
       const key = `${product.productId}-${product.productVariantId}`;
       if (productMap.has(key)) {
@@ -268,10 +269,11 @@ export class BranchReceivingComponent {
         existingProduct.quantity += 1;
         existingProduct.totalAmountVariant = existingProduct.quantity * existingProduct.productVariantPrice;
         existingProduct.totalAmountProduct = existingProduct.quantity * existingProduct.productPrice;
+        existingProduct.frameEngineNumbers.push(`${product.frameNumber} / ${product.engineNumber}`);
       }
       else {
-        productMap.set(key, { 
-          productId: product.productId, 
+        productMap.set(key, {
+          productId: product.productId,
           productVariantId: product.productVariantId,
           productName: product.productName,
           productVariantName: product.productVariantName,
@@ -281,17 +283,18 @@ export class BranchReceivingComponent {
           productVariantPrice: product.productVariantPrice,
           totalAmountProduct: product.productPrice,
           totalAmountVariant: product.productVariantPrice,
-          quantity: 1
+          quantity: 1,
+          frameEngineNumbers: [`${product.frameNumber} / ${product.engineNumber}`]
         });
       }
     });
-  
+
     return Array.from(productMap.values()); // Convert map values to an array
   }
 
   groupProductsByVariant2(products: any[]): any[] {
     const productMap = new Map<string, any>();
-  
+
     products.forEach(product => {
       const key = `${product.productId}-${product.productVariantId}`;
       if (productMap.has(key)) {
@@ -299,10 +302,11 @@ export class BranchReceivingComponent {
         existingProduct.quantity += 1;
         existingProduct.totalAmountVariant = existingProduct.quantity * existingProduct.productVariantPrice;
         existingProduct.totalAmountProduct = existingProduct.quantity * existingProduct.productPrice;
+        existingProduct.productCode.push(`${product.code}`);
       }
       else {
-        productMap.set(key, { 
-          productId: product.productId, 
+        productMap.set(key, {
+          productId: product.productId,
           productVariantId: product.productVariantId,
           productName: product.productName,
           productVariantName: product.productVariantName,
@@ -312,11 +316,12 @@ export class BranchReceivingComponent {
           productVariantPrice: product.productVariantPrice,
           totalAmountProduct: product.productPrice,
           totalAmountVariant: product.productVariantPrice,
-          quantity: product.quantity
+          quantity: 1,
+          productCode: [`${product.code}`]
         });
       }
     });
-  
+
     return Array.from(productMap.values()); // Convert map values to an array
   }
 
@@ -324,7 +329,7 @@ export class BranchReceivingComponent {
     return products.reduce((total, product) => total + product.quantity, 0);
   }
 
-  
+
   onConfirm(): void {
     this.ladingData.iAccepted = 'accept'; // Gán giá trị "accept" cho iAccepted
     this.onSubmitUpdate();
@@ -336,7 +341,7 @@ export class BranchReceivingComponent {
     this.onSubmitUpdate(false); // Chỉ gọi API đầu tiên khi reject
   }
 
-  onSubmitUpdate(callSecondApi: boolean = true): void { 
+  onSubmitUpdate(callSecondApi: boolean = true): void {
     // Prepare common data
     const updateLadingData = {
       id: this.ladingId,
@@ -353,57 +358,55 @@ export class BranchReceivingComponent {
       toBranchId: this.ladingData.toBranchId,
       fromBranchName: this.ladingData.fromBranchName,
       toBranchName: this.ladingData.toBranchName,
-      updateInvenRequests: this.ladingData.billOfLadingProductNormals.map((item: any) => ({
+      productCodeBills: this.ladingData.productCodeBills.map((item: any) => ({
         productId: item.productId,
         productVarriantId: item.productVariantId,
         productName: item.productName,
         productVarriantName: item.productVarriantName,
-        quantity: item.quantity
+        productCodeId: item.id
       }))
     };
-  
+
     if (callSecondApi) {
       // Call the update API
-      this.httpClient.put(`${this.url}/api/bill-of-lading/confilm`, updateLadingData)
-        .subscribe(
-          (response1) => {
-            console.log('Cập nhật bill of lading thành công', response1);
-            this.hideConfirmDialog2();
-            this.messageService.add({
-              severity: 'success',
-              summary: '',
-              detail: 'Chuyển hàng thành công',
-              life: 3000,
-            });
-            setTimeout(() => {
-              this.router.navigate(['/pages/stock-transfer']);
-            }, 2000);
-          },
-          (error1) => {
-            console.error('Lỗi cập nhật bill of lading', error1);
-          }
-        );
+      this.billOfLadingService.updateLading(updateLadingData).subscribe(
+        (response1) => {
+          console.log('Cập nhật bill of lading thành công', response1);
+          this.hideConfirmDialog2();
+          this.messageService.add({
+            severity: 'success',
+            summary: '',
+            detail: 'Chuyển hàng thành công',
+            life: 3000,
+          });
+          setTimeout(() => {
+            this.router.navigate(['/pages/stock-transfer']);
+          }, 2000);
+        },
+        (error1) => {
+          console.error('Lỗi cập nhật bill of lading', error1);
+        }
+      );
     } else {
       // Call the reject API
-      this.httpClient.put(`${this.url}/api/bill-of-lading/reject`, updateLadingData)
-        .subscribe(
-          (response2) => {
-            console.log('Đã hủy đơn chuyển hàng', response2);
-            this.hideConfirmDialog();
-            this.messageService.add({
-              severity: 'warn',
-              summary: '',
-              detail: 'Đơn chuyển hàng đã bị hủy',
-              life: 3000,
-            });
-            setTimeout(() => {
-              this.router.navigate(['/pages/stock-transfer']);
-            }, 2000);
-          },
-          (error2) => {
-            console.error('Lỗi khi hủy đơn chuyển hàng', error2);
-          }
-        );
+      this.billOfLadingService.rejectLading(updateLadingData).subscribe(
+        (response2) => {
+          console.log('Đã hủy đơn chuyển hàng', response2);
+          this.hideConfirmDialog();
+          this.messageService.add({
+            severity: 'warn',
+            summary: '',
+            detail: 'Đơn chuyển hàng đã bị hủy',
+            life: 3000,
+          });
+          setTimeout(() => {
+            this.router.navigate(['/pages/stock-transfer']);
+          }, 2000);
+        },
+        (error2) => {
+          console.error('Lỗi khi hủy đơn chuyển hàng', error2);
+        }
+      );
     }
   }
 }

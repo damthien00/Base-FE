@@ -13,8 +13,22 @@ export class MerchandiseService {
   public url = environment.url;
   constructor(private http: HttpClient) { }
 
-  getProductDetails(productId: number, productVariantId: number, branchId: number, IsPurchased: number = 0, IsBillOfLading: number = 0): Observable<any> {
-    let url = `${this.url}/api/inventory-stock-detail-product-imei/get-paging?ProductId=${productId}&IsPurchased=${IsPurchased}&IsBillOfLading=${IsBillOfLading}`;
+  getProductDetails(productId: number, productVariantId: number, branchId: number, IsPurchased: number = 0, IsBillOfLading: number = 0, PageSize: number = 1000, PageIndex: number = 1): Observable<any> {
+    let url = `${this.url}/api/inventory-stock-detail-product-imei/get-paging?ProductId=${productId}&IsPurchased=${IsPurchased}&IsBillOfLading=${IsBillOfLading}&PageSize=${PageSize}&PageIndex=${PageIndex}`;
+
+    if (productVariantId !== null && productVariantId !== undefined) {
+      url += `&ProductVariantId=${productVariantId}`;
+    }
+
+    if (branchId !== null && branchId !== undefined) {
+      url += `&BranchId=${branchId}`;
+    }
+
+    return this.http.get<any>(url);
+  }
+  
+  getProductCode(productId: number, productVariantId: number, branchId: number, IsPurchased: number = 0, IsBillOfLading: number = 0, PageSize: number = 1000, PageIndex: number = 1): Observable<any> {
+    let url = `${this.url}/api/product-code/get-paging?ProductId=${productId}&IsPurchased=${IsPurchased}&IsBillOfLading=${IsBillOfLading}&PageSize=${PageSize}&PageIndex=${PageIndex}`;
 
     if (productVariantId !== null && productVariantId !== undefined) {
       url += `&ProductVariantId=${productVariantId}`;
@@ -91,6 +105,16 @@ export class MerchandiseService {
 
   getBillOfLadingById(id: number): Observable<any> {
     return this.http.get<any>(`${this.url}/api/bill-of-lading/get-by-id?Id=${id}`);
+  }
+
+  updateLading(updateLadingData: any): Observable<any> {
+    const url = `${this.url}/api/bill-of-lading/confilm`;
+    return this.http.put(url, updateLadingData);
+  }
+
+  rejectLading(updateLadingData: any): Observable<any> {
+    const url = `${this.url}/api/bill-of-lading/reject`;
+    return this.http.put(url, updateLadingData);
   }
 
  
