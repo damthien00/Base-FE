@@ -205,4 +205,29 @@
     margin-right: 10px; /* Space between checkbox and label */
 }
 
+/* Limit the height of the MultiSelect dropdown panel */
+.p-multiselect-panel {
+    max-height: 200px !important; /* Adjust the height as per your requirement */
+    overflow-y: auto; /* Allow vertical scrolling if content exceeds the max height */
+  }
+  
+  /* Reduce the padding and font size of each item in the dropdown */
+  .p-multiselect-item {
+    padding: 4px 8px !important; /* Adjust padding for a more compact view */
+    font-size: 13px !important; /* Adjust font size */
+  }
+  
+  /* Adjust the height of the input field */
+  .p-multiselect-label {
+    padding: 5px 8px !important; /* Control the input box size */
+    font-size: 14px !important;  /* Control the font size of the selected items display */
+  }
+  
+  /* Optional: Customize the placeholder text size and appearance */
+  .p-multiselect-label-empty {
+    font-size: 14px !important;
+    color: #999 !important; /* Placeholder color */
+  }
+  
+
 

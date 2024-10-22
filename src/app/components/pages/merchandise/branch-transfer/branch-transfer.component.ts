@@ -60,14 +60,17 @@ export class BranchTransferComponent implements OnInit {
   public userCurrent: any;
   selectedBranch: any;
   items!: any[];
+  items2!: any[];
+  totalRecords!: number;
   branchError: boolean = false;
-
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
   frameNumber: any;
   engineNumber: any;
   availableQuantity: any;
+  showProductCodesDialog: boolean = false;
+  selectedProduct: any = null;
 
   imeiData: any[] = [];
   frameEngineData: any[] = [];
@@ -274,6 +277,13 @@ export class BranchTransferComponent implements OnInit {
     data.isEditing = !data.isEditing;
   }
 
+  toggleEdit2(data: any, saveChanges: boolean = false): void {
+    if (saveChanges) {
+      this.validateQuantity(data); // Validate the entered quantity
+    }
+    data.isEditing2 = !data.isEditing2;
+  }
+
   validateQuantity(data: any): void {
     if (data.quantity > data.availableQuantity) {
       data.isValid = true; // Trigger the error message
@@ -410,10 +420,16 @@ export class BranchTransferComponent implements OnInit {
     // });
   }
 
+  openProductCodesDialog(product: any): void {
+    this.selectedProduct = product;
+    this.showProductCodesDialog = true;
+  }
+
   async fetchProductImeiData(productId: number, productVariantId: number, branchId: number) {
     try {
       const response = await this.merchandiseService.getProductDetails(productId, productVariantId, branchId).toPromise();
       this.items = response.data.items;
+      this.totalRecords = response.data.totalRecords;
 
       // Find the product in the cart and add its frame/engine data
       const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
@@ -421,6 +437,24 @@ export class BranchTransferComponent implements OnInit {
       );
       if (productInCart) {
         productInCart.frameEngineData = this.items; // Store the frame/engine data specific to this product
+      }
+    } catch (error) {
+      console.error('Error fetching product IMEI data', error);
+    }
+  }
+
+  async fetchProductCodeData(productId: number, productVariantId: number, branchId: number) {
+    try {
+      const response = await this.merchandiseService.getProductCode(productId, productVariantId, branchId).toPromise();
+      this.items2 = response.data.items;
+      this.totalRecords = response.data.totalRecords;
+
+      // Find the product in the cart and add its frame/engine data
+      const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
+        (detail) => detail.productId === productId && detail.productVariantId === productVariantId
+      );
+      if (productInCart) {
+        productInCart.productCodeData = this.items2; // Store the frame/engine data specific to this product
       }
     } catch (error) {
       console.error('Error fetching product IMEI data', error);
@@ -487,18 +521,13 @@ export class BranchTransferComponent implements OnInit {
 
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
 
-      // Fetch IMEI data if product type is 1
-      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
+      this.fetchProductCodeData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
         const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
           (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
         );
 
         if (productInCart) {
-          if (productInCart.frameEngineData && productInCart.frameEngineData.length > 0) {
-            productInCart.quantity = 0; // If frameEngineData is available, set quantity to 0
-          } else {
-            productInCart.quantity = 0; // If frameEngineData is null or empty, set quantity to 1
-          }
+          productInCart.quantity = 0;
         }
 
         // Update related values and refresh UI
@@ -506,21 +535,6 @@ export class BranchTransferComponent implements OnInit {
         this.showProducts = false;
         this.searchInput.nativeElement.value = '';
         console.log(this.stockInReceipt);
-      });
-
-      this.fetchAvailableQuantity(item.productId, item.productVariantId, this.userCurrent?.branchId).then((availableQuantity) => {
-        const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
-          (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
-        );
-
-        if (productInCart) {
-          productInCart.availableQuantity = availableQuantity; // Gán số lượng có sẵn vào data
-        }
-
-        // Update giao diện và các giá trị khác...
-        this.updatePaymentInfo();
-        this.showProducts = false;
-        this.searchInput.nativeElement.value = '';
       });
     }
   }
@@ -652,6 +666,27 @@ export class BranchTransferComponent implements OnInit {
     this.updateTotal(data);
   }
 
+  updateQuantity2(data: any) {
+    // Calculate the number of selected checkboxes
+    const checkedCountCode = data.productCodeData.filter((code: any) => code.isChecked).length;
+
+    // Update the quantity based on the selected checkboxes
+    data.quantity = checkedCountCode;
+
+    // Check if no checkboxes are selected and the quantity is 0 or less
+    if (data.quantity <= 0) {
+      data.isValid1 = true;
+      data.isValidMessage3 = 'Vui lòng chọn ít nhất một mã code';
+      data.isValidMessage4 = 'Số lượng > 0';
+    } else {
+      data.isValid1 = false;
+      data.isValidMessage3 = '';
+      data.isValidMessage4 = '';
+    }
+
+    this.updateTotal(data);
+  }
+
   preventInput(event: KeyboardEvent) {
     event.preventDefault();
   }
@@ -699,15 +734,19 @@ export class BranchTransferComponent implements OnInit {
           }))
       );
 
-    const billOfLadingProductNormals = this.stockInReceipt.inventoryStockInDetails
-      .filter(product => product.productType !== 1) // Exclude products with productType === 1
-      .map((product) => ({
-        productId: product.productId,
-        productVariantId: product.productVariantId,
-        productName: product.name || product.productName,
-        productVariantName: product.productName,
-        quantity: product.quantity,
-      }));
+    const productCodeBills = this.stockInReceipt.inventoryStockInDetails
+      .filter(product => product.productType !== 1)
+      .flatMap(product =>
+        product.productCodeData
+          .filter(code => code.isChecked)
+          .map((code) => ({
+            productId: product.productId,
+            productVariantId: product.productVariantId,
+            productName: product.name || product.productName,
+            productVariantName: product.productName,
+            productCodeId: code.id,
+          }))
+      );
 
     const selectedBranch = this.branch.find(option => option.id === this.selectedBranch);
     const toBranchId = selectedBranch ? selectedBranch.id : 0; // Replace with actual logic if needed
@@ -724,7 +763,7 @@ export class BranchTransferComponent implements OnInit {
       iAccepted: 'waiting',
       recipientNote: 'string',
       inventoryStockDetailProductImeis: inventoryStockDetailProductImeis,
-      billOfLadingProductNormals: billOfLadingProductNormals,
+      productCodeBills: productCodeBills,
     };
 
     this.merchandiseService.createladingIn(formData).subscribe(

@@ -307,15 +307,17 @@
                                     ></i>
                                 </td>
                             </tr>
-                            <tr *ngIf="data.frameNumbers?.length > 0">
+                            <tr *ngFor="let product of displayedProducts">
                                 <td colspan="8" class="p-3 border-none">
-                                  <div style="display: flex;">
-                                    <ng-container *ngFor="let frame of data.frameNumbers; let i = index">
-                                      <div style="margin: 5px 0;" class="variant-item">
-                                        <span class="variant-item-label">{{ frame }} / {{ data.engineNumbers[i] }}</span>
-                                      </div>
-                                    </ng-container>
-                                  </div>
+                                    <div class="flex flex-column">
+                                        <div style="display: flex; flex-wrap: wrap;">
+                                            <div style="display: flex;" *ngFor="let frameEngine of product.frameEngineNumbers">
+                                                 <div style="margin: 5px 0;" class="variant-item">
+                                                     <span class="variant-item-label"> {{ frameEngine }}</span>
+                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </ng-template>
@@ -432,6 +434,19 @@
                                         (click)="removedata(i)"
                                     ></i>
                                 </td>
+                            </tr>
+                            <tr *ngFor="let product of displayedProducts2">
+                                <td colspan="8" class="p-3 border-none">
+                                    <div class="flex flex-column">
+                                        <div style="display: flex; flex-wrap: wrap;">
+                                            <div style="display: flex;" *ngFor="let code of product.productCode">
+                                                 <div style="margin: 5px 0;" class="variant-item">
+                                                     <span class="variant-item-label"> {{ code }}</span>
+                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>              
                         </ng-template>
                     </p-table>
@@ -539,7 +554,7 @@
                                 ></textarea>
                             </div>
                             <button
-                                *ngIf="userCurrent?.id === this.FromBranchId"
+                                *ngIf="userCurrent?.branchId === this.FromBranchId"
                                 pButton
                                 pRipple
                                 icon="pi pi-check"
@@ -549,7 +564,7 @@
                                 (click)="showConfirmDialog()"
                             ></button>
                             <button
-                                *ngIf="userCurrent?.id === this.ToBranchId"
+                                *ngIf="userCurrent?.branchId === this.ToBranchId"
                                 pButton
                                 pRipple
                                 icon="pi pi-check"
@@ -566,7 +581,7 @@
     </div>
 </div>
 
-<p-dialog *ngIf="userCurrent?.id === this.FromBranchId"
+<p-dialog *ngIf="userCurrent?.branchId === this.FromBranchId"
     [(visible)]="displayConfirmation" [modal]="true" [closable]="false" header="Xác nhận chuyển hàng">
     <p>Bạn muốn xác nhận hủy đơn chuyển hàng này chứ ?</p>
     <!-- <div style="position: absolute; top: 18px; right: 20px; color: red; cursor: pointer;" (click)="this.hideConfirmDialog()">
@@ -578,7 +593,7 @@
     </p-footer>
 </p-dialog>
 
-<p-dialog *ngIf="userCurrent?.id === this.ToBranchId"
+<p-dialog *ngIf="userCurrent?.branchId === this.ToBranchId"
     [(visible)]="displayConfirmation2" [modal]="true" [closable]="false" header="Xác nhận chuyển hàng">
     <p>Bạn muốn xác nhận đơn chuyển hàng này chứ ?</p>
     <!-- <div style="position: absolute; top: 18px; right: 20px; color: red; cursor: pointer;" (click)="this.hideConfirmDialog2()">
