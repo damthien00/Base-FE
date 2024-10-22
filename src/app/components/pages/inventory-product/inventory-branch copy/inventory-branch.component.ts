@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { Table, TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
@@ -29,7 +30,7 @@ export class InventoryBranchComponent implements OnInit {
     totalRecordsCount: any;
     expandedRows = {};
     data: any;
-
+    branchId: any;
     expandAll() {
         this.expandedRows = this.products.reduce(
             (acc, p) => (acc[p.id] = true) && acc,
@@ -73,13 +74,16 @@ export class InventoryBranchComponent implements OnInit {
     selectedBranch: any;
     brandIdSelected: any;
     userCurrent: any;
+    branchName:any;
+    
     constructor(
         private productCateogryService: CategoryService,
         private productService: ProductService,
         private messageService: MessageService,
         private nodeService: NodeService,
         private branchService: BranchService,
-        private authService: AuthService
+        private authService: AuthService,
+        private route: ActivatedRoute,
     ) {
         this.optionsFillerProduct.pageIndex = this.pageNumber;
         this.optionsFillerProduct.pageSize = this.pageSize;
@@ -112,6 +116,15 @@ export class InventoryBranchComponent implements OnInit {
         //  || this.brandIdSelected;
         this.loadProduct();
 
+        this.route.paramMap.subscribe((params) => {
+            const branchId = params.get('branchId');
+            const branchName = params.get('branchName');
+            if (branchId && branchName) {
+                this.branchId = branchId;
+                this.branchName = branchName;
+            }
+        });
+
         // this.loading = true;
         // let response = await this.productService.FilterProduct(
         //     this.optionsFillerProduct
@@ -137,11 +150,10 @@ export class InventoryBranchComponent implements OnInit {
     }
 
     loadProduct() {
-        this.optionsFilterInventoryProduct.branchId =
-            
+        this.optionsFilterInventoryProduct.branchId = this.branchId;
         this.optionsFilterInventoryProduct.pageIndex = this.pageNumber;
         this.optionsFilterInventoryProduct.pageSize = this.pageSize;
-        this.optionsFilterInventoryProduct.branchId = this.userCurrent.branchId;
+        //this.optionsFilterInventoryProduct.branchId = this.userCurrent.branchId;
 
 
         this.productService

@@ -292,4 +292,42 @@ export class ProductService {
 
         return this.http.get<any>(url);
     }
+
+    getInventoryCompany(
+        optionsFilterInventoryProduct: OptionsFilterInventoryProduct
+    ): Observable<any> {
+        const {
+            pageSize,
+            pageIndex,
+            productName,
+            productVariantName,
+            branchId,
+            fromQuantity,
+            toQuantity,
+            keyWord
+        } = optionsFilterInventoryProduct;
+
+        let url = `${this.url}/api/inventory/paging-total-all?pageSize=${pageSize}&pageIndex=${pageIndex}`;
+
+        if (productName) {
+            url += `&productName=${productName}`;
+        }
+        if (productVariantName) {
+            url += `&productVariantName=${productVariantName}`;
+        }
+        if (branchId) {
+            url += `&branchId=${branchId}`;
+        }
+        if (fromQuantity !== null) {
+            url += `&fromQuantity=${fromQuantity}`;
+        }
+        if (toQuantity !== null) {
+            url += `&toQuantity=${toQuantity}`;
+        }
+        if (keyWord) {
+            url += `&keyword=${keyWord}`;
+        }
+
+        return this.http.get<any>(url);
+    }
 }

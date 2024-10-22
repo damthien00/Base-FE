@@ -2,7 +2,7 @@
     <div class="col-12">
         <p-toolbar styleClass="mb-2">
             <div class="">
-                <h3>Danh sách tồn kho đại lý</h3>
+                <h3>Danh sách tồn kho công ty</h3>
                 <p-breadcrumb
                     [model]="items"
                     [home]="{ icon: 'pi pi-home' }"
@@ -29,15 +29,15 @@
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Tìm kiếm theo tên sản phẩm:</label
+                                >Tìm kiếm theo chi nhánh:</label
                             >
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search"></i>
                                 <input
                                     pInputText
                                     type="text"
-                                    [(ngModel)]="name"
-                                    placeholder="Tìm kiếm theo tên sản phẩm"
+                                    [(ngModel)]="keyWord"
+                                    placeholder="Tìm kiếm theo tên chi nhánh"
                                     style="width: 350px"
                                     class="sm:"
                                 />
@@ -55,51 +55,74 @@
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th style="max-width: 5%;">STT</th>
-                        <th>Tên sản phẩm</th>
+                        <!-- <th style="max-width: 5%;">STT</th> -->
+                        <th>Mã chi nhánh</th>
+                        <th>Tên chi nhánh</th>
+                        <th>Số điện thoại</th>
                         <th>Số lượng nhập</th>
                         <th>Số lượng xuất</th>
                         <th>Tồn kho</th>
                     </tr>
                     <tr class="p-table-bill" >
                         <th style="background-color: bisque;"></th>
+                        <th style="background-color: bisque;"></th>
                         <th style="background-color: bisque;">Tổng</th>
                         <th style="background-color: bisque;">{{ data.totalQuantityIn }}</th>
                         <th style="background-color: bisque;">{{ data.totalQuantityIn }}</th>
                         <th style="background-color: bisque;">{{ data.totalQuantityIn - data.totalQuantityOut }}</th>
-                      </tr>
+                    </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-inv let-i="rowIndex">
                     <tr>
-                        <td
+                        <!-- <td
                             style="width: 5%; min-width: 10rem"
                             class="code"
                         >
                             <span class="p-column-title">Code</span>
                             {{ (pageNumber - 1) * pageSize + i + 1 }}
-                        </td>
-                        <td style="width: 15%; min-width: 10rem">
+                        </td> -->
+                        <td style="width: 15%; min-width: 10rem" [routerLink]="['/pages/products/inventory-branch-detail', inv.branchId, inv.branchName]">
                             <span class="p-column-title">CreateName</span>
-                            {{ inv.productName }}
+                            {{ inv.branchId }}
                         </td>
                         <td style="width: 14%; min-width: 10rem">
                             <span class="p-column-title"
                                 >ImportStockInDate</span
                             >
                             {{
-                                inv.quantityIn
+                                inv.branchName
+                            }}
+
+                            <!-- {{ stockInItem.parentName }} -->
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title"
+                                >ImportStockInDate</span
+                            >
+                            {{
+                                inv.phoneNumber
+                            }}
+
+                            <!-- {{ stockInItem.parentName }} -->
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title"
+                                >ImportStockInDate</span
+                            >
+                            {{
+                                inv.totalIn
                             }}
 
                             <!-- {{ stockInItem.parentName }} -->
                         </td>
                         <td style="width: 14%; min-width: 8rem">
                             <span class="p-column-title">TotalPoduct</span>
-                            {{ inv.quantityOut }}
+                            {{ inv.totalOut }}
                         </td>
                         <td style="width: 14%; min-width: 10rem">
                             <span class="p-column-title">TotalPrice</span>
                             {{
-                                inv.quantityIn - inv.quantityOut
+                                inv.totalIn - inv.totalOut
                             }}
                         </td>
                     </tr>

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem, MessageService } from 'primeng/api';
-import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { Table, TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
 import { OptionsFilterBranch } from 'src/app/core/DTOs/branch/optionsFilterBranchs';
 import { OptionsFilterInventoryProduct } from 'src/app/core/DTOs/inventory-product/optionsFilterInventoryProduct';
@@ -13,11 +12,12 @@ import { ProductService } from 'src/app/core/services/product.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-inventory-branch',
-  templateUrl: './inventory-branch.component.html',
-  styleUrls: ['./inventory-branch.component.css']
+  selector: 'app-inventory-company',
+  templateUrl: './inventory-company.component.html',
+  styleUrls: ['./inventory-company.component.css']
 })
-export class InventoryBranchComponent implements OnInit {
+export class InventoryCompanyComponent implements OnInit {
+
     imageUrl = environment.imageUrl;
     optionsFillerProduct: OptionsFilterProduct = new OptionsFilterProduct();
     optionsFilterBranch: OptionsFilterBranch = new OptionsFilterBranch();
@@ -29,6 +29,7 @@ export class InventoryBranchComponent implements OnInit {
     totalRecordsCount: any;
     expandedRows = {};
     data: any;
+    keyWord: any;
 
     expandAll() {
         this.expandedRows = this.products.reduce(
@@ -90,8 +91,8 @@ export class InventoryBranchComponent implements OnInit {
 
     async ngOnInit() {
         this.items = [
-            { label: 'Kho', route: '/products/inventory-brand' },
-            { label: 'Kho hàng đại lý' },
+            { label: 'Kho', route: '/products/inventory-company' },
+            { label: 'Danh sách tồn kho công ty' },
         ];
 
         this.loadBranchs();
@@ -137,15 +138,14 @@ export class InventoryBranchComponent implements OnInit {
     }
 
     loadProduct() {
-        this.optionsFilterInventoryProduct.branchId =
-            
+        //this.optionsFilterInventoryProduct.branchId = this.brandIdSelected?.id || this.brandIdSelected;
         this.optionsFilterInventoryProduct.pageIndex = this.pageNumber;
         this.optionsFilterInventoryProduct.pageSize = this.pageSize;
-        this.optionsFilterInventoryProduct.branchId = this.userCurrent.branchId;
+        //this.optionsFilterInventoryProduct.branchId = this.userCurrent.branchId;
 
 
         this.productService
-            .getInventoryBranch(this.optionsFilterInventoryProduct)
+            .getInventoryCompany(this.optionsFilterInventoryProduct)
             .subscribe((response) => {
                 this.products = response.data.items;
                 this.data = response.data;
@@ -154,7 +154,7 @@ export class InventoryBranchComponent implements OnInit {
     }
 
     searchBranch() {
-        this.optionsFilterInventoryProduct.productName = this.name ? this.name : null;
+        this.optionsFilterInventoryProduct.keyWord = this.keyWord ? this.keyWord : null;
         this.loadProduct();
     }
 
@@ -263,5 +263,6 @@ export class InventoryBranchComponent implements OnInit {
             ? this.totalRecordsCount
             : calculatedEnd;
     }
+
 
 }

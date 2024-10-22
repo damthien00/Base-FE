@@ -6,4 +6,5 @@ export class OptionsFilterInventoryProduct {
     branchId: number | null = null;
     fromQuantity: number | null = null;
     toQuantity: number | null = null;
+    keyWord: string | null = null;
 }

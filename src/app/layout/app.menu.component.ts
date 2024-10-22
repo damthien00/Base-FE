@@ -170,6 +170,13 @@ export class AppMenuComponent implements OnInit {
                                 ],
                             },
                             {
+                                label: 'Tồn kho tổng công ty',
+                                icon: 'pi pi-fw pi-box',
+                                routerLink: [
+                                    '/pages/products/inventory-company',
+                                ],
+                            },
+                            {
                                 label: 'Nhập kho',
                                 icon: 'pi pi-fw pi-box',
                                 routerLink: ['/pages/warehouse/stock-in'],

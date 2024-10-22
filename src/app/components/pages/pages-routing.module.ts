@@ -33,6 +33,20 @@ import { RouterModule } from '@angular/router';
                     ),
             },
             {
+                path: 'products/inventory-branch-detail/:branchId/:branchName',
+                loadChildren: () =>
+                    import('./inventory-product/inventory-branch copy/inventory-branch.module').then(
+                        (m) => m.InventoryBranchModule
+                    ),
+            },
+            {
+                path: 'products/inventory-company',
+                loadChildren: () =>
+                    import('./inventory-product/inventory-company/inventory-company.module').then(
+                        (m) => m.InventoryCompanyModule
+                    ),
+            },
+            {
                 path: 'warehouse/stock-in',
                 loadChildren: () =>
                     import('./warehouse/stock-in/show/show.module').then(
