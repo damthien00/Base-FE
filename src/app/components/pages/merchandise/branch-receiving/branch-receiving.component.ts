@@ -87,6 +87,7 @@ export class BranchReceivingComponent {
   filteredDatas: any[] = [];
   isAccept: boolean = false;
   isRejected: boolean = false;
+  showMoreMap: { [key: string]: boolean } = {};
 
   onBarcode: boolean = false;
   constructor(
@@ -259,6 +260,16 @@ export class BranchReceivingComponent {
       });
   }
 
+  displayedProductCodes(product: any): string[] {
+    if (!product.productCode) return [];
+    return product.productCode.slice(0, product.showAllCodes ? product.productCode.length : 3);
+  }
+
+  // Function to toggle code visibility
+  toggleCodeVisibility(product: any): void {
+    product.showAllCodes = !product.showAllCodes;
+  }
+  
   groupProductsByVariant(products: any[]): any[] {
     const productMap = new Map<string, any>();
 
@@ -292,7 +303,50 @@ export class BranchReceivingComponent {
     return Array.from(productMap.values()); // Convert map values to an array
   }
 
-  groupProductsByVariant2(products: any[]): any[] {
+  // groupProductsByVariant2(products: any[]): any[] {
+  //   const productMap = new Map<string, any>();
+
+  //   products.forEach(product => {
+  //     const key = `${product.productId}-${product.productVariantId}`;
+      
+  //     if (productMap.has(key)) {
+  //       const existingProduct = productMap.get(key);
+  //       existingProduct.quantity += 1;
+  //       existingProduct.totalAmountVariant = existingProduct.quantity * existingProduct.productVariantPrice;
+  //       existingProduct.totalAmountProduct = existingProduct.quantity * existingProduct.productPrice;
+
+  //       // Check if the product's inventoryStockInDetailId is the same
+  //       const inventoryKey = product.inventoryStockInDetailId;
+  //       if (existingProduct.inventoryStockInDetailId === inventoryKey) {
+  //         existingProduct.productCode.push(product.code);
+  //       } else {
+  //         // If inventoryStockInDetailId is different, start a new group
+  //         existingProduct.productCode.push(product.code);
+  //       }
+  //     } else {
+  //       // New product group
+  //       productMap.set(key, {
+  //         productId: product.productId,
+  //         productVariantId: product.productVariantId,
+  //         productName: product.productName,
+  //         productVariantName: product.productVariantName,
+  //         productImage: product.productImage,
+  //         productVariantImage: product.productVariantImage,
+  //         productPrice: product.productPrice,
+  //         productVariantPrice: product.productVariantPrice,
+  //         totalAmountProduct: product.productPrice,
+  //         totalAmountVariant: product.productVariantPrice,
+  //         quantity: 1,
+  //         productCode: [product.code],
+  //         inventoryStockInDetailId: product.inventoryStockInDetailId
+  //       });
+  //     }
+  //   });
+
+  //   return Array.from(productMap.values());
+  // }
+
+  groupProductsByVariant2(products: any[]): any[] { 
     const productMap = new Map<string, any>();
 
     products.forEach(product => {
@@ -328,7 +382,6 @@ export class BranchReceivingComponent {
   calculateTotalQuantity(products: any[]): number {
     return products.reduce((total, product) => total + product.quantity, 0);
   }
-
 
   onConfirm(): void {
     this.ladingData.iAccepted = 'accept'; // Gán giá trị "accept" cho iAccepted
