@@ -196,10 +196,9 @@
                                 <th style="width: 20%">Tên sản phẩm</th>
                                 <!-- <th style="text-align: center">Giá chuyển</th> -->
                                 <th style="width: 9%; text-align: center">ĐVT</th>
-                                <th style="width: 13.5%; text-align: center">SL chuyển</th>
-                                <th style="width: 13.5%; text-align: center">SL nhận</th>
+                                <th style="width: 10.5%; text-align: center">SL chuyển</th>
+                                <th style="width: 10.5%; text-align: center">SL nhận</th>
                                 <th style="width: 12.5%; text-align: center">Thành tiền</th>
-                                <th style="width: 7%;"></th>
                             </tr>
                         </ng-template>
 
@@ -290,28 +289,23 @@
                                 <td style="width: 9%; text-align: center">
                                     {{ data.unitName }}
                                 </td>
-                                <td style="width: 13.5%; text-align: center">
+                                <td style="width: 10.5%; text-align: center">
                                     {{ data.quantity }}
                                 </td>
-                                <td style="width: 13.5%; text-align: center">
+                                <td style="width: 10.5%; text-align: center">
                                     {{ data.quantity }}
                                 </td>
                                 <td style="width: 12.5%; text-align: center">
                                     <span *ngIf="!data.productVariantId || !data.productVariantName">{{ (data.totalAmountProduct || 0) | currency:'VND' }}</span>
                                     <span *ngIf="data.productVariantId && data.productVariantName">{{ (data.totalAmountVariant || 0) | currency:'VND' }}</span>                                    
                                 </td>
-                                <td style="width: 7%; text-align: center">
-                                    <i
-                                        class="pi pi-trash"
-                                        (click)="removedata(i)"
-                                    ></i>
-                                </td>
+                              
                             </tr>
-                            <tr *ngFor="let product of displayedProducts">
-                                <td colspan="8" class="p-3 border-none">
+                            <tr *ngIf="data.frameEngineNumbers?.length > 0">
+                                <td colspan="6">
                                     <div class="flex flex-column">
                                         <div style="display: flex; flex-wrap: wrap;">
-                                            <div style="display: flex;" *ngFor="let frameEngine of product.frameEngineNumbers">
+                                            <div style="display: flex;" *ngFor="let frameEngine of data.frameEngineNumbers">
                                                  <div style="margin: 5px 0;" class="variant-item">
                                                      <span class="variant-item-label"> {{ frameEngine }}</span>
                                                  </div>
@@ -406,48 +400,43 @@
                                     <span style="font-weight: 600;">{{ data.productName }}</span>
                                     <span *ngIf="data.productVariantId && data.productVariantName"> - {{ data.productVariantName }}</span>
                                 </td>
-                                <!-- <td style="width: 12.5%; text-align: center">
-                                    {{ data.productPrice?.toLocaleString(
-                                        "vi-VN",
-                                        {
-                                            style: "currency",
-                                            currency: "VND"
-                                        }
-                                    ) }}
-                                </td> -->
                                 <td style="width: 9%; text-align: center">
                                     {{ data.unitName }}
                                 </td>
-                                <td style="width: 13.5%; text-align: center">
+                                <td style="width: 10.5%; text-align: center">
                                     {{ data.quantity }}
                                 </td>
-                                <td style="width: 13.5%; text-align: center">
+                                <td style="width: 10.5%; text-align: center">
                                     {{ data.quantity }}
                                 </td>
+                                <!-- <td style="width: 28%; text-align: center">
+                                    <div style="display: flex;" *ngFor="let code of displayedProductCodes(data)">
+                                      <div style="margin: 5px 0;" class="variant-item">
+                                        <span class="variant-item-label">{{ code }}</span>
+                                      </div>
+                                    </div>
+                                    <div *ngIf="data.productCode.length > 3">
+                                      <a (click)="toggleCodeVisibility(data)">{{ data.showAllCodes ? 'Ẩn bớt' : 'Xem thêm' }}</a>
+                                    </div>
+                                </td> -->
                                 <td style="width: 12.5%; text-align: center">
                                     <span *ngIf="!data.productVariantId || !data.productVariantName">{{ (data.totalAmountProduct || 0)  | currency:'VND' }}</span>
                                     <span *ngIf="data.productVariantId && data.productVariantName">{{ (data.totalAmountVariant || 0) | currency:'VND' }}</span>                                    
                                 </td>
-                                <td style="width: 7%; text-align: center">
-                                    <i
-                                        class="pi pi-trash"
-                                        (click)="removedata(i)"
-                                    ></i>
-                                </td>
                             </tr>
-                            <tr *ngFor="let product of displayedProducts2">
-                                <td colspan="8" class="p-3 border-none">
+                            <tr *ngIf="data.productCode?.length > 0">
+                                <td colspan="6">
                                     <div class="flex flex-column">
                                         <div style="display: flex; flex-wrap: wrap;">
-                                            <div style="display: flex;" *ngFor="let code of product.productCode">
-                                                 <div style="margin: 5px 0;" class="variant-item">
-                                                     <span class="variant-item-label"> {{ code }}</span>
-                                                 </div>
+                                            <div style="display: flex; " *ngFor="let code of data.productCode">
+                                                <div style="margin: 5px 0;" class="variant-item">
+                                                  <span class="variant-item-label">{{ code }}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>              
                                 </td>
-                            </tr>              
+                              </tr>
                         </ng-template>
                     </p-table>
                 </div>

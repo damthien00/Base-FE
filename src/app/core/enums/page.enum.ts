@@ -5,4 +5,5 @@ export enum Page {
     Dashboard = '/dashboard',
     Register = '/auth/register',
     Forget = '/auth/forget',
+    SetPassword = '/auth/set-password',
 }

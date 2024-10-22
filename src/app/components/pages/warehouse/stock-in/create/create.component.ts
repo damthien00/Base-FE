@@ -54,7 +54,7 @@ export class CreateComponent implements OnInit {
     isValidForm: boolean = true;
     temporaryDiscountRate: number = 0;
     temporaryDiscountUnit: string = 'VND';
-
+    quantityError: boolean = false;
     displayDiscountModal = false;
     optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
     optionsFilterSupplier: OptionsFilterSupplier = new OptionsFilterSupplier();
@@ -467,6 +467,15 @@ export class CreateComponent implements OnInit {
         product.frameNumber = '';
         product.engineNumber = '';
         this.checkValidity();
+    }
+
+    validateQuantity(data: any) {
+        if (data.quantity > 100) {
+            this.quantityError = true;
+            data.quantity = 100;
+        } else {
+            this.quantityError = false;
+        }
     }
 
     removeImeiItem(product: any, index: number) {

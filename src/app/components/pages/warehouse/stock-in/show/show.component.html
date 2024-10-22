@@ -307,6 +307,43 @@
                                     </div>
                                 </td>
                             </tr>
+
+                            <tr
+                            *ngIf="
+                                data &&
+                                data.productCodes &&
+                                data.productCodes
+                                    .length > 0
+                            "
+                        >
+                            <td colspan="8" class="p-3 border-none">
+                                <div class="flex flex-column">
+                                    <label for="" class="mb-2"
+                                        >Mã code:
+                                    </label>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            flex-wrap: wrap;
+                                        "
+                                    >
+                                        <div
+                                            class="variant-item"
+                                            *ngFor="
+                                                let product of data.productCodes;
+                                                let i = index
+                                            "
+                                        >
+                                            <span
+                                                class="variant-item-label"
+                                            >
+                                                {{ product.code }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                         </ng-template>
                     </p-table>
                 </div>

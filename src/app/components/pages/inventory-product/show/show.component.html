@@ -155,7 +155,7 @@
                         <td>
                             <div>
                                 <img
-                                    *ngIf="product.productImages != null"
+                                    *ngIf="product.productImage != null"
                                     [src]="imageUrl + product.productImage"
                                     [alt]="product.productName"
                                     width="50"
@@ -163,7 +163,7 @@
                                     class="shadow-4"
                                 />
                                 <svg
-                                    *ngIf="product.productImages == null"
+                                    *ngIf="product.productImage == null"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -224,7 +224,10 @@
                                         <tr>
                                             <td>
                                                 <img
-                                                    *ngIf="product.productImage"
+                                                    *ngIf="
+                                                        product.productImage !=
+                                                        null
+                                                    "
                                                     [src]="
                                                         imageUrl +
                                                         product.productImage
@@ -237,7 +240,10 @@
                                                     class="shadow-4"
                                                 />
                                                 <svg
-                                                    *ngIf="!variant.linkImage"
+                                                    *ngIf="
+                                                        product.productImage ==
+                                                        null
+                                                    "
                                                     viewBox="0 0 24 24"
                                                     fill="none"
                                                     xmlns="http://www.w3.org/2000/svg"

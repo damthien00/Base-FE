@@ -270,7 +270,7 @@
                                                     $event
                                                 )
                                             "
-                                            (ngModelChange)="updateTotal(data)"
+                                            (ngModelChange)="updateTotal(data); validateQuantity(data)"
                                             buttonLayout="horizontal"
                                             (onFocus)="
                                                 functionService.handleFocusPrice(
@@ -280,8 +280,12 @@
                                             inputId="horizontal"
                                             spinnerMode="horizontal"
                                             [min]="1"
+                                            [max]="100"
                                             [step]="1"
                                         />
+                                        <div *ngIf="quantityError"  style="color: red; margin-top: 5px;">
+                                            <p style="color: red;">Số lượng không được lớn hơn 100</p>
+                                        </div>
                                         <span
                                             *ngIf="data.productType === 1"
                                             style="

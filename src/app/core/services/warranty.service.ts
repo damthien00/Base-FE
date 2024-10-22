@@ -18,6 +18,9 @@ export class WarrantyService {
         if (options.CustomerKeyword) {
             url += `&customerKeyword=${options.CustomerKeyword}`;
         }
+        if (options.BranchId) {
+            url += `&branchId=${options.BranchId}`;
+        }
         if (options.Imei) {
             url += `&imei=${options.Imei}`;
         }

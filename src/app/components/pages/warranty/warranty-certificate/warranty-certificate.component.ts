@@ -138,18 +138,20 @@ export class WarrantyCertificateComponent implements OnInit {
             this.userCurrent = user;
             console.log(this.userCurrent);
         });
+
         this.loadWarranty();
     }
 
     async ngOnInit() {
         this.items = [{ label: 'Danh sách phiếu bảo hành' }];
-        // console.log(b);
     }
 
     loadWarranty() {
+        this.optionsFilterWarranty.BranchId = this.userCurrent.branchId;
         if (this.optionsFilterWarranty.CustomerKeyword === '') {
             this.optionsFilterWarranty.CustomerKeyword = null;
         }
+
         if (!this.optionsFilterWarranty.Imei) {
             // If Imei is null, undefined, or an empty string, reset other properties
             this.optionsFilterWarranty.Imei = null;
@@ -176,8 +178,6 @@ export class WarrantyCertificateComponent implements OnInit {
     }
 
     warrantyRequest(data: any) {
-        console.log(data);
-
         const formData = new FormData();
         formData.append('Code', '');
         formData.append('CustomerId', data.customer.id.toString());
@@ -186,7 +186,6 @@ export class WarrantyCertificateComponent implements OnInit {
         formData.append('BranchId', this.userCurrent.branchId);
         formData.append('BranchName', this.userCurrent.branchName);
         formData.append('TotalQuantity', '1');
-
         this.warrantyInfos = {
             id: data.id,
             dueDate: '',

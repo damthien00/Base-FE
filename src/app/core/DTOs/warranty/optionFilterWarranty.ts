@@ -4,7 +4,7 @@ export class OptionsFilterWarranty {
     Imei: string | null = '';
     ProductName: string | null;
     CustomerKeyword: string | null;
-
+    BranchId: string | null;
     FrameNumber: string | null;
     EngineNumber: string | null;
 }
