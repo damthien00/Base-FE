@@ -259,4 +259,37 @@ export class ProductService {
             `${this.url}/api/inventory-stock-in/getstockindetailsbyproductcode?productCode=${encodedProductCode}`
         );
     }
+    getInventoryBranch(
+        optionsFilterInventoryProduct: OptionsFilterInventoryProduct
+    ): Observable<any> {
+        const {
+            pageSize,
+            pageIndex,
+            productName,
+            productVariantName,
+            branchId,
+            fromQuantity,
+            toQuantity,
+        } = optionsFilterInventoryProduct;
+
+        let url = `${this.url}/api/inventory/paging-branch?pageSize=${pageSize}&pageIndex=${pageIndex}`;
+
+        if (productName) {
+            url += `&productName=${productName}`;
+        }
+        if (productVariantName) {
+            url += `&productVariantName=${productVariantName}`;
+        }
+        if (branchId) {
+            url += `&branchId=${branchId}`;
+        }
+        if (fromQuantity !== null) {
+            url += `&fromQuantity=${fromQuantity}`;
+        }
+        if (toQuantity !== null) {
+            url += `&toQuantity=${toQuantity}`;
+        }
+
+        return this.http.get<any>(url);
+    }
 }

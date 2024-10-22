@@ -163,6 +163,13 @@ export class AppMenuComponent implements OnInit {
                         icon: 'pi pi-fw pi-home',
                         items: [
                             {
+                                label: 'Tồn kho đại lý',
+                                icon: 'pi pi-fw pi-box',
+                                routerLink: [
+                                    '/pages/products/inventory-branch',
+                                ],
+                            },
+                            {
                                 label: 'Nhập kho',
                                 icon: 'pi pi-fw pi-box',
                                 routerLink: ['/pages/warehouse/stock-in'],

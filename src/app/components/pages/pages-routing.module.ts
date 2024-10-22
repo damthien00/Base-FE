@@ -26,6 +26,13 @@ import { RouterModule } from '@angular/router';
                     ),
             },
             {
+                path: 'products/inventory-branch',
+                loadChildren: () =>
+                    import('./inventory-product/inventory-branch/inventory-branch.module').then(
+                        (m) => m.InventoryBranchModule
+                    ),
+            },
+            {
                 path: 'warehouse/stock-in',
                 loadChildren: () =>
                     import('./warehouse/stock-in/show/show.module').then(
