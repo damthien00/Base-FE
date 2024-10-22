@@ -70,7 +70,9 @@ export class BranchTransferComponent implements OnInit {
   engineNumber: any;
   availableQuantity: any;
   showProductCodesDialog: boolean = false;
+  showFrameEnginDialog: boolean = false;
   selectedProduct: any = null;
+  selectedFrameEngin: any = null;
 
   imeiData: any[] = [];
   frameEngineData: any[] = [];
@@ -420,9 +422,14 @@ export class BranchTransferComponent implements OnInit {
     // });
   }
 
-  openProductCodesDialog(product: any): void {
-    this.selectedProduct = product;
+  openProductCodesDialog(data: any): void {
+    this.selectedProduct = data;
     this.showProductCodesDialog = true;
+  }
+
+  openProductFrameEnginDialog(data: any): void {
+    this.selectedFrameEngin = data;
+    this.showFrameEnginDialog = true;
   }
 
   async fetchProductImeiData(productId: number, productVariantId: number, branchId: number) {
@@ -521,6 +528,26 @@ export class BranchTransferComponent implements OnInit {
 
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
 
+      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
+        const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
+          (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
+        );
+
+        if (productInCart) {
+          if (productInCart.frameEngineData && productInCart.frameEngineData.length > 0) {
+            productInCart.quantity = 0; // If frameEngineData is available, set quantity to 0
+          } else {
+            productInCart.quantity = 0; // If frameEngineData is null or empty, set quantity to 1
+          }
+        }
+
+        // Update related values and refresh UI
+        this.updatePaymentInfo();
+        this.showProducts = false;
+        this.searchInput.nativeElement.value = '';
+        console.log(this.stockInReceipt);
+      });
+
       this.fetchProductCodeData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
         const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
           (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
@@ -536,6 +563,21 @@ export class BranchTransferComponent implements OnInit {
         this.searchInput.nativeElement.value = '';
         console.log(this.stockInReceipt);
       });
+
+      // this.fetchAvailableQuantity(item.productId, item.productVariantId, this.userCurrent?.branchId).then((availableQuantity) => {
+      //   const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
+      //     (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
+      //   );
+
+      //   if (productInCart) {
+      //     productInCart.availableQuantity = availableQuantity; // Gán số lượng có sẵn vào data
+      //   }
+
+      //   // Update giao diện và các giá trị khác...
+      //   this.updatePaymentInfo();
+      //   this.showProducts = false;
+      //   this.searchInput.nativeElement.value = '';
+      // });
     }
   }
 
