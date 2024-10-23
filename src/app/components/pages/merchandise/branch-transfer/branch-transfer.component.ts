@@ -62,7 +62,9 @@ export class BranchTransferComponent implements OnInit {
   items!: any[];
   items2!: any[];
   totalRecords!: number;
+  totalRecords2!: number;
   branchError: boolean = false;
+  productCodeSearchTerm: string = '';
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
@@ -445,26 +447,42 @@ export class BranchTransferComponent implements OnInit {
       if (productInCart) {
         productInCart.frameEngineData = this.items; // Store the frame/engine data specific to this product
       }
+
+      return response; // Return the response object
     } catch (error) {
       console.error('Error fetching product IMEI data', error);
     }
+  }
+
+  searchByProductCode() {
+    const { productId, productVariantId } = this.selectedProduct;
+
+    this.merchandiseService.getProductCode(productId, productVariantId, this.userCurrent?.branchId, 0, 0, 1000, 1, this.productCodeSearchTerm)
+      .subscribe(response => {
+        this.selectedProduct.productCodeData = response.data.items;
+        this.totalRecords2 = response.data.totalRecords;
+      }, error => {
+        console.error('Error fetching product code data', error);
+      });
   }
 
   async fetchProductCodeData(productId: number, productVariantId: number, branchId: number) {
     try {
       const response = await this.merchandiseService.getProductCode(productId, productVariantId, branchId).toPromise();
       this.items2 = response.data.items;
-      this.totalRecords = response.data.totalRecords;
+      this.totalRecords2 = response.data.totalRecords;
 
       // Find the product in the cart and add its frame/engine data
       const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
         (detail) => detail.productId === productId && detail.productVariantId === productVariantId
       );
       if (productInCart) {
-        productInCart.productCodeData = this.items2; // Store the frame/engine data specific to this product
+        productInCart.productCodeData = this.items2; // Store the product code data specific to this product
       }
+
+      return response; // Return the response object
     } catch (error) {
-      console.error('Error fetching product IMEI data', error);
+      console.error('Error fetching product code data', error);
     }
   }
 
@@ -484,7 +502,6 @@ export class BranchTransferComponent implements OnInit {
     // Check if the product already exists in the cart
     const existingDetail = this.stockInReceipt.inventoryStockInDetails.find(
       (detail: any) => {
-        console.log(detail, item);
         const isProductVariantIdExist =
           detail.productVariantId !== undefined &&
           item.productVariantId !== undefined;
@@ -495,7 +512,6 @@ export class BranchTransferComponent implements OnInit {
         );
       }
     );
-    console.log(existingDetail);
 
     if (existingDetail) {
       // If the product already exists, update the quantity and total price
@@ -514,7 +530,7 @@ export class BranchTransferComponent implements OnInit {
         productVariantId: item.productVariantId,
         warrantyPolicyId: item.warrantyPolicyId,
         productType: item.productType,
-        quantity: item.productType === 1 ? (item.frameEngineData && item.frameEngineData.length > 0 ? 0 : 1) : 1,  // Adjust quantity if frameEngineData is null or empty
+        quantity: item.productType === 1 ? (item.frameEngineData && item.frameEngineData.length > 0 ? 0 : 1) : 1,
         productCode: item.productCode ? '' : '',
         price: item.price,
         unit: item.unit,
@@ -523,22 +539,29 @@ export class BranchTransferComponent implements OnInit {
         engineNumber: '',
         branchId: this.userCurrent?.branchId,
         branchName: this.userCurrent?.branchName,
-        frameEngineData: []
+        frameEngineData: [],
+        totalRecords: 0,  // Add totalRecords here
+        totalRecords2: 0   // Add totalRecords2 here
       };
 
       this.stockInReceipt.inventoryStockInDetails.push(newDetail);
 
-      this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
+      // Use Promise.all to fetch both data
+      Promise.all([
+        this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId),
+        this.fetchProductCodeData(item.productId, item.productVariantId, this.userCurrent?.branchId)
+      ]).then(([imeiResponse, codeResponse]) => {
         const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
           (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
         );
 
         if (productInCart) {
-          if (productInCart.frameEngineData && productInCart.frameEngineData.length > 0) {
-            productInCart.quantity = 0; // If frameEngineData is available, set quantity to 0
-          } else {
-            productInCart.quantity = 0; // If frameEngineData is null or empty, set quantity to 1
-          }
+          // Update totalRecords and totalRecords2 from the respective responses
+          productInCart.totalRecords = imeiResponse.data.totalRecords;
+          productInCart.totalRecords2 = codeResponse.data.totalRecords;
+
+          // Update quantity based on the frameEngineData
+          productInCart.quantity = productInCart.frameEngineData && productInCart.frameEngineData.length > 0 ? 0 : 0;
         }
 
         // Update related values and refresh UI
@@ -546,40 +569,12 @@ export class BranchTransferComponent implements OnInit {
         this.showProducts = false;
         this.searchInput.nativeElement.value = '';
         console.log(this.stockInReceipt);
+      }).catch(error => {
+        console.error('Error fetching product data', error);
       });
-
-      this.fetchProductCodeData(item.productId, item.productVariantId, this.userCurrent?.branchId).then(() => {
-        const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
-          (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
-        );
-
-        if (productInCart) {
-          productInCart.quantity = 0;
-        }
-
-        // Update related values and refresh UI
-        this.updatePaymentInfo();
-        this.showProducts = false;
-        this.searchInput.nativeElement.value = '';
-        console.log(this.stockInReceipt);
-      });
-
-      // this.fetchAvailableQuantity(item.productId, item.productVariantId, this.userCurrent?.branchId).then((availableQuantity) => {
-      //   const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
-      //     (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
-      //   );
-
-      //   if (productInCart) {
-      //     productInCart.availableQuantity = availableQuantity; // Gán số lượng có sẵn vào data
-      //   }
-
-      //   // Update giao diện và các giá trị khác...
-      //   this.updatePaymentInfo();
-      //   this.showProducts = false;
-      //   this.searchInput.nativeElement.value = '';
-      // });
     }
   }
+
 
   updateTotal(data: any) {
     data.total = data.price * data.quantity || data.price;

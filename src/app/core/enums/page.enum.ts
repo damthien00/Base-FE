@@ -6,4 +6,5 @@ export enum Page {
     Register = '/auth/register',
     Forget = '/auth/forget',
     SetPassword = '/auth/set-password',
+    ResendOtp = '/auth/resend-email-otp',
 }

@@ -68,6 +68,7 @@ export class BranchReceivingComponent {
   totalQuantityProduct!: number;
   displayConfirmation: boolean = false;
   displayConfirmation2: boolean = false;
+  displayConfirmation3: boolean = false;
 
   displayDiscountModal = false;
   optionsFilterProduct: OptionsFilterProduct = new OptionsFilterProduct();
@@ -232,6 +233,14 @@ export class BranchReceivingComponent {
     this.displayConfirmation2 = false;
   }
 
+  showConfirmDialog3(): void {
+    this.displayConfirmation3 = true;
+  }
+
+  hideConfirmDialog3(): void {
+    this.displayConfirmation3 = false;
+  }
+
   FillDataById(): void {
     const id = this.ladingId; // Lấy ID từ URL
     this.billOfLadingService.getLadingById(id)
@@ -269,7 +278,7 @@ export class BranchReceivingComponent {
   toggleCodeVisibility(product: any): void {
     product.showAllCodes = !product.showAllCodes;
   }
-  
+
   groupProductsByVariant(products: any[]): any[] {
     const productMap = new Map<string, any>();
 
@@ -308,7 +317,7 @@ export class BranchReceivingComponent {
 
   //   products.forEach(product => {
   //     const key = `${product.productId}-${product.productVariantId}`;
-      
+
   //     if (productMap.has(key)) {
   //       const existingProduct = productMap.get(key);
   //       existingProduct.quantity += 1;
@@ -346,7 +355,7 @@ export class BranchReceivingComponent {
   //   return Array.from(productMap.values());
   // }
 
-  groupProductsByVariant2(products: any[]): any[] { 
+  groupProductsByVariant2(products: any[]): any[] {
     const productMap = new Map<string, any>();
 
     products.forEach(product => {
@@ -396,33 +405,33 @@ export class BranchReceivingComponent {
 
   onSubmitUpdate(callSecondApi: boolean = true): void {
     // Prepare common data
-    const updateLadingData = {
+    const rejectLadingData = {
       id: this.ladingId,
       iAccepted: this.ladingData.iAccepted,
       recipientNote: this.recipientNote,
       inventoryStockDetailProductImeis: this.ladingData.inventoryStockDetailProductImeis.map((item: any) => ({
         productId: item.productId,
-        productVarriantId: item.productVariantId,
+        productVariantId: item.productVariantId,
         productName: item.productName,
-        productVarriantName: item.productVarriantName,
+        productVariantName: item.productVarriantName,
         inventoryStockDetailProductImeiId: item.id
       })),
       fromBranchId: this.ladingData.fromBranchId,
       toBranchId: this.ladingData.toBranchId,
       fromBranchName: this.ladingData.fromBranchName,
       toBranchName: this.ladingData.toBranchName,
-      productCodeBills: this.ladingData.productCodeBills.map((item: any) => ({
+      productCodeBills: this.ladingData.productCodes.map((item: any) => ({
         productId: item.productId,
-        productVarriantId: item.productVariantId,
+        productVariantId: item.productVariantId,
         productName: item.productName,
-        productVarriantName: item.productVarriantName,
+        productVariantName: item.productVarriantName,
         productCodeId: item.id
       }))
     };
 
     if (callSecondApi) {
       // Call the update API
-      this.billOfLadingService.updateLading(updateLadingData).subscribe(
+      this.billOfLadingService.updateLading(rejectLadingData).subscribe(
         (response1) => {
           console.log('Cập nhật bill of lading thành công', response1);
           this.hideConfirmDialog2();
@@ -442,19 +451,35 @@ export class BranchReceivingComponent {
       );
     } else {
       // Call the reject API
-      this.billOfLadingService.rejectLading(updateLadingData).subscribe(
+      this.billOfLadingService.rejectLading(rejectLadingData).subscribe(
         (response2) => {
           console.log('Đã hủy đơn chuyển hàng', response2);
-          this.hideConfirmDialog();
-          this.messageService.add({
-            severity: 'warn',
-            summary: '',
-            detail: 'Đơn chuyển hàng đã bị hủy',
-            life: 3000,
-          });
-          setTimeout(() => {
-            this.router.navigate(['/pages/stock-transfer']);
-          }, 2000);
+          if (this.userCurrent?.branchId === this.ToBranchId) {
+            this.hideConfirmDialog3();
+            this.messageService.add({
+              severity: 'warn',
+              summary: '',
+              detail: 'Đơn nhận hàng đã bị hủy',
+              life: 3000,
+            });
+            setTimeout(() => {
+              this.router.navigate(['/pages/stock-receive']);
+            }, 2000);
+          }
+
+          if (this.userCurrent?.branchId === this.FromBranchId) {
+            this.hideConfirmDialog();
+            this.messageService.add({
+              severity: 'warn',
+              summary: '',
+              detail: 'Đơn chuyển hàng đã bị hủy',
+              life: 3000,
+            });
+            setTimeout(() => {
+              this.router.navigate(['/pages/stock-transfer']);
+            }, 2000);
+          }
+        
         },
         (error2) => {
           console.error('Lỗi khi hủy đơn chuyển hàng', error2);

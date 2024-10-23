@@ -121,5 +121,19 @@ export class AuthService {
         return throwError('Something bad happened; please try again later.');
     }
 
+    resendEmailOtp(toEmail: string): Observable<any> {
+        const requestPayload = {
+            toEmail: toEmail,
+            subject: 'BHDT',
+            body: 'Lấy lại mật khẩu.',
+        };
+
+        return this.http.post<any>(`${this.url}/api/user/resend-email-otp`, requestPayload);
+    }
+
+    setPassword(payload: any): Observable<any> {
+        return this.http.post(`${this.url}/api/user/set-password`, payload);
+    }
+
     // tny end add
 }

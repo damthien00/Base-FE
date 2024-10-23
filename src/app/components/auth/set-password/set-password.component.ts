@@ -9,83 +9,91 @@ import { ValidationService } from 'src/app/core/utils/validation.utils';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 
 @Component({
-  selector: 'app-set-password',
-  templateUrl: './set-password.component.html',
-  styleUrl: './set-password.component.scss'
+    selector: 'app-set-password',
+    templateUrl: './set-password.component.html',
+    styleUrl: './set-password.component.scss'
 })
 export class SetPasswordComponent {
-  valCheck: string[] = ['rememberMe'];
+    valCheck: string[] = ['rememberMe'];
+    messages: any[] = [];
+    password!: string;
+    resetPasswordForm: FormGroup;
 
-  password!: string;
-  loginForm: FormGroup;
+    constructor(
+        private formBuilder: FormBuilder,
+        private validationService: ValidationService,
+        public layoutService: LayoutService,
+        private authService: AuthService,
+        private router: Router,
+        private messageService: MessageService
+    ) {
+        this.resetPasswordForm = this.formBuilder.group(
+            {
+                email: [
+                    null,
+                    [
+                        Validators.required,
+                        Validators.pattern(
+                            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+                        ),
+                    ],
+                ],
+                newPassword: [null, [Validators.required]],
+                confirmPassword: [null, [Validators.required]],
+                otp: [null, [Validators.required]],
+            },
+            { validator: this.passwordMatchValidator }
+        );
+    }
 
-  constructor(
-      private formBuilder: FormBuilder,
-      private validationService: ValidationService,
-      public layoutService: LayoutService,
-      private authService: AuthService,
-      private router: Router,
-      private messageService: MessageService
-  ) {
-      this.loginForm = this.formBuilder.group({
-          email: [
-              null,
-              [
-                  Validators.required,
-                  Validators.pattern(
-                      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-                  ),
-              ],
-          ],
-          password: [null, [Validators.required]],
-          rememberMe: false,
-      });
-  }
+    passwordMatchValidator(form: FormGroup) {
+        const newPassword = form.get('newPassword')?.value;
+        const confirmPassword = form.get('confirmPassword')?.value;
 
-  onSubmit() {
-      if (this.loginForm.valid) {
-          const formData = {
-              email: this.loginForm.value.email,
-              password: this.loginForm.value.password,
-              rememberMe: this.loginForm.value.rememberMe,
-          };
-          this.authService.login(formData).subscribe((res) => {
-              if (res.status == true) {
-                  this.authService.setAuthTokenLocalStorage(res.data);
-                  this.authService.fetchUserCurrent().subscribe((data) => {
-                      this.authService.setUserCurrent(data.data);
-                      if (
-                          this.authService.hasRole(roleConstant.admin) ||
-                          this.authService.hasRole(roleConstant.master) ||
-                          this.authService.hasRole(roleConstant.employee)
-                      ) {
-                          this.messageService.add({
-                              severity: 'success',
-                              summary: 'Thành công',
-                              detail: 'Đăng nhập thành công',
-                          });
-                          this.router.navigate([Page.Dashboard]);
-                      } else {
-                          this.authService.setAuthTokenLocalStorage(null);
-                          this.authService.setUserCurrent(null);
-                          this.messageService.add({
-                              severity: 'warning',
-                              summary: 'Cảnh báo',
-                              detail: 'Bạn không có quyền',
-                          });
-                      }
-                  });
-                  this.router.navigate([Page.Login]);
-              } else {
-                  this.messageService.add({
-                      severity: 'error',
-                      summary: 'Thất bại',
-                      detail: res.message,
-                  });
-              }
-          });
-      } else {
-          this.loginForm.markAllAsTouched();
-      }
-  }
+        return newPassword === confirmPassword ? null : { passwordMismatch: true };
+    }
+
+    onSubmit() {
+        if (this.resetPasswordForm.invalid) {
+            this.resetPasswordForm.markAllAsTouched();
+            return;
+        }
+
+        const formData = this.resetPasswordForm.value;
+
+        this.authService.setPassword(formData).subscribe({
+            next: (response) => {
+                // Handle success, show a PrimeNG success message
+
+                if (response.status === false) {
+                    this.messages = [];
+                    this.messages.push({
+                        severity: 'error',
+                        summary: '',
+                        detail: response.message,
+                        life: 3000,
+                    });
+                } else {
+                    // Handle success, show a PrimeNG success message
+                    this.messages = [];
+                    this.messages.push({
+                        severity: 'success',
+                        summary: '',
+                        detail: 'Mật khẩu đã được thiết lập thành công!',
+                        life: 3000,
+                    });
+                }
+            },
+            error: (err) => {
+                // Handle error, show a PrimeNG error message
+                this.messages = [];
+                this.messages.push({
+                    severity: 'error',
+                    summary: '',
+                    detail: 'Có lỗi xảy ra. Vui lòng kiểm tra lại thông tin.',
+                    life: 3000,
+                });
+            }
+        });
+    }
 }

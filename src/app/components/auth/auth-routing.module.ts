@@ -26,6 +26,11 @@ import { RouterModule } from '@angular/router';
                 loadChildren: () =>
                     import('./set-password/set-password.module').then((m) => m.SetPasswordModule),
             },
+            {
+                path: 'resend-email-otp',
+                loadChildren: () =>
+                    import('./resend-email-otp/resend-email-otp.module').then((m) => m.ResendEmailOtpModule),
+            },
             { path: '**', redirectTo: '/notfound' },
         ]),
     ],
