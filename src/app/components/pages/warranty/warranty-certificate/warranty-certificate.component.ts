@@ -147,7 +147,9 @@ export class WarrantyCertificateComponent implements OnInit {
     }
 
     loadWarranty() {
-        this.optionsFilterWarranty.BranchId = this.userCurrent.branchId;
+        if (this.userCurrent.branchId != 1) {
+            this.optionsFilterWarranty.BranchId = this.userCurrent.branchId;
+        }
         if (this.optionsFilterWarranty.CustomerKeyword === '') {
             this.optionsFilterWarranty.CustomerKeyword = null;
         }

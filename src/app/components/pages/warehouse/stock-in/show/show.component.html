@@ -81,12 +81,12 @@
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th style="width: 15%;">Mã nhập kho</th>
-                        <th style="width: 15%;">Người tạo</th>
-                        <th style="width: 5%;">Ngày nhập kho</th>
-                        <th style="width: 5%;">Số sản phẩm</th>
-                        <th style="width: 6%;">Tổng tiền</th>
-                        <th style="width: 40%;">Ghi chú</th>
+                        <th style="width: 15%">Mã nhập kho</th>
+                        <th style="width: 15%">Người tạo</th>
+                        <th style="width: 5%">Ngày nhập kho</th>
+                        <th style="width: 5%">Số sản phẩm</th>
+                        <th style="width: 6%">Tổng tiền</th>
+                        <th style="width: 40%">Ghi chú</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-stockInItem>
@@ -111,7 +111,6 @@
                                 stockInItem.createdAt
                                     | date : "dd/MM/yyyy HH:mm:ss"
                             }}
-
                             <!-- {{ stockInItem.parentName }} -->
                         </td>
                         <td style="width: 14%; min-width: 8rem">
@@ -159,356 +158,399 @@
             </div>
         </div>
     </div>
-</div>
-<p-dialog
-    [(visible)]="displayStockInDetailModal"
-    modal="true"
-    [closable]="false"
-    [draggable]="false"
-    [resizable]="false"
-    [style]="{ width: '70vw' }"
->
-    <!-- Header -->
-    <ng-template pTemplate="header">
-        <div class="flex justify-content-between" style="width: 100%">
-            <h4>Chi tiết phiếu nhập kho</h4>
-            <span class="close" (click)="displayStockInDetailModal = false">
-                <i class="pi pi-times"></i>
-            </span>
-        </div>
-    </ng-template>
+    <p-dialog
+        [(visible)]="displayStockInDetailModal"
+        modal="true"
+        [closable]="false"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: '70vw' }"
+    >
+        <!-- Header -->
+        <ng-template pTemplate="header">
+            <div class="flex justify-content-between" style="width: 100%">
+                <h4>Chi tiết phiếu nhập kho</h4>
+                <span class="close" (click)="displayStockInDetailModal = false">
+                    <i class="pi pi-times"></i>
+                </span>
+            </div>
+        </ng-template>
 
-    <!-- Body -->
-    <ng-template pTemplate="content">
-        <div class="grid">
-            <div class="col-8">
-                <div class="card p-0" style="height: 280px">
-                    <p-table
-                        #dt
-                        [value]="stockInItemDetail?.inventoryStockInDetails"
-                        responsiveLayout="scroll"
-                        scrollHeight="280px"
-                        [rowHover]="true"
-                        dataKey="id"
-                    >
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th>#</th>
-                                <th>Ảnh</th>
-                                <th>Tên sản phẩm</th>
-                                <th style="text-align: center">Giá nhập</th>
-                                <th style="text-align: center">ĐVT</th>
-                                <th style="text-align: center">Số lượng</th>
-                                <th style="text-align: center">Thành tiền</th>
-                            </tr>
-                        </ng-template>
+        <!-- Body -->
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="col-8">
+                    <div class="card p-0" style="height: 280px">
+                        <p-table
+                            #dt
+                            [value]="stockInItemDetail?.inventoryStockInDetails"
+                            responsiveLayout="scroll"
+                            scrollHeight="280px"
+                            [rowHover]="true"
+                            dataKey="id"
+                        >
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th style="text-align: center">Giá nhập</th>
+                                    <th style="text-align: center">ĐVT</th>
+                                    <th style="text-align: center">Số lượng</th>
+                                    <th style="text-align: center">
+                                        Thành tiền
+                                    </th>
+                                </tr>
+                            </ng-template>
 
-                        <ng-template pTemplate="body" let-data let-i="rowIndex">
-                            <tr>
-                                <td style="width: 3%">
-                                    {{ i + 1 }}
-                                </td>
-                                <td style="width: 8%">
-                                    <img
-                                        *ngIf="data.productImage"
-                                        [src]="imageUrl + data.productImage"
-                                        height="50"
-                                        width="50"
-                                        style="border-radius: 4px"
-                                        alt="Product Image"
-                                    />
-
-                                    <svg
-                                        *ngIf="!data.productImage"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="jss3869 ng-star-inserted"
-                                        style="
-                                            color: rgb(232, 234, 235);
-                                            height: 50px;
-                                        "
-                                    >
-                                        <path
-                                            _ngcontent-ng-c1628733639=""
-                                            d="M19 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2ZM5 19V5h14l.002 14H5Z"
-                                            fill="currentColor"
-                                        ></path>
-                                        <path
-                                            _ngcontent-ng-c1628733639=""
-                                            d="m10 14-1-1-3 4h12l-5-7-3 4ZM8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
-                                            fill="currentColor"
-                                        ></path>
-                                    </svg>
-                                </td>
-                                <td style="width: 15.5%">
-                                    {{ data.productName }}
-                                </td>
-                                <td style="width: 12.5%; text-align: center">
-                                    {{
-                                        data.price
-                                            | currency
-                                                : "VND"
-                                                : "symbol"
-                                                : "1.0-0"
-                                    }}
-                                </td>
-                                <td style="width: 9%; text-align: center">
-                                    {{ data.unit }}
-                                </td>
-                                <td style="width: 13.5%; text-align: center">
-                                    {{ data.quantity }}
-                                </td>
-                                <td style="width: 13.5%; text-align: center">
-                                    {{
-                                        data.totail
-                                            | currency
-                                                : "VND"
-                                                : "symbol"
-                                                : "1.0-0"
-                                    }}
-                                </td>
-                            </tr>
-                            <tr
-                                *ngIf="
-                                    data &&
-                                    data.inventoryStockDetailProductImeis &&
-                                    data.inventoryStockDetailProductImeis
-                                        .length > 0
-                                "
+                            <ng-template
+                                pTemplate="body"
+                                let-data
+                                let-i="rowIndex"
                             >
-                                <td colspan="8" class="p-3 border-none">
-                                    <div class="flex flex-column">
-                                        <label for="" class="mb-2"
-                                            >Số khung/ số máy:
-                                        </label>
-                                        <div
+                                <tr>
+                                    <td style="width: 3%">
+                                        {{ i + 1 }}
+                                    </td>
+                                    <td style="width: 8%">
+                                        <img
+                                            *ngIf="data.productImage"
+                                            [src]="imageUrl + data.productImage"
+                                            height="50"
+                                            width="50"
+                                            style="border-radius: 4px"
+                                            alt="Product Image"
+                                        />
+
+                                        <svg
+                                            *ngIf="!data.productImage"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="jss3869 ng-star-inserted"
                                             style="
-                                                display: flex;
-                                                flex-wrap: wrap;
+                                                color: rgb(232, 234, 235);
+                                                height: 50px;
                                             "
                                         >
+                                            <path
+                                                _ngcontent-ng-c1628733639=""
+                                                d="M19 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2ZM5 19V5h14l.002 14H5Z"
+                                                fill="currentColor"
+                                            ></path>
+                                            <path
+                                                _ngcontent-ng-c1628733639=""
+                                                d="m10 14-1-1-3 4h12l-5-7-3 4ZM8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
+                                                fill="currentColor"
+                                            ></path>
+                                        </svg>
+                                    </td>
+                                    <td style="width: 15.5%">
+                                        {{ data.productName }}
+                                    </td>
+                                    <td
+                                        style="width: 12.5%; text-align: center"
+                                    >
+                                        {{
+                                            data.price
+                                                | currency
+                                                    : "VND"
+                                                    : "symbol"
+                                                    : "1.0-0"
+                                        }}
+                                    </td>
+                                    <td style="width: 9%; text-align: center">
+                                        {{ data.unit }}
+                                    </td>
+                                    <td
+                                        style="width: 13.5%; text-align: center"
+                                    >
+                                        {{ data.quantity }}
+                                    </td>
+                                    <td
+                                        style="width: 13.5%; text-align: center"
+                                    >
+                                        {{
+                                            data.totail
+                                                | currency
+                                                    : "VND"
+                                                    : "symbol"
+                                                    : "1.0-0"
+                                        }}
+                                    </td>
+                                </tr>
+                                <tr
+                                    *ngIf="
+                                        data &&
+                                        data.inventoryStockDetailProductImeis &&
+                                        data.inventoryStockDetailProductImeis
+                                            .length > 0
+                                    "
+                                >
+                                    <td colspan="8" class="p-3 border-none">
+                                        <div class="flex flex-column">
+                                            <label for="" class="mb-2"
+                                                >Số khung/ số máy:
+                                            </label>
                                             <div
-                                                class="variant-item"
-                                                *ngFor="
-                                                    let variant of data.inventoryStockDetailProductImeis;
-                                                    let i = index
+                                                style="
+                                                    display: flex;
+                                                    flex-wrap: wrap;
                                                 "
                                             >
-                                                <span
-                                                    class="variant-item-label"
+                                                <div
+                                                    class="variant-item"
+                                                    *ngFor="
+                                                        let variant of data.inventoryStockDetailProductImeis;
+                                                        let i = index
+                                                    "
                                                 >
-                                                    {{ variant.frameNumber }}/{{
-                                                        variant.engineNumber
-                                                    }}
-                                                </span>
+                                                    <span
+                                                        class="variant-item-label"
+                                                    >
+                                                        {{
+                                                            variant.frameNumber
+                                                        }}/{{
+                                                            variant.engineNumber
+                                                        }}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr
-                            *ngIf="
-                                data &&
-                                data.productCodes &&
-                                data.productCodes
-                                    .length > 0
-                            "
-                        >
-                            <td colspan="8" class="p-3 border-none">
-                                <div class="flex flex-column">
-                                    <label for="" class="mb-2"
-                                        >Mã code:
-                                    </label>
-                                    <div
-                                        style="
-                                            display: flex;
-                                            flex-wrap: wrap;
-                                        "
-                                    >
-                                        <div
-                                            class="variant-item"
-                                            *ngFor="
-                                                let product of data.productCodes;
-                                                let i = index
-                                            "
-                                        >
-                                            <span
-                                                class="variant-item-label"
+                                    </td>
+                                </tr>
+                                <tr
+                                    *ngIf="
+                                        data &&
+                                        data.productCodes &&
+                                        data.productCodes.length > 0
+                                    "
+                                >
+                                    <td colspan="8" class="p-3 border-none">
+                                        <div class="flex flex-column">
+                                            <label for="" class="mb-2"
+                                                >Mã code:
+                                            </label>
+                                            <div
+                                                style="
+                                                    display: flex;
+                                                    flex-wrap: wrap;
+                                                "
                                             >
-                                                {{ product.code }}
-                                            </span>
+                                                <div
+                                                    class="variant-item"
+                                                    *ngFor="
+                                                        let product of data.productCodes;
+                                                        let i = index
+                                                    "
+                                                >
+                                                    <span
+                                                        class="variant-item-label"
+                                                    >
+                                                        {{ product.code }}
+                                                        <svg
+                                                            (click)="
+                                                                generateBarcode(
+                                                                    product.code
+                                                                )
+                                                            "
+                                                            stroke="currentColor"
+                                                            fill="currentColor"
+                                                            stroke-width="0"
+                                                            viewBox="0 0 24 24"
+                                                            height="1em"
+                                                            width="1em"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                fill="none"
+                                                                d="M0 0h24v24H0z"
+                                                            ></path>
+                                                            <path
+                                                                d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
+                                                            ></path>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div
+                        class="card"
+                        style="min-height: 280px; background-color: #efeeee"
+                    >
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Tổng số sản phẩm
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                    >
+                                        <span>{{
+                                            stockInItemDetail?.subQuantity
+                                        }}</span>
                                     </div>
                                 </div>
-                            </td>
-                        </tr>
-                        </ng-template>
-                    </p-table>
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Tổng tiền hàng
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                    >
+                                        <span>{{
+                                            stockInItemDetail?.total
+                                                | currency
+                                                    : "VND"
+                                                    : "symbol"
+                                                    : "1.0-0"
+                                        }}</span>
+                                    </div>
+                                </div>
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Giảm giá
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                    >
+                                        <span>{{
+                                            stockInItemDetail?.totalDiscount
+                                                | currency
+                                                    : "VND"
+                                                    : "symbol"
+                                                    : "1.0-0"
+                                        }}</span>
+                                    </div>
+                                </div>
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Cần trả nhà cung cấp
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                    >
+                                        <span>{{
+                                            stockInItemDetail?.total -
+                                                stockInItemDetail?.totalDiscount
+                                                | currency
+                                                    : "VND"
+                                                    : "symbol"
+                                                    : "1.0-0"
+                                        }}</span>
+                                    </div>
+                                </div>
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Tiền trả nhà cung cấp
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
+                                    >
+                                        <span>{{
+                                            stockInItemDetail?.total -
+                                                stockInItemDetail?.totalDiscount
+                                                | currency
+                                                    : "VND"
+                                                    : "symbol"
+                                                    : "1.0-0"
+                                        }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-4">
-                <div
-                    class="card"
-                    style="min-height: 280px; background-color: #efeeee"
-                >
-                    <div class="grid p-fluid">
-                        <div class="col-12 md:col-12">
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Tổng số sản phẩm
+                <div class="col-12">
+                    <div
+                        class="card"
+                        style="height: auto; background-color: #efeeee"
+                    >
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-6">
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Mã hóa đơn
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    >
+                                        <span>{{
+                                            stockInItemDetail?.code
+                                        }}</span>
+                                    </div>
                                 </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
-                                >
-                                    <span>{{
-                                        stockInItemDetail?.subQuantity
-                                    }}</span>
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Nhà cung cấp
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    >
+                                        {{
+                                            stockInItemDetail?.supplierName ||
+                                                "Đang trống"
+                                        }}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Tổng tiền hàng
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
-                                >
-                                    <span>{{
-                                        stockInItemDetail?.total
-                                            | currency
-                                                : "VND"
-                                                : "symbol"
-                                                : "1.0-0"
-                                    }}</span>
-                                </div>
-                            </div>
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Giảm giá
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
-                                >
-                                    <span>{{
-                                        stockInItemDetail?.totalDiscount
-                                            | currency
-                                                : "VND"
-                                                : "symbol"
-                                                : "1.0-0"
-                                    }}</span>
-                                </div>
-                            </div>
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Cần trả nhà cung cấp
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
-                                >
-                                    <span>{{
-                                        stockInItemDetail?.total -
-                                            stockInItemDetail?.totalDiscount
-                                            | currency
-                                                : "VND"
-                                                : "symbol"
-                                                : "1.0-0"
-                                    }}</span>
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Địa chỉ
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    >
+                                        {{ stockInItemDetail?.supplierAddress }}
+                                        {{
+                                            stockInItemDetail?.supplierWardName
+                                        }}
+                                        {{
+                                            stockInItemDetail?.supplierDistrictName
+                                        }}{{
+                                            stockInItemDetail?.supplierCityName
+                                        }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Tiền trả nhà cung cấp
+                            <div class="col-12 md:col-6">
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Thời gian tạo
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    >
+                                        <span>{{
+                                            stockInItemDetail?.createdAt
+                                                | date : "dd/MM/yyyy HH:mm:ss"
+                                        }}</span>
+                                    </div>
                                 </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-end"
-                                >
-                                    <span>{{
-                                        stockInItemDetail?.total -
-                                            stockInItemDetail?.totalDiscount
-                                            | currency
-                                                : "VND"
-                                                : "symbol"
-                                                : "1.0-0"
-                                    }}</span>
+                                <div class="field grid">
+                                    <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                        Người tạo
+                                    </div>
+                                    <div
+                                        class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    >
+                                        {{ stockInItemDetail?.createName }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12">
-                <div
-                    class="card"
-                    style="height: auto; background-color: #efeeee"
-                >
-                    <div class="grid p-fluid">
-                        <div class="col-12 md:col-6">
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Mã hóa đơn
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
-                                >
-                                    <span>{{ stockInItemDetail?.code }}</span>
-                                </div>
-                            </div>
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Nhà cung cấp
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
-                                >
-                                    {{
-                                        stockInItemDetail?.supplierName ||
-                                            "Đang trống"
-                                    }}
-                                </div>
-                            </div>
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Địa chỉ
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
-                                >
-                                    {{ stockInItemDetail?.supplierAddress }}
-                                    {{ stockInItemDetail?.supplierWardName }}
-                                    {{ stockInItemDetail?.supplierDistrictName
-                                    }}{{ stockInItemDetail?.supplierCityName }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-6">
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Thời gian tạo
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
-                                >
-                                    <span>{{
-                                        stockInItemDetail?.createdAt
-                                            | date : "dd/MM/yyyy HH:mm:ss"
-                                    }}</span>
-                                </div>
-                            </div>
-                            <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Người tạo
-                                </div>
-                                <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
-                                >
-                                    {{ stockInItemDetail?.createName }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-</p-dialog>
+        </ng-template>
+    </p-dialog>
+</div>
+
+<div id="print-section"></div>
