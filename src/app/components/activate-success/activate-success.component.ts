@@ -20,7 +20,6 @@ export class ActivateSuccessComponent implements OnInit {
     ) {
         this.authService.userCurrent.subscribe((user) => {
             this.userCurrent = user;
-            console.log(this.userCurrent);
         });
     }
     warrantyById: any;

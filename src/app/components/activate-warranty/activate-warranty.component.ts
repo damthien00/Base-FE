@@ -10,6 +10,7 @@ import { CustomerService } from 'src/app/core/services/customer.service';
 import { OptionsFilterCustomer } from 'src/app/core/DTOs/customer/optionsFilterCustomers';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { OptionsFilterBranch } from 'src/app/core/DTOs/branch/optionsFilterBranchs';
+import { dA } from '@fullcalendar/core/internal-common';
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
     query: string;
@@ -189,20 +190,24 @@ export class ActivateWarrantyComponent implements OnInit {
                         .getProoductByEmei(this.keywords)
                         .subscribe(
                             (data) => {
-                                const product = data?.data;
-
+                                const product = data?.data.items[0];
                                 if (product) {
                                     const isProductExists =
                                         this.productListSelected.some(
                                             (p) => p.id === product.id // So sánh theo ID hoặc một thuộc tính duy nhất của sản phẩm
                                         );
-                                    if (!isProductExists && product.term) {
+
+                                    if (
+                                        !isProductExists &&
+                                        product.product.warrantyPolicy.term
+                                    ) {
                                         this.productListSelected.push(product);
                                     } else {
                                         console.log(
                                             'Product already exists in the list'
                                         );
                                     }
+                                    console.log(this.productListSelected);
                                 } else {
                                     console.error('No product found');
                                 }
@@ -229,8 +234,6 @@ export class ActivateWarrantyComponent implements OnInit {
                 console.log(cities.data);
                 this.cities = cities.data;
             });
-
-        console.log(countryId);
     }
 
     getDistrictsByCity(cityId: number) {
@@ -783,21 +786,19 @@ export class ActivateWarrantyComponent implements OnInit {
                                 const warrantyProduct = {
                                     productId: product.productId,
                                     productVariantId: product.productVariantId,
-                                    productName:
-                                        product.productVariant.productName,
-                                    value1: product.productVariant
-                                        .valuePropeties1,
-                                    value2: product.productVariant
-                                        .valuePropeties2,
-                                    sk: product.frameNumber,
-                                    sm: product.engineNumber,
+                                    productName: product.productName,
+                                    productVariantName:
+                                        product.productVariantName,
+
                                     quantity: -1,
-                                    inventoryStockDetailProductImeiId:
-                                        product.id,
-                                    expirationDate: product.term
+                                    inventoryStockDetailProductImeiId: null,
+                                    expirationDate: product.product
+                                        .warrantyPolicy.term
                                         ? this.calculateExpirationDate(
-                                              product.term,
-                                              product.termType
+                                              product.product.warrantyPolicy
+                                                  .term,
+                                              product.product.warrantyPolicy
+                                                  .termType
                                           )
                                         : new Date(
                                               new Date().getTime() +
@@ -812,6 +813,8 @@ export class ActivateWarrantyComponent implements OnInit {
                                         this.createActivateWarranty.value
                                             .customerName || 'string',
                                     branchId: product.branchId || 1,
+                                    productCode: product.code.toString(),
+                                    productCodeId: Number(product.id),
                                     branchName: product.branchName || '',
                                     phoneNumber:
                                         this.createActivateWarranty.value

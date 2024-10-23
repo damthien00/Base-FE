@@ -37,18 +37,23 @@ export class StockInService {
             CreatedById,
             StartDate,
             Code,
+            branchId,
+            CreateName,
             EndDate,
             TrackingNumber,
         } = optionsFilterStockIn;
 
-        // Khởi tạo URL với các tham số cơ bản
         let url = `${this.url}/api/inventory-stock-in/paging?pageSize=${
             pageSize ?? 100
         }&pageIndex=${pageIndex ?? 1}`;
-
-        // Thêm tham số CreatedById nếu có
+        if (branchId !== null && branchId !== undefined) {
+            url += `&BrnachId=${branchId}`;
+        }
         if (CreatedById !== null && CreatedById !== undefined) {
             url += `&CreatedById=${CreatedById}`;
+        }
+        if (CreateName !== null && CreateName !== undefined) {
+            url += `&CreateName=${CreateName}`;
         }
 
         // Thêm tham số StartDate nếu có

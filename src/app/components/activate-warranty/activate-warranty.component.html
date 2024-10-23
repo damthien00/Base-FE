@@ -160,10 +160,10 @@
                             [showClear]="true"
                             placeholder="Chọn Tỉnh/Thành"
                             formControlName="cityId"
-                            optionValue="id"
                             (onChange)="onCityChange($event, $event.value)"
                             (onClear)="onClearCity()"
                         ></p-dropdown>
+                        <!-- optionValue="id" -->
                     </div>
                 </div>
                 <div class="col-12 md:col-12 py-1">
@@ -183,8 +183,8 @@
                             (onClear)="onClearDistrict()"
                             [emptyMessage]="'Vui lòng chọn tỉnh trước!'"
                             formControlName="districtId"
-                            optionValue="id"
                         ></p-dropdown>
+                        <!-- optionValue="id" -->
                     </div>
                 </div>
                 <div class="col-12 md:col-12 py-1">
@@ -198,13 +198,13 @@
                             [options]="wards"
                             [style]="{ width: '100%' }"
                             optionLabel="name"
-                            optionValue="id"
                             [showClear]="true"
                             placeholder="Chọn Xã/Phường"
                             (onClear)="onClearWard()"
                             formControlName="wardId"
                             [emptyMessage]="'Vui lòng chọn tỉnh/huyện trước!'"
                         ></p-dropdown>
+                        <!-- optionValue="id" -->
                     </div>
                 </div>
                 <div class="col-12 md:col-12 py-1">
@@ -283,30 +283,59 @@
                             <td>
                                 <div class="flex flex-column">
                                     <span class="mb-1"
-                                        >{{ item.product.name }}-{{
-                                            item.productVariant.valuePropeties1
-                                        }}-{{
-                                            item.productVariant.valuePropeties2
+                                        >{{ item.productName
+                                        }}{{
+                                            "-" + item.productVariantName
                                         }}</span
                                     >
                                     <span
-                                        ><strong>Số khung:</strong>
-                                        {{ item.frameNumber }}</span
-                                    >
-                                    <span
-                                        ><strong>Số máy:</strong>
-                                        {{ item.engineNumber }}</span
+                                        ><strong>Số Serial:</strong>
+                                        {{ item.code }}</span
                                     >
                                 </div>
                             </td>
                             <td>
-                                <span *ngIf="!item.term">Không bảo hành </span>
-                                <span>{{ item.term }} </span>
-                                <span *ngIf="item.termType === 1">ngày</span>
-                                <span *ngIf="item.termType === 2">tuần</span>
-                                <span *ngIf="item.termType === 3">tháng</span>
-                                <span *ngIf="item.termType === 4">quý</span>
-                                <span *ngIf="item.termType === 5">năm</span>
+                                <span *ngIf="!item.product.warrantyPolicy.term"
+                                    >Không bảo hành
+                                </span>
+                                <span
+                                    >{{ item.product.warrantyPolicy.term }}
+                                </span>
+                                <span
+                                    *ngIf="
+                                        item.product.warrantyPolicy.termType ===
+                                        1
+                                    "
+                                    >ngày</span
+                                >
+                                <span
+                                    *ngIf="
+                                        item.product.warrantyPolicy.termType ===
+                                        2
+                                    "
+                                    >tuần</span
+                                >
+                                <span
+                                    *ngIf="
+                                        item.product.warrantyPolicy.termType ===
+                                        3
+                                    "
+                                    >tháng</span
+                                >
+                                <span
+                                    *ngIf="
+                                        item.product.warrantyPolicy.termType ===
+                                        4
+                                    "
+                                    >quý</span
+                                >
+                                <span
+                                    *ngIf="
+                                        item.product.warrantyPolicy.termType ===
+                                        5
+                                    "
+                                    >năm</span
+                                >
                             </td>
                             <td>
                                 <span (click)="removeProduct()">

@@ -6,6 +6,7 @@ import { MenuItem } from 'primeng/api';
 import { environment } from 'src/environments/environment';
 import { B } from '@fullcalendar/core/internal-common';
 import { AuthService } from 'src/app/core/services/auth.service';
+import * as JsBarcode from 'jsbarcode';
 
 @Component({
     selector: 'app-show',
@@ -19,7 +20,7 @@ export class ShowComponent implements OnInit {
     optionsFilterStockIn: OptionsFilterStockIn = new OptionsFilterStockIn();
     displayStockInDetailModal: boolean = false;
     public userCurrent: any;
-
+    selectedCodePrint: any;
     stockInItemDetail: any;
     code: any;
     deadlineRange: Date[] = [];
@@ -29,6 +30,8 @@ export class ShowComponent implements OnInit {
     pageNumber: number = 1;
     totalRecordsCount: any;
     isLoading: boolean = true;
+
+    printData: any;
 
     constructor(
         private stockInService: StockInService,
@@ -54,6 +57,9 @@ export class ShowComponent implements OnInit {
 
     loadStockIn() {
         this.isLoading = true;
+        if (this.userCurrent.branchId != 1) {
+            this.optionsFilterStockIn.branchId = this.userCurrent.branchId;
+        }
         this.optionsFilterStockIn.pageIndex = this.pageNumber;
         this.optionsFilterStockIn.pageSize = this.pageSize;
         this.stockInService
@@ -99,14 +105,13 @@ export class ShowComponent implements OnInit {
             this.optionsFilterStockIn.EndDate = null;
         }
         this.pageNumber = 1;
-        this.optionsFilterStockIn.Code = this.code;
+        this.optionsFilterStockIn.CreateName = this.code;
+
         this.loadStockIn();
     }
 
     //Paganation
     onPageChange(event: any): void {
-        console.log(event);
-
         this.pageSize = event.rows;
         this.pageNumber = event.page + 1;
         this.loadStockIn();
@@ -137,5 +142,35 @@ export class ShowComponent implements OnInit {
         return calculatedEnd > this.totalRecordsCount
             ? this.totalRecordsCount
             : calculatedEnd;
+    }
+
+    generateBarcode(code: any) {
+        this.selectedCodePrint = code;
+        this.printOrder();
+    }
+
+    printOrder() {
+        const printSection = document.getElementById('print-section');
+        if (printSection) {
+            // Xóa nội dung cũ và thêm phần tử SVG mới
+            printSection.innerHTML = `
+                <svg id="barcode"></svg>
+            `;
+            // Tạo mã vạch sau khi thêm phần tử SVG
+            JsBarcode('#barcode', this.selectedCodePrint, {
+                format: 'CODE128',
+                lineColor: '#0aa',
+                width: 2,
+                height: 40,
+                displayValue: true,
+            });
+            console.log('Updated print section:', printSection.innerHTML);
+        } else {
+            console.log('print-section not found');
+        }
+
+        setTimeout(() => {
+            window.print();
+        }, 500);
     }
 }

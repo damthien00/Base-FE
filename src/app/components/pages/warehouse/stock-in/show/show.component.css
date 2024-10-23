@@ -41,3 +41,40 @@
     align-items: center;
     margin-bottom: 10px;
 }
+/* Mặc định ẩn print-section */
+#print-section {
+    display: none;
+}
+
+/* Khi in, hiển thị print-section và ẩn các phần khác */
+@media print {
+    body * {
+            display: none;
+        }
+
+    .grid {
+        display: none;
+    }
+
+    #print-section,
+    #print-section * {
+        display: block !important;
+        page-break-inside: avoid;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        z-index: 99999999;
+        background-color: #fff;
+        width: 100%;
+        height:100vh;
+        right: 0;
+        bottom: 0;
+    }
+
+    .header,
+    .navbar,
+    .footer,
+    .sidebar {
+        display: none !important;
+    }
+}
