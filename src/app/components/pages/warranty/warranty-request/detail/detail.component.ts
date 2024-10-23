@@ -35,12 +35,12 @@ export interface WarehouseReceipt {
 }
 
 @Component({
-    selector: 'app-create',
-    templateUrl: './create.component.html',
-    styleUrls: ['./create.component.css'],
+    selector: 'app-detail',
+    templateUrl: './detail.component.html',
+    styleUrls: ['./detail.component.css'],
     providers: [MessageService],
 })
-export class CreateComponent implements OnInit {
+export class DetailComponent implements OnInit {
     imageUrl: string = environment.imageUrl;
     @ViewChild('searchInput') searchInput!: ElementRef;
     items: MenuItem[] | undefined;

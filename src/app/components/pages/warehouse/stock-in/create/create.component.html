@@ -134,7 +134,7 @@
                                                         <span
                                                             class="product-inventory"
                                                         >
-                                                            Có thể bán:
+                                                            Hiện có:
                                                             <strong>{{
                                                                 item.mass
                                                             }}</strong>
@@ -270,7 +270,10 @@
                                                     $event
                                                 )
                                             "
-                                            (ngModelChange)="updateTotal(data); validateQuantity(data)"
+                                            (ngModelChange)="
+                                                updateTotal(data);
+                                                validateQuantity(data)
+                                            "
                                             buttonLayout="horizontal"
                                             (onFocus)="
                                                 functionService.handleFocusPrice(
@@ -283,8 +286,13 @@
                                             [max]="100"
                                             [step]="1"
                                         />
-                                        <div *ngIf="quantityError"  style="color: red; margin-top: 5px;">
-                                            <p style="color: red;">Số lượng không được lớn hơn 100</p>
+                                        <div
+                                            *ngIf="quantityError"
+                                            style="color: red; margin-top: 5px"
+                                        >
+                                            <p style="color: red">
+                                                Số lượng không được lớn hơn 100
+                                            </p>
                                         </div>
                                         <span
                                             *ngIf="data.productType === 1"

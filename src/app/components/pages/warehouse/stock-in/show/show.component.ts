@@ -4,7 +4,6 @@ import { StockInService } from './../../../../../core/services/stock-in.service'
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { environment } from 'src/environments/environment';
-import { B } from '@fullcalendar/core/internal-common';
 import { AuthService } from 'src/app/core/services/auth.service';
 import * as JsBarcode from 'jsbarcode';
 

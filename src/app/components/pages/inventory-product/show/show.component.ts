@@ -96,12 +96,9 @@ export class ShowComponent implements OnInit {
         ];
 
         this.loadBranchs();
-        console.log(this.branchs);
         const branch = this.branchs.find(
             (branch) => branch.id === this.userCurrent.branchId
         );
-        console.log(branch);
-
         if (branch) {
             console.log(branch);
 
@@ -138,8 +135,13 @@ export class ShowComponent implements OnInit {
     }
 
     loadProduct() {
-        this.optionsFilterInventoryProduct.branchId =
-            this.brandIdSelected?.id || this.brandIdSelected;
+        if (this.userCurrent.branchId != 1) {
+            this.optionsFilterInventoryProduct.branchId =
+                this.userCurrent.branchId;
+        } else {
+            this.optionsFilterInventoryProduct.branchId =
+                this.brandIdSelected?.id || this.brandIdSelected;
+        }
         this.optionsFilterInventoryProduct.pageIndex = this.pageNumber;
         this.optionsFilterInventoryProduct.pageSize = this.pageSize;
 

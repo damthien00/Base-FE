@@ -160,6 +160,7 @@
                             [showClear]="true"
                             placeholder="Chọn Tỉnh/Thành"
                             formControlName="cityId"
+                            optionValue="id"
                             (onChange)="onCityChange($event, $event.value)"
                             (onClear)="onClearCity()"
                         ></p-dropdown>
@@ -183,6 +184,7 @@
                             (onClear)="onClearDistrict()"
                             [emptyMessage]="'Vui lòng chọn tỉnh trước!'"
                             formControlName="districtId"
+                            optionValue="id"
                         ></p-dropdown>
                         <!-- optionValue="id" -->
                     </div>
@@ -203,6 +205,7 @@
                             (onClear)="onClearWard()"
                             formControlName="wardId"
                             [emptyMessage]="'Vui lòng chọn tỉnh/huyện trước!'"
+                            optionValue="id"
                         ></p-dropdown>
                         <!-- optionValue="id" -->
                     </div>
