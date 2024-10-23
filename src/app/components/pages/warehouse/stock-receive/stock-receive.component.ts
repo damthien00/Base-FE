@@ -117,7 +117,7 @@ export class StockReceiveComponent implements OnInit {
       case 'accept':
         return 'Nhận hàng thành công';
       case 'reject':
-        return 'Đã hủy chuyển hàng';
+        return 'Đã hủy nhận hàng';
       default:
         return 'Trạng thái không xác định';
     }

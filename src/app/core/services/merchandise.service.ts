@@ -26,8 +26,8 @@ export class MerchandiseService {
 
     return this.http.get<any>(url);
   }
-  
-  getProductCode(productId: number, productVariantId: number, branchId: number, IsPurchased: number = 0, IsBillOfLading: number = 0, PageSize: number = 1000, PageIndex: number = 1): Observable<any> {
+
+  getProductCode(productId: number, productVariantId: number, branchId: number, IsPurchased: number = 0, IsBillOfLading: number = 0, PageSize: number = 1000, PageIndex: number = 1, ProductCode: string = ''): Observable<any> {
     let url = `${this.url}/api/product-code/get-paging?ProductId=${productId}&IsPurchased=${IsPurchased}&IsBillOfLading=${IsBillOfLading}&PageSize=${PageSize}&PageIndex=${PageIndex}`;
 
     if (productVariantId !== null && productVariantId !== undefined) {
@@ -36,6 +36,10 @@ export class MerchandiseService {
 
     if (branchId !== null && branchId !== undefined) {
       url += `&BranchId=${branchId}`;
+    }
+
+    if (ProductCode) {
+      url += `&ProductCode=${ProductCode}`;
     }
 
     return this.http.get<any>(url);
@@ -67,7 +71,7 @@ export class MerchandiseService {
   }
 
 
-  getFilters(PageSize: number, PageIndex: number, FromBranchId?: number, ToBranchId?: number, FromBranchName?: string, ToBranchName?: string, Code?: string, IAccepted?: string, CreatedAt?: string  ): Observable<any> {
+  getFilters(PageSize: number, PageIndex: number, FromBranchId?: number, ToBranchId?: number, FromBranchName?: string, ToBranchName?: string, Code?: string, IAccepted?: string, CreatedAt?: string): Observable<any> {
     let params = new HttpParams()
       .set('PageSize', PageSize.toString())
       .set('PageIndex', PageIndex.toString());
@@ -117,5 +121,5 @@ export class MerchandiseService {
     return this.http.put(url, updateLadingData);
   }
 
- 
+
 }
