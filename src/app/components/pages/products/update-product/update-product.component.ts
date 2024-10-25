@@ -1909,7 +1909,9 @@ export class UpdateProductComponent implements OnInit {
             return;
         }
 
-        const productTypeValue = productData.productType === 1 ? 1 : 0;
+        const productTypeValue = this.productForm.get('productType')?.enabled
+        ? (productData.productType === 1 ? 1 : 0)
+        : this.productById.productType;
 
         const product: Products = {
             id: productData.id,
