@@ -548,9 +548,10 @@ export class BranchTransferComponent implements OnInit {
 
       // Use Promise.all to fetch both data
       Promise.all([
-        this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId),
+        // this.fetchProductImeiData(item.productId, item.productVariantId, this.userCurrent?.branchId),
         this.fetchProductCodeData(item.productId, item.productVariantId, this.userCurrent?.branchId)
-      ]).then(([imeiResponse, codeResponse]) => {
+      // ]).then(([imeiResponse, codeResponse]) => {
+      ]).then(([imeiResponse]) => {
         const productInCart = this.stockInReceipt.inventoryStockInDetails.find(
           (detail) => detail.productId === item.productId && detail.productVariantId === item.productVariantId
         );
@@ -558,7 +559,7 @@ export class BranchTransferComponent implements OnInit {
         if (productInCart) {
           // Update totalRecords and totalRecords2 from the respective responses
           productInCart.totalRecords = imeiResponse.data.totalRecords;
-          productInCart.totalRecords2 = codeResponse.data.totalRecords;
+          // productInCart.totalRecords2 = codeResponse.data.totalRecords;
 
           // Update quantity based on the frameEngineData
           productInCart.quantity = productInCart.frameEngineData && productInCart.frameEngineData.length > 0 ? 0 : 0;
@@ -772,7 +773,7 @@ export class BranchTransferComponent implements OnInit {
       );
 
     const productCodeBills = this.stockInReceipt.inventoryStockInDetails
-      .filter(product => product.productType !== 1)
+      .filter(product => product.productType === 0 || product.productType === 1)
       .flatMap(product =>
         product.productCodeData
           .filter(code => code.isChecked)

@@ -135,5 +135,9 @@ export class AuthService {
         return this.http.post(`${this.url}/api/user/set-password`, payload);
     }
 
+    getUsers(pageSize: number = 1000): Observable<any> {
+        return this.http.get<any>(`${this.url}/api/user/paging-info?pageSize=${pageSize}`);
+      }
+
     // tny end add
 }
