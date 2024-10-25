@@ -388,12 +388,24 @@ export class ActivateWarrantyComponent implements OnInit {
                                     this.productListSelected.map((product) => ({
                                         productCodeId: Number(product.id), // Lấy id từ danh sách sản phẩm đã chọn
                                         //Để tạm null
-                                        warrantyStartDate: null,
-                                        warrantyEndDate: null,
+                                        warrantyStartDate: new Date(),
+                                        warrantyEndDate: product.product
+                                            .warrantyPolicy.term
+                                            ? this.calculateExpirationDate(
+                                                  product.product.warrantyPolicy
+                                                      .term,
+                                                  product.product.warrantyPolicy
+                                                      .termType
+                                              )
+                                            : new Date(
+                                                  new Date().getTime() +
+                                                      7 * 60 * 60 * 1000
+                                              ).toISOString(),
                                     }));
 
                                 const formData1 = {
-                                    updateRequests,
+                                    updateProductCodeIsPurchaseRequests:
+                                        updateRequests,
                                 };
                                 // Sau khi tạo phiếu bảo hành, cập nhật trạng thái Purchased cho tất cả sản phẩm
                                 return this.warrantyService.updateProductCodePurchased(
