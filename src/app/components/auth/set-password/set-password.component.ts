@@ -18,6 +18,7 @@ export class SetPasswordComponent implements OnInit {
     messages: any[] = [];
     password!: string;
     resetPasswordForm: FormGroup;
+    otpSent: boolean = false;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -92,9 +93,7 @@ export class SetPasswordComponent implements OnInit {
                         detail: 'Mật khẩu đã được thiết lập thành công!',
                         life: 2000,
                     });
-                    setTimeout(() => {
-                        this.router.navigate(['/auth/login']);
-                    }, 3000);
+                    this.otpSent = true;
                 }
             },
             error: (err) => {
@@ -106,7 +105,12 @@ export class SetPasswordComponent implements OnInit {
                     detail: 'Có lỗi xảy ra. Vui lòng kiểm tra lại thông tin.',
                     life: 3000,
                 });
+                this.otpSent = false;
             }
         });
+    }
+
+    navigateToSetPassword() {
+        this.router.navigate(['/auth/login']);
     }
 }
