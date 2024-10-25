@@ -154,12 +154,7 @@
                         </td>
 
                         <td>
-                            {{
-        warrantyOrder?.warrantyProducts?.[0]?.inventoryStockDetailProductImei
-            ? warrantyOrder.warrantyProducts[0].inventoryStockDetailProductImei.frameNumber + '-' +
-              warrantyOrder.warrantyProducts[0].inventoryStockDetailProductImei.engineNumber
-            : 'N/A'
-                            }}
+                            {{ warrantyOrder?.productCode }}
                         </td>
 
                         <td>

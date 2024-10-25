@@ -74,12 +74,9 @@ export class WarrantyService {
             .pipe(catchError(this.handleError));
     }
 
-    updatePurchased(data: any): Observable<any> {
+    updateProductCodePurchased(data: any): Observable<any> {
         return this.http
-            .put<any>(
-                `${this.url}/api/inventory-stock-detail-product-imei/update-is-purchased`,
-                data
-            )
+            .put<any>(`${this.url}/api/product-code/update-is-purchased`, data)
             .pipe(catchError(this.handleError));
     }
 

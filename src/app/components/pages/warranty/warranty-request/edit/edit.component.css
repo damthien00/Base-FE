@@ -216,19 +216,20 @@ label.custom-file-upload {
     font-family: sans-serif;
 }
 
-.input-input-wrap{
+.input-input-wrap {
     border: 1px solid rgba(42, 41, 134, 0.5);
     width: 100%;
     border-radius: 0.3rem;
     transition: 0.5s linear;
 }
+
 .input-input-wrap:hover {
     border: 1px solid var(--primary-color);
 }
 
-.custom-file-upload{
- border-top-right-radius: 0 !important;
- border-bottom-right-radius: 0 !important;
+.custom-file-upload {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 #datetime-picker {

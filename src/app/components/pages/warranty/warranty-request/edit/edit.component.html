@@ -4,10 +4,10 @@
     <div class="col-12">
         <p-toolbar styleClass="mb-2">
             <div class="">
-                <h3>Tạo yêu cầu bảo hành</h3>
+                <h3>Cập nhật yêu cầu bảo hành</h3>
                 <p-breadcrumb
-                    [model]="items"
                     [home]="{ icon: 'pi pi-home' }"
+                    [model]="items"
                 ></p-breadcrumb>
             </div>
             <ng-template pTemplate="right"></ng-template>
@@ -18,7 +18,7 @@
                     <label style="font-weight: 600" class="mb-2">
                         Thông tin khách hàng</label
                     >
-                    <p-autoComplete
+                    <!-- <p-autoComplete
                         [(ngModel)]="selectedItem"
                         [suggestions]="customers"
                         field="name"
@@ -26,12 +26,95 @@
                         placeholder="Tìm kiếm khách hàng theo tên, SĐT, Mã khách hàng"
                         (completeMethod)="search($event)"
                         (onSelect)="onCustomerSelect($event)"
-                    />
+                    /> -->
+                    <div class="grid p-fluid">
+                        <div class="col-12 md:col-6">
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Mã yêu cầu
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    <!-- <span>{{
+                                            stockInItemDetail?.code
+                                        }}</span> -->
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Ngày tạo
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    <!-- {{
+                                            stockInItemDetail?.supplierName ||
+                                                "Đang trống"
+                                        }} -->
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Người tạo
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    <!-- {{ stockInItemDetail?.supplierAddress }}
+                                        {{
+                                            stockInItemDetail?.supplierWardName
+                                        }}
+                                        {{
+                                            stockInItemDetail?.supplierDistrictName
+                                        }}{{
+                                            stockInItemDetail?.supplierCityName
+                                        }} -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Tên khách hàng
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    <!-- <span>{{
+                                            stockInItemDetail?.createdAt
+                                                | date : "dd/MM/yyyy HH:mm:ss"
+                                        }}</span> -->
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Số điện thoại
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    <!-- {{ stockInItemDetail?.createName }} -->
+                                </div>
+                            </div>
+                            <div class="field grid">
+                                <div class="col-12 mb-2 md:col-7 md:mb-0">
+                                    Địa chỉ
+                                </div>
+                                <div
+                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                >
+                                    <!-- {{ stockInItemDetail?.createName }} -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <!-- listCart -->
                 <div class="card" style="min-height: 525px">
                     <p-table
                         #dt
-                        [value]="listCart"
+                        [value]=""
                         responsiveLayout="scroll"
                         [rowHover]="true"
                         dataKey="id"
@@ -272,7 +355,7 @@
                                 >
                                 <div class="supplier-select mb-3">
                                     <label class="mb-2">Chi nhánh</label>
-                                    <p-dropdown
+                                    <!-- <p-dropdown
                                         [options]="branchs"
                                         [style]="{ width: '100%' }"
                                         optionLabel="name"
@@ -284,7 +367,7 @@
                                         "
                                         [(ngModel)]="selectedBranchId"
                                         name="districtId"
-                                    ></p-dropdown>
+                                    ></p-dropdown> -->
                                 </div>
 
                                 <div class="field grid">
@@ -296,7 +379,7 @@
                                     <div
                                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                     >
-                                        {{ listCart.length }}
+                                        <!-- {{ listCart.length }} -->
                                     </div>
                                 </div>
 
@@ -306,10 +389,10 @@
                                         >Mô tả chi tiết lỗi</label
                                     >
                                     <textarea
-                                        [(ngModel)]="note"
                                         pInputTextarea
                                         spellcheck="false"
                                     ></textarea>
+                                    <!-- [(ngModel)]="note" -->
                                 </div>
 
                                 <div class="field mb-4">
@@ -322,7 +405,7 @@
                                         multiple
                                     /> -->
 
-                                    <input
+                                    <!-- <input
                                         type="file"
                                         id="actual-btn"
                                         hidden
@@ -330,7 +413,7 @@
                                         accept="image/*"
                                         multiple
                                         (change)="onImageSelected($event)"
-                                    />
+                                    /> -->
 
                                     <!-- our custom upload button -->
                                     <div class="input-input-wrap">
@@ -340,10 +423,10 @@
                                             >Chọn ảnh</label
                                         >
                                         <!-- name of file chosen -->
-                                        <span id="file-chosen"
+                                        <!-- <span id="file-chosen"
                                             >{{ files?.length || 0 }} đã
                                             chọn</span
-                                        >
+                                        > -->
                                     </div>
                                     <label
                                         class="mb-2"
@@ -362,8 +445,8 @@
                                 pRipple
                                 icon="pi pi-plus"
                                 label="Lưu"
-                                (click)="onSubmit()"
                             ></button>
+                            <!-- (click)="onSubmit()" -->
                         </div>
                     </div>
                 </div>

@@ -76,7 +76,7 @@ export class CreateComponent implements OnInit {
     warrantyInfos: any[] = [];
     fileName: string = 'No file chosen';
     value: string | undefined;
-
+    statusList: any[] = [];
     keyWord: any;
     constructor(
         private nodeService: NodeService,
@@ -98,6 +98,14 @@ export class CreateComponent implements OnInit {
             { label: 'Bảo hành', route: '/inputtext' },
             { label: 'Tạo phiếu bảo hành', route: '/inputtext' },
         ];
+        this.statusList = [
+            { label: 'Mới tạo', value: 0 },
+            { label: 'Đã tiếp nhận', value: 1 },
+            { label: 'Đang sửa', value: 2 },
+            { label: 'Đã sửa xong', value: 3 },
+            { label: 'Đã trả khách', value: 4 },
+        ];
+
         this.stockInReceipt = {
             supplierId: '',
             // subquantity: '',
@@ -401,15 +409,39 @@ export class CreateComponent implements OnInit {
                 formData.append('AttachmentFiles', file);
             }
         }
-
+        console.log(this.listCart);
         this.warrantyInfos = this.listCart.map((item) => {
             return {
-                id: item.warrantyId,
-                dueDate: item.returnDate, // Giả sử thuộc tính `dueDate` có trong `item`
+                id: item.warrantyProducts[0].warrantyId,
+                status: 0,
+                dueDate: item.returnDate,
             };
         });
+
         const warrantyInfosJson = JSON.stringify(this.warrantyInfos);
-        formData.append('WarrantyInfos', warrantyInfosJson);
+
+        if (this.files && this.files.length > 0) {
+            for (const file of this.files) {
+                formData.append('AttachmentFiles', file);
+            }
+        }
+
+        if (this.warrantyInfos && this.warrantyInfos.length > 0) {
+            for (let i = 0; i < this.warrantyInfos.length; i++) {
+                formData.append(
+                    `WarrantyInfos[${i}].id`,
+                    this.warrantyInfos[i].id
+                );
+                formData.append(
+                    `WarrantyInfos[${i}].status`,
+                    this.warrantyInfos[i].status
+                );
+                formData.append(
+                    `WarrantyInfos[${i}].dueDate`,
+                    this.warrantyInfos[i].dueDate
+                );
+            }
+        }
 
         this.warrantyService.createWarrantyClaim(formData).subscribe(
             (item) => {
@@ -561,7 +593,6 @@ export class CreateComponent implements OnInit {
         const maxFileCount = 5; // Tối đa 5 file
         const allowedExtensions = /(\.jpeg|\.jpg|\.png|\.gif|\.bmp)$/i; // Các định dạng được phép
         const maxSize = 3 * 1024 * 1024; // 3MB
-
         if (files.length > maxFileCount) {
             this.messageService.add({
                 severity: 'warn',

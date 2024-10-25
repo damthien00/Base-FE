@@ -322,7 +322,6 @@ export class ActivateWarrantyComponent implements OnInit {
                         const allWarranties = [];
                         const observables = this.productListSelected.map(
                             (product) => {
-                                console.log(1, product);
                                 // Tạo thông tin bảo hành cho từng sản phẩm
                                 const warrantyProduct = {
                                     productId: product.productId,
@@ -331,7 +330,7 @@ export class ActivateWarrantyComponent implements OnInit {
                                     productVariantName:
                                         product.productVariantName,
 
-                                    quantity: -1,
+                                    quantity: 1,
                                     inventoryStockDetailProductImeiId: null,
                                     expirationDate: product.product
                                         .warrantyPolicy.term
@@ -387,9 +386,7 @@ export class ActivateWarrantyComponent implements OnInit {
                             switchMap((responses) => {
                                 const updateRequests =
                                     this.productListSelected.map((product) => ({
-                                        inventoryStockDetailProductImeiId:
-                                            product.id, // Lấy id từ danh sách sản phẩm đã chọn
-
+                                        productCodeId: Number(product.id), // Lấy id từ danh sách sản phẩm đã chọn
                                         //Để tạm null
                                         warrantyStartDate: null,
                                         warrantyEndDate: null,
@@ -399,7 +396,7 @@ export class ActivateWarrantyComponent implements OnInit {
                                     updateRequests,
                                 };
                                 // Sau khi tạo phiếu bảo hành, cập nhật trạng thái Purchased cho tất cả sản phẩm
-                                return this.warrantyService.updatePurchased(
+                                return this.warrantyService.updateProductCodePurchased(
                                     formData1
                                 );
                             }),

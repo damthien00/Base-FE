@@ -28,23 +28,23 @@ import { RouterModule } from '@angular/router';
             {
                 path: 'products/inventory-branch',
                 loadChildren: () =>
-                    import('./inventory-product/inventory-branch/inventory-branch.module').then(
-                        (m) => m.InventoryBranchModule
-                    ),
+                    import(
+                        './inventory-product/inventory-branch/inventory-branch.module'
+                    ).then((m) => m.InventoryBranchModule),
             },
             {
                 path: 'products/inventory-branch-detail/:branchId/:branchName',
                 loadChildren: () =>
-                    import('./inventory-product/inventory-branch copy/inventory-branch.module').then(
-                        (m) => m.InventoryBranchModule
-                    ),
+                    import(
+                        './inventory-product/inventory-branch copy/inventory-branch.module'
+                    ).then((m) => m.InventoryBranchModule),
             },
             {
                 path: 'products/inventory-company',
                 loadChildren: () =>
-                    import('./inventory-product/inventory-company/inventory-company.module').then(
-                        (m) => m.InventoryCompanyModule
-                    ),
+                    import(
+                        './inventory-product/inventory-company/inventory-company.module'
+                    ).then((m) => m.InventoryCompanyModule),
             },
             {
                 path: 'warehouse/stock-in',
@@ -88,6 +88,14 @@ import { RouterModule } from '@angular/router';
                     import(
                         './warranty/warranty-certificate/warranty-certificate.module'
                     ).then((m) => m.WarrantyCertificateModule),
+            },
+
+            {
+                path: 'warranty/warranty-request/edit/:id',
+                loadChildren: () =>
+                    import('./warranty/warranty-request/edit/edit.module').then(
+                        (m) => m.EditModule
+                    ),
             },
             {
                 path: 'warranty/warranty-request',
@@ -134,6 +142,7 @@ import { RouterModule } from '@angular/router';
                         './products/update-product/update-product.module'
                     ).then((m) => m.UpdateProductModule),
             },
+
             {
                 path: 'product-category/show',
                 loadChildren: () =>
