@@ -3,6 +3,8 @@ import { WarrantyService } from 'src/app/core/services/warranty.service';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { MessageService } from 'primeng/api';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
     selector: 'app-activate-success',
@@ -25,8 +27,9 @@ export class ActivateSuccessComponent implements OnInit {
     warrantyById: any;
     warrantyId: number | null = null;
     warrantyInfos: any;
+    currentDate: string;
     ngOnInit() {
-        // Lấy dữ liệu từ local storage
+        this.currentDate = new Date().toLocaleDateString('vi-VN');
         const warrantiesData = localStorage.getItem('lastCreatedWarranties');
         if (warrantiesData) {
             this.warrantyById = JSON.parse(warrantiesData);
@@ -35,7 +38,7 @@ export class ActivateSuccessComponent implements OnInit {
         }
     }
 
-    getWarrantyById() {}
+    getWarrantyById() { }
 
     warrantyRequest() {
         // console.log(data);
@@ -65,5 +68,59 @@ export class ActivateSuccessComponent implements OnInit {
         //         console.error('Error:', error);
         //     }
         // );
+    }
+
+    calculateRemainingMonths(expirationDate: string): number {
+        const currentDate = new Date();
+        const expiration = new Date(expirationDate);
+
+        // Calculate the difference in months
+        const monthsDifference = (expiration.getFullYear() - currentDate.getFullYear()) * 12 + (expiration.getMonth() - currentDate.getMonth());
+
+        return Math.max(monthsDifference, 0); // Ensure it's not negative
+    }
+
+    exportPDF() {
+        const element = document.getElementById('transferNote');
+        if (element) {
+            element.style.display = 'block'; // Ensure element is visible
+
+            // Clear previous content in the orders-table
+            const ordersTableBody = element.querySelector('.orders-table tbody');
+            ordersTableBody.innerHTML = '';
+
+            this.warrantyById.forEach((item, index) => {
+                const row = document.createElement('tr');
+
+                // Product details
+                const product = item.warrantyProducts[0];
+                const remainingMonths = this.calculateRemainingMonths(product.expirationDate); // Get remaining months
+
+                row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${product.productName} ${product.productVariantName}</td>
+              <td>${item.productCode}</td>
+              <td>${remainingMonths} tháng</td>
+              <td>${new Date(product.expirationDate).toLocaleDateString('vi-VN')}</td>
+            `;
+                ordersTableBody.appendChild(row);
+            });
+
+            html2canvas(element, {
+                scale: 1, // Increase scale for better quality
+                useCORS: true, // Enable Cross-Origin Resource Sharing
+            }).then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+    
+                const imgWidth = pdf.internal.pageSize.getWidth(); // Full width of A4 page
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight); // Start at (0,0) to fit full page
+                pdf.save('Warranty_Activation.pdf');
+    
+                element.style.display = 'none'; // Hide element after saving
+            });
+        }
     }
 }

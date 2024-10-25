@@ -31,12 +31,12 @@ i {
     margin-top: 10px
 }
 
-.title-success{
+.title-success {
     color: #35B011 !important;
-    margin-top:10px
+    margin-top: 10px
 }
 
-.info-customer{
+.info-customer {
     margin-top: 10px;
 }
 
@@ -76,4 +76,157 @@ i {
 .footer span {
     font-size: 14px;
     font-weight: 600;
+}
+
+
+/* transfer-note */
+.transfer-note {
+    width: 210mm; /* Width of A4 paper */
+    margin: 0 auto; /* Center align the content */
+    overflow: hidden; /* Prevent overflow issues */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.company-info {
+    text-align: left;
+}
+
+.company-info h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.transfer-code {
+    text-align: right;
+    padding: 10px 0;
+}
+
+.content-transfer span {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.details {
+    display: flex;
+    justify-content: space-around;
+}
+
+.details,
+.orders {
+    margin: 30px 0;
+}
+
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.details-table th,
+.details-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.orders-table {
+    width: 100%;
+    /* Đặt chiều rộng của bảng */
+    border-collapse: collapse;
+    /* Gộp viền */
+    margin-top: 10px;
+    /* Khoảng cách phía trên bảng */
+}
+
+.orders-table th,
+.orders-table td {
+    border: 1px solid #ddd;
+    /* Viền cho ô */
+    padding: 8px;
+    /* Khoảng cách bên trong ô */
+    text-align: left;
+    /* Canh trái cho văn bản */
+}
+
+.orders-table th {
+    background-color: #f2f2f2;
+    /* Màu nền cho tiêu đề */
+    font-weight: bold;
+    /* Đậm chữ */
+}
+
+.orders-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+    /* Màu nền cho hàng chẵn */
+}
+
+.orders-table tr:hover {
+    background-color: #f1f1f1;
+    /* Màu nền cho hàng khi di chuột qua */
+}
+
+.footer-transper {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.footer-transper div {
+    width: 30%;
+}
+
+.footer-transper div p {
+    margin: 40px 0 0;
+    font-style: italic;
+}
+
+
+.transfer-note {
+    font-family: Arial, sans-serif;
+}
+
+/* CSS cho bảng */
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    /* Gộp các đường viền */
+}
+
+.orders-table th,
+.orders-table td {
+    border: 1px solid #ddd;
+    /* Đường viền cho các ô */
+    padding: 8px;
+    /* Khoảng cách bên trong ô */
+    text-align: left;
+    /* Căn trái cho nội dung ô */
+}
+
+/* Thay đổi màu nền cho các ô header */
+.orders-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    /* Làm đậm chữ cho tiêu đề */
+}
+
+/* Tùy chọn: Thay đổi màu nền cho các hàng khi hover */
+.orders-table tr:hover {
+    background-color: #f1f1f1;
+    /* Màu nền cho hàng khi hover */
+}
+
+.icon-file {
+    display: flex;
+    background-color: white;
+}
+
+.icon-file:hover {
+    color: rgb(157, 157, 162);
+    cursor: pointer;
+    transition: 0.5s;
 }
