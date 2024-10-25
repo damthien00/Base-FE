@@ -98,6 +98,6 @@ export class ResendEmailOtpComponent {
   }
 
   navigateToSetPassword() {
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/auth/set-password']);
   }
 }
