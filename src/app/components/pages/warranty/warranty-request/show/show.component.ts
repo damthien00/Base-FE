@@ -118,7 +118,6 @@ export class ShowComponent implements OnInit {
             .getWarrantyClaims(this.optionsFilterWarrantyClaims)
             .subscribe((response) => {
                 this.warrantyClaims = response.data.items;
-                console.log(this.warrantyClaims);
             });
     }
 
@@ -274,7 +273,6 @@ export class ShowComponent implements OnInit {
             : null;
         this.optionsFillerProduct.pageIndex = 1;
 
-        console.log(this.optionsFillerProduct);
         await this.productService
             .FilterProduct(this.optionsFillerProduct)
             .then((response) => {

@@ -35,12 +35,14 @@
             >
                 <ng-template pTemplate="caption">
                     <div
-                        class="flex flex-column gap-3 align-items-end md:flex-row md:">
+                        class="flex flex-column gap-3 align-items-end md:flex-row md:"
+                    >
                         <div class="flex flex-column">
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Tìm tên khách hàng/SĐT:</label>
+                                >Tìm tên khách hàng/SĐT:</label
+                            >
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search"></i>
                                 <input
@@ -92,7 +94,6 @@
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th style="width: 3rem">STT</th>
                         <th pSortableColumn="code">Mã phiếu</th>
                         <th style="width: 15rem" pSortableColumn="name">
                             Tên khách hàng
@@ -103,43 +104,39 @@
                         <th pSortableColumn="category">Ngày tạo yêu cầu</th>
                     </tr>
                 </ng-template>
-                <ng-template
-                    pTemplate="body"
-                    let-warranty
-                    let-expanded="expanded"
-                >
+                <ng-template pTemplate="body" let-warranty>
                     <tr>
                         <td>
-                            <div
-                                *ngIf="
-                                    product.productVariants &&
-                                    product.productVariants.length > 0
-                                "
+                            <span
+                                [routerLink]="[
+                                    '/pages/warranty/warranty-request/edit',
+                                    warranty.id
+                                ]"
                             >
-                                <p-button
-                                    type="button"
-                                    pRipple
-                                    [pRowToggler]="product"
-                                    [text]="true"
-                                    [rounded]="true"
-                                    [plain]="true"
-                                    [icon]="
-                                        expanded
-                                            ? 'pi pi-chevron-down'
-                                            : 'pi pi-chevron-right'
-                                    "
-                                />
-                            </div>
-                        </td>
-                        <td>
-                            {{ warranty.code }}
+                                {{ warranty.code }}
+                            </span>
                         </td>
                         <td>{{ warranty.customerName }}</td>
                         <td>{{ warranty.phoneNumber }}</td>
                         <td>{{ warranty.branchName }}</td>
-                        <td>{{ warranty.totalQuantity }}</td>
                         <td>
-                            {{ warranty.createdAt }}
+                            <span *ngIf="warranty.status === 0">Mới tạo</span>
+                            <span *ngIf="warranty.status === 1"
+                                >Đã tiếp nhận</span
+                            >
+                            <span *ngIf="warranty.status === 2">Đang sửa</span>
+                            <span *ngIf="warranty.status === 3"
+                                >Đã sửa xong</span
+                            >
+                            <span *ngIf="warranty.status === 4"
+                                >Đã trả khách</span
+                            >
+                        </td>
+
+                        <td>
+                            {{
+                                warranty.createdAt | date : "dd/MM/yyyy, HH:mm"
+                            }}
                         </td>
                     </tr>
                 </ng-template>
