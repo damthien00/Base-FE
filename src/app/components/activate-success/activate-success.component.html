@@ -91,18 +91,14 @@
                                         product?.warrantyProducts[0]
                                             ?.productName
                                     }}
-                                    {{ product?.warrantyProducts[0]?.value1 }}
                                     {{
-                                        product?.warrantyProducts[0]?.value2
-                                    }}</span
-                                >
+                                        product?.warrantyProducts[0]
+                                            ?.productVariantName
+                                    }}
+                                </span>
                                 <span style="font-size: 13px"
-                                    ><strong>Số khung:</strong>
-                                    {{ product?.warrantyProducts[0]?.sk }}</span
-                                >
-                                <span style="font-size: 13px"
-                                    ><strong>Số máy:</strong>
-                                    {{ product?.warrantyProducts[0]?.sm }}</span
+                                    ><strong>Số Serial:</strong>
+                                    {{ product?.productCode }}</span
                                 >
                             </div>
                         </td>
