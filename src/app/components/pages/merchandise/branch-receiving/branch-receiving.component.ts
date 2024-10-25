@@ -385,7 +385,7 @@ export class BranchReceivingComponent {
       }
     });
 
-    return Array.from(productMap.values()); // Convert map values to an array
+    return Array.from(productMap.values());
   }
 
   calculateTotalQuantity(products: any[]): number {
@@ -393,11 +393,11 @@ export class BranchReceivingComponent {
   }
 
   onConfirm(): void {
-    this.ladingData.iAccepted = 'accept'; // Gán giá trị "accept" cho iAccepted
+    this.ladingData.iAccepted = 'accept';
     this.onSubmitUpdate();
   }
 
-  // Hàm được gọi khi người dùng nhấn "Hủy"
+ 
   onReject(): void {
     this.ladingData.iAccepted = 'reject'; // Gán giá trị "reject" cho iAccepted
     this.onSubmitUpdate(false); // Chỉ gọi API đầu tiên khi reject
@@ -487,4 +487,6 @@ export class BranchReceivingComponent {
       );
     }
   }
+
+  
 }

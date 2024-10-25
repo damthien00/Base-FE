@@ -317,13 +317,13 @@
                                     ></i>
                                 </td>
                             </tr>
-                            <tr *ngIf="data.productType == 1">
+                            <!-- <tr *ngIf="data.productType == 1">
                                 <td colspan="8" class="p-3 border-none">
                                     <button type="button" pButton label="Danh sách mã số khung/số máy" icon="pi pi-align-justify" (click)="openProductFrameEnginDialog(data)"></button>
                                 </td>
-                            </tr>
+                            </tr> -->
 
-                            <tr *ngIf="data.productType == 0">
+                            <tr *ngIf="data.productType == 0 || data.productType == 1">
                                 <td colspan="8" class="p-3 border-none">
                                     <button type="button" pButton label="Danh sách mã code" icon="pi pi-align-justify" (click)="openProductCodesDialog(data)"></button>
                                 </td>                        
@@ -387,7 +387,7 @@
                                         </ng-template>
                                 </p-dialog>
 
-                                <p-dialog 
+                                <!-- <p-dialog 
                                         header="DANH SÁCH MÃ SỐ KHUNG/SỐ MÁY" 
                                         [(visible)]="showFrameEnginDialog" 
                                         [modal]="true" 
@@ -419,7 +419,7 @@
                                                 </span>
                                             </div>
                                         </ng-template>
-                                </p-dialog>
+                                </p-dialog> -->
                             </div>
                         </ng-template>
                     </p-table>               

@@ -1,23 +1,179 @@
 /* Common button styles */
 .status-button {
-    padding: 5px 10px;
-    font-size: 14px;
-    border-radius: 8px; /* Rounded corners */
-    border: none;
-    color: rgb(255, 243, 243); /* White text for all buttons */
-    cursor: pointer;
-  }
-  
-  /* Button colors for different statuses */
-  .status-waiting {
-    background-color: #ffc107; /* Yellow for 'waiting' */
-  }
-  
-  .status-accept {
-    background-color: #44ef6c; /* Green for 'accept' */
-  }
-  
-  .status-reject {
-    background-color: #dc3545; /* Red for 'reject' */
-  }
-  
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  /* Rounded corners */
+  border: none;
+  color: rgb(255, 243, 243);
+  /* White text for all buttons */
+  cursor: pointer;
+}
+
+/* Button colors for different statuses */
+.status-waiting {
+  background-color: #ffc107;
+  /* Yellow for 'waiting' */
+}
+
+.status-accept {
+  background-color: #44ef6c;
+  /* Green for 'accept' */
+}
+
+.status-reject {
+  background-color: #dc3545;
+  /* Red for 'reject' */
+}
+
+.small-checkbox .p-checkbox-box {
+  width: 16px;
+  height: 16px;
+}
+
+.small-checkbox .p-checkbox .p-checkbox-box .p-checkbox-icon {
+  font-size: 12px;
+}
+
+/* transfer-note */
+.transfer-note {
+  background-color: white;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.company-info {
+  text-align: left;
+}
+
+.company-info h4 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.transfer-code {
+  text-align: right;
+  padding: 10px 0;
+}
+
+.content-transfer span {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.details {
+  display: flex;
+  justify-content: space-around;
+}
+
+.details,
+.orders {
+  margin: 30px 0;
+}
+
+.details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.details-table th,
+.details-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.orders-table {
+  width: 100%;
+  /* Đặt chiều rộng của bảng */
+  border-collapse: collapse;
+  /* Gộp viền */
+  margin-top: 10px;
+  /* Khoảng cách phía trên bảng */
+}
+
+.orders-table th,
+.orders-table td {
+  border: 1px solid #ddd;
+  /* Viền cho ô */
+  padding: 8px;
+  /* Khoảng cách bên trong ô */
+  text-align: left;
+  /* Canh trái cho văn bản */
+}
+
+.orders-table th {
+  background-color: #f2f2f2;
+  /* Màu nền cho tiêu đề */
+  font-weight: bold;
+  /* Đậm chữ */
+}
+
+.orders-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+  /* Màu nền cho hàng chẵn */
+}
+
+.orders-table tr:hover {
+  background-color: #f1f1f1;
+  /* Màu nền cho hàng khi di chuột qua */
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.footer div {
+  width: 30%;
+}
+
+.footer div p {
+  margin: 40px 0 0;
+  font-style: italic;
+}
+
+
+.transfer-note {
+  font-family: Arial, sans-serif;
+}
+
+/* CSS cho bảng */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse; /* Gộp các đường viền */
+}
+
+.orders-table th, .orders-table td {
+  border: 1px solid #ddd; /* Đường viền cho các ô */
+  padding: 8px; /* Khoảng cách bên trong ô */
+  text-align: left; /* Căn trái cho nội dung ô */
+}
+
+/* Thay đổi màu nền cho các ô header */
+.orders-table th {
+  background-color: #f2f2f2;
+  font-weight: bold; /* Làm đậm chữ cho tiêu đề */
+}
+
+/* Tùy chọn: Thay đổi màu nền cho các hàng khi hover */
+.orders-table tr:hover {
+  background-color: #f1f1f1; /* Màu nền cho hàng khi hover */
+}
+
+.icon-file {
+  width: 190px;
+  background-color: white;
+}
+
+.icon-file:hover {
+  color: rgb(157, 157, 162);
+  cursor: pointer;
+  transition: 0.5s;
+}

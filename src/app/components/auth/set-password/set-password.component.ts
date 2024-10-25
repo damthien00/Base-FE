@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -13,7 +13,7 @@ import { LayoutService } from 'src/app/layout/service/app.layout.service';
     templateUrl: './set-password.component.html',
     styleUrl: './set-password.component.scss'
 })
-export class SetPasswordComponent {
+export class SetPasswordComponent implements OnInit {
     valCheck: string[] = ['rememberMe'];
     messages: any[] = [];
     password!: string;
@@ -27,6 +27,10 @@ export class SetPasswordComponent {
         private router: Router,
         private messageService: MessageService
     ) {
+
+    }
+
+    ngOnInit() {
         this.resetPasswordForm = this.formBuilder.group(
             {
                 email: [
@@ -44,6 +48,12 @@ export class SetPasswordComponent {
             },
             { validator: this.passwordMatchValidator }
         );
+
+        const storedEmail = sessionStorage.getItem('email');
+
+        if (storedEmail) {
+            this.resetPasswordForm.get('email')?.setValue(storedEmail);
+        }
     }
 
     passwordMatchValidator(form: FormGroup) {
@@ -71,17 +81,20 @@ export class SetPasswordComponent {
                         severity: 'error',
                         summary: '',
                         detail: response.message,
-                        life: 3000,
+                        life: 2000,
                     });
                 } else {
-                    // Handle success, show a PrimeNG success message
+                    this.resetPasswordForm.reset();
                     this.messages = [];
                     this.messages.push({
                         severity: 'success',
                         summary: '',
                         detail: 'Mật khẩu đã được thiết lập thành công!',
-                        life: 3000,
+                        life: 2000,
                     });
+                    setTimeout(() => {
+                        this.router.navigate(['/auth/login']);
+                    }, 3000);
                 }
             },
             error: (err) => {

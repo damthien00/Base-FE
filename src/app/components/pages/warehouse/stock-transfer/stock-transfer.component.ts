@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { OptionsFilterLading } from 'src/app/core/models/option-filter-lading';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { BranchService } from 'src/app/core/services/branch.service';
 import { MerchandiseService } from 'src/app/core/services/merchandise.service';
 import { DatePipe } from '@angular/common';
+import { BillOfLadingService } from 'src/app/core/services/bill-of-lading.service';
+import html2pdf from 'html2pdf.js';
 
 
 @Component({
@@ -15,6 +17,7 @@ import { DatePipe } from '@angular/common';
 
 })
 export class StockTransferComponent implements OnInit {
+    @ViewChild('transferNote') transferNote!: ElementRef;
     items: MenuItem[] | undefined;
     PageIndex: number = 1;
     PageSize: number = 30;
@@ -37,6 +40,11 @@ export class StockTransferComponent implements OnInit {
     formatdate: string = "dd/mm/yy";
     currentPageReport: string = '';
     public userCurrent: any;
+    selectedUsers: any;
+    selectedBillOfLading: any;
+    hideTransferNote = true;
+    selectedUserData: any = null;
+    selectedLadings: any[] = [];
     statuses = [
         { label: 'Đang chuyển', value: 'waiting' },
         { label: 'Chuyển thành công', value: 'accept' },
@@ -48,6 +56,7 @@ export class StockTransferComponent implements OnInit {
         private merchandiService: MerchandiseService,
         private branchService: BranchService,
         private authService: AuthService,
+        private billOfLadingService: BillOfLadingService,
         private datePipe: DatePipe
     ) {
         this.authService.userCurrent.subscribe((user) => {
@@ -62,6 +71,124 @@ export class StockTransferComponent implements OnInit {
         ];
         this.Filters();
         this.loadWarrantyPolicies();
+    }
+
+    onCheckboxChange(user: any, event: any) {
+        if (event.checked) {
+            this.selectedLadings.push(user); // Thêm vào danh sách đã chọn
+        } else {
+            const index = this.selectedLadings.findIndex(l => l.id === user.id);
+            if (index !== -1) {
+                this.selectedLadings.splice(index, 1); // Xóa khỏi danh sách đã chọn
+            }
+        }
+    }
+
+
+    groupAndSumProducts(products) {
+        const groupedProducts = [];
+
+        products.forEach(product => {
+            // Kiểm tra xem sản phẩm với cùng productId và productVariantId đã tồn tại trong nhóm chưa
+            const existingProduct = groupedProducts.find(p => p.productId === product.productId && p.productVariantId === product.productVariantId);
+
+            if (existingProduct) {
+                // Nếu đã tồn tại, tăng số lượng lên 1 và nối frameNumber/engineNumber
+                existingProduct.quantity += 1;
+                existingProduct.codes.push(product.code);  // Thêm frameNumber vào danh sách
+                // existingProduct.engineNumbers.push(product.engineNumber); // Thêm engineNumber vào danh sách
+            } else {
+                // Nếu chưa tồn tại, thêm sản phẩm mới vào nhóm với số lượng ban đầu là 1 và frameNumber/engineNumber ban đầu
+                groupedProducts.push({
+                    ...product,
+                    quantity: 1,
+                    codes: [product.code],
+                    // engineNumbers: [product.engineNumber] // Tạo danh sách engineNumber
+                });
+            }
+        });
+
+        return groupedProducts;
+    }
+
+    showTransferNoteForLading(lading: any) {
+        document.getElementById("transferNote").style.display = 'block';
+
+        // Cập nhật nội dung mã phiếu
+        const transferCodeElement = document.querySelector(".transfer-code p") as HTMLElement;
+        if (transferCodeElement) {
+            transferCodeElement.innerText = `Mã Phiếu chuyển: ${lading.code}`;
+        }
+
+        // Cập nhật thông tin chi nhánh chuyển
+        const fromBranchNameElement = document.querySelector(".from-branch-name") as HTMLElement;
+        const fromBranchPhoneElement = document.querySelector(".from-branch-phone") as HTMLElement;
+        const fromBranchAddressElement = document.querySelector(".from-branch-address") as HTMLElement;
+        const exportDateElement = document.querySelector(".export-date") as HTMLElement;
+
+        if (fromBranchNameElement) {
+            fromBranchNameElement.innerText = lading.fromBranchName; // Cập nhật tên chi nhánh chuyển
+        }
+        if (fromBranchPhoneElement) {
+            fromBranchPhoneElement.innerText = lading.phoneNumber; // Giả sử bạn có trường này trong lading
+        }
+        if (fromBranchAddressElement) {
+            fromBranchAddressElement.innerText = lading.address; // Giả sử bạn có trường này trong lading
+        }
+        if (exportDateElement) {
+            exportDateElement.innerText = new Date(lading.createdAt).toLocaleDateString(); // Cập nhật ngày xuất, bạn có thể định dạng lại nếu cần
+        }
+
+        // Tương tự cho chi nhánh nhận
+        const toBranchNameElement = document.querySelector(".to-branch-name") as HTMLElement;
+        const toBranchPhoneElement = document.querySelector(".to-branch-phone") as HTMLElement;
+        const toBranchAddressElement = document.querySelector(".to-branch-address") as HTMLElement;
+
+        if (toBranchNameElement) {
+            toBranchNameElement.innerText = lading.toBranchName; // Cập nhật tên chi nhánh nhận
+        }
+        if (toBranchPhoneElement) {
+            toBranchPhoneElement.innerText = lading.toBranchPhone; // Giả sử bạn có trường này trong lading
+        }
+        if (toBranchAddressElement) {
+            toBranchAddressElement.innerText = lading.toBranchAddress; // Giả sử bạn có trường này trong lading
+        }
+
+        const groupedProducts = this.groupAndSumProducts(lading.productCodes);
+
+        // Cập nhật danh sách đơn hàng
+        const tbody = document.querySelector(".orders-table tbody");
+        tbody.innerHTML = ''; // Xóa dữ liệu cũ
+        groupedProducts.forEach((product, index) => {
+            const row = `<tr>
+                  <td>${index + 1}</td>
+                  <td>${product.productName || ''} ${`-` + product.productVariantName || ''}</td>
+                  <td>${product.codes.join(", ")}</td>
+                  <td style="text-align: center;">${product.unitName || ''}</td>
+                  <td style="text-align: center;">${product.quantity || ''}</td>
+                </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Xuất PDF
+    async generatePDF() {
+        for (const lading of this.selectedLadings) {
+            // Hiển thị nội dung phiếu chuyển cho mỗi lading
+            this.showTransferNoteForLading(lading);
+
+            const element = document.getElementById('transferNote');
+            const options = {
+                margin: 1,
+                filename: `phieu_chuyen_kho_${lading.code}.pdf`, // Tên file theo mã phiếu
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // Xuất PDF
+            await html2pdf().from(element).set(options).save();
+        }
     }
 
     loadWarrantyPolicies() {
