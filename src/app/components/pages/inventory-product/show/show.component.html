@@ -155,7 +155,7 @@
                         <td>
                             <div>
                                 <img
-                                    *ngIf="product.productImage != null"
+                                    *ngIf="product.productImage != ''"
                                     [src]="imageUrl + product.productImage"
                                     [alt]="product.productName"
                                     width="50"
@@ -163,7 +163,7 @@
                                     class="shadow-4"
                                 />
                                 <svg
-                                    *ngIf="product.productImage == null"
+                                    *ngIf="product.productImage == ''"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +226,7 @@
                                                 <img
                                                     *ngIf="
                                                         product.productImage !=
-                                                        null
+                                                        ''
                                                     "
                                                     [src]="
                                                         imageUrl +
@@ -242,7 +242,7 @@
                                                 <svg
                                                     *ngIf="
                                                         product.productImage ==
-                                                        null
+                                                        ''
                                                     "
                                                     viewBox="0 0 24 24"
                                                     fill="none"

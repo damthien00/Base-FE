@@ -14,9 +14,9 @@ export class OptionsFilterWarrantyClaims {
     pageIndex: number | null = 1;
     StartDate: Date | null = null;
     EndDate: Date | null = null;
-    CustomerKeyword: string | null;
+    KeyWordCustomer: string | null;
     Status: number | null = null;
-
+    ProductCode: string | null;
     // FrameNumber: string | null;
     // EngineNumber: string | null;
 }
