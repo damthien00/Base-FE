@@ -41,8 +41,11 @@ export class WarrantyService {
         console.log(options);
 
         let url = `${this.url}/api/warranty-claim/paging?pageSize=${options.pageSize}&pageIndex=${options.pageIndex}`;
-        if (options.CustomerKeyword) {
-            url += `&customerKeyword=${options.CustomerKeyword}`;
+        if (options.KeyWordCustomer) {
+            url += `&keyWordCustomer=${options.KeyWordCustomer}`;
+        }
+        if (options.ProductCode) {
+            url += `&productCode=${options.ProductCode}`;
         }
 
         if (options.StartDate) {

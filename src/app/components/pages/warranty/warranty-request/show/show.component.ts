@@ -39,10 +39,12 @@ export class ShowComponent implements OnInit {
     optionsFilterWarrantyClaims: OptionsFilterWarrantyClaims =
         new OptionsFilterWarrantyClaims();
     nodes!: any[];
-    optionsStatus: any[] = [
-        { name: 'Ẩn', value: 0 },
-        { name: 'Hoạt động', value: 1 },
-        { name: 'Hết hàng', value: 2 },
+    optionsStatus = [
+        { label: 'Mới tạo', value: 0 },
+        { label: 'Đã tiếp nhận', value: 1 },
+        { label: 'Đang sửa', value: 2 },
+        { label: 'Đã sửa xong', value: 3 },
+        { label: 'Đã trả khách', value: 4 },
     ];
     selectedNodes: any;
     statusFilter: any;
@@ -81,10 +83,15 @@ export class ShowComponent implements OnInit {
     statuses: any[] = [];
 
     rowsPerPageOptions = [5, 10, 20];
-    pageSize = 30;
-    pageNumber = 1;
+    // pageSize = 30;
+    // pageNumber = 1;
     totalRecords = 20;
     treeCategory: any[] = [];
+
+    pageSize: number = 10;
+    pageNumber: number = 1;
+    totalRecordsCount: any;
+    isLoading: boolean = true;
 
     warrantyClaims: any[] = [];
 
@@ -114,9 +121,15 @@ export class ShowComponent implements OnInit {
     }
 
     loadWarrantyClaims() {
+        this.optionsFilterWarrantyClaims.pageIndex = this.pageNumber;
+        this.optionsFilterWarrantyClaims.pageSize = this.pageSize;
+
+        console.log(this.optionsFilterWarrantyClaims);
+
         this.warrantyService
             .getWarrantyClaims(this.optionsFilterWarrantyClaims)
             .subscribe((response) => {
+                this.totalRecordsCount = response.data.totalRecords;
                 this.warrantyClaims = response.data.items;
             });
     }
@@ -279,5 +292,39 @@ export class ShowComponent implements OnInit {
                 this.products = response.data;
                 this.totalRecords = response.totalRecordsCount;
             });
+    }
+
+    //Paganation
+    onPageChange(event: any): void {
+        this.pageSize = event.rows;
+        this.pageNumber = event.page + 1;
+        this.loadWarrantyClaims();
+    }
+
+    goToPreviousPage(): void {
+        if (this.pageNumber > 1) {
+            this.pageNumber--;
+            this.loadWarrantyClaims();
+        }
+    }
+
+    goToNextPage(): void {
+        const lastPage = Math.ceil(this.totalRecordsCount / this.pageSize);
+        if (this.pageNumber < lastPage) {
+            this.pageNumber++;
+            this.loadWarrantyClaims();
+        }
+    }
+
+    get startRecord(): number {
+        return (this.pageNumber - 1) * this.pageSize + 1;
+    }
+
+    get endRecord(): number {
+        // Tính toán số bản ghi kết thúc (không vượt quá tổng số bản ghi)
+        const calculatedEnd = (this.pageNumber - 1 + 1) * this.pageSize;
+        return calculatedEnd > this.totalRecordsCount
+            ? this.totalRecordsCount
+            : calculatedEnd;
     }
 }

@@ -30,21 +30,21 @@
                     <div class="grid p-fluid">
                         <div class="col-12 md:col-6">
                             <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Mã yêu cầu
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Mã yêu cầu:
                                 </div>
                                 <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                                 >
                                     <span>{{ warrantyClaimId?.id }}</span>
                                 </div>
                             </div>
                             <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Ngày tạo
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Ngày tạo:
                                 </div>
                                 <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                                 >
                                     <span>{{
                                         warrantyClaimId?.createdAt
@@ -53,31 +53,25 @@
                                 </div>
                             </div>
                             <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Người tạo
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Người tạo:
                                 </div>
                                 <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                                 >
-                                    <!-- {{ stockInItemDetail?.supplierAddress }}
-                                        {{
-                                            stockInItemDetail?.supplierWardName
-                                        }}
-                                        {{
-                                            stockInItemDetail?.supplierDistrictName
-                                        }}{{
-                                            stockInItemDetail?.supplierCityName
-                                        }} -->
+                                    <span>{{
+                                        warrantyClaimId?.createName
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 md:col-6">
                             <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Tên khách hàng
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Tên khách hàng:
                                 </div>
                                 <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                                 >
                                     <span>{{
                                         warrantyClaimId?.customerName
@@ -85,11 +79,11 @@
                                 </div>
                             </div>
                             <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Số điện thoại
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Số điện thoại:
                                 </div>
                                 <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                                 >
                                     <span>{{
                                         warrantyClaimId?.phoneNumber
@@ -97,20 +91,31 @@
                                 </div>
                             </div>
                             <div class="field grid">
-                                <div class="col-12 mb-2 md:col-7 md:mb-0">
-                                    Địa chỉ
+                                <div class="col-12 mb-2 md:col-5 md:mb-0">
+                                    Địa chỉ:
                                 </div>
                                 <div
-                                    class="col-12 mb-2 md:col-5 md:mb-0 flex justify-content-start"
+                                    class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                                 >
-                                    <!-- {{ stockInItemDetail?.createName }} -->
+                                    {{ warrantyClaimId?.customer.addressDetail
+                                    }}{{
+                                        ", " +
+                                            warrantyClaimId?.customer.wardName
+                                    }}{{
+                                        ", " +
+                                            warrantyClaimId?.customer
+                                                .districtname
+                                    }}{{
+                                        ", " +
+                                            warrantyClaimId?.customer.cityName
+                                    }}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- listCart -->
-                <div class="card" style="min-height: 525px">
+                <div class="card">
                     <p-table
                         [value]="warrantyClaimId.warrrantyWarrantyClaims"
                         responsiveLayout="scroll"
@@ -201,7 +206,6 @@
                                 <label class="mb-2" style="font-weight: 600"
                                     >Thông tin phiếu yêu cầu</label
                                 >
-
                                 <div class="field grid">
                                     <!-- Tổng số sản phẩm -->
 
@@ -236,9 +240,9 @@
                                     <label htmlFor="email1"
                                         >Mô tả chi tiết lỗi</label
                                     >
-                                    <span>
+                                    <div>
                                         {{ warrantyClaimId.note }}
-                                    </span>
+                                    </div>
 
                                     <!-- [(ngModel)]="note" -->
                                 </div>
