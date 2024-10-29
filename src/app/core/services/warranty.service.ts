@@ -48,13 +48,15 @@ export class WarrantyService {
             url += `&productCode=${options.ProductCode}`;
         }
 
-        if (options.StartDate) {
-            url += `&startDate=${options.StartDate}`;
-        }
-        if (options.EndDate) {
-            url += `&endDate=${options.EndDate}`;
+        // Thêm tham số StartDate nếu có
+        if (options.StartDate !== null && options.StartDate !== undefined) {
+            url += `&StartDate=${options.StartDate.toISOString()}`;
         }
 
+        // Thêm tham số EndDate nếu có
+        if (options.EndDate !== null && options.EndDate !== undefined) {
+            url += `&EndDate=${options.EndDate.toISOString()}`;
+        }
         if (options.Status) {
             url += `&status=${options.Status}`;
         }
@@ -67,7 +69,7 @@ export class WarrantyService {
     }
 
     getWarrantyByCustomer(id: number): Observable<any> {
-        let url = `${this.url}/api/warranty/paging?customerId=${id}`;
+        let url = `${this.url}/api/warranty/paging?customerId=${id}&statusRequest=0`;
         return this.http.get<any>(url);
     }
 

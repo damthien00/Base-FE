@@ -78,18 +78,22 @@
                                 />
                             </span>
                         </div>
-                        <!-- <div class="flex flex-column">
+                        <div class="flex flex-column">
                             <label
                                 for="email1"
                                 class="block text-900 text-large font-weight mb-2"
-                                >Ngày tạo yêu cầu:</label
+                                >Ngày tạo phiếu:</label
                             >
                             <p-calendar
+                                placeholder="Từ ngày - Đến ngày"
+                                [(ngModel)]="deadlineRange"
+                                selectionMode="range"
                                 [showIcon]="true"
-                                placeholder="Chọn khoảng thời gian"
-                                inputId="icon"
+                                [showClearButton]="true"
+                                (onBlur)="blurDateRange()"
+                                [dateFormat]="this.formatdate"
                             ></p-calendar>
-                        </div> -->
+                        </div>
                         <div class="flex flex-column">
                             <label
                                 for="email1"
@@ -124,7 +128,9 @@
                         </th>
                         <th>Số điện thoại</th>
                         <th pSortableColumn="branch">Chi nhánh</th>
-                        <th pSortableColumn="price">Trạng thái</th>
+                        <th pSortableColumn="price" style="text-align: center">
+                            Trạng thái
+                        </th>
                         <th pSortableColumn="category">Ngày tạo yêu cầu</th>
                     </tr>
                 </ng-template>
@@ -144,20 +150,33 @@
                         <td>{{ warranty.customerName }}</td>
                         <td>{{ warranty.phoneNumber }}</td>
                         <td>{{ warranty.branchName }}</td>
-                        <td>
-                            <span *ngIf="warranty.status === 0">Mới tạo</span>
-                            <span *ngIf="warranty.status === 1"
+                        <td style="text-align: center">
+                            <span
+                                *ngIf="warranty.status === 0"
+                                class="status status1"
+                                >Mới tạo</span
+                            >
+                            <span
+                                *ngIf="warranty.status === 1"
+                                class="status status2"
                                 >Đã tiếp nhận</span
                             >
-                            <span *ngIf="warranty.status === 2">Đang sửa</span>
-                            <span *ngIf="warranty.status === 3"
+                            <span
+                                *ngIf="warranty.status === 2"
+                                class="status status3"
+                                >Đang sửa</span
+                            >
+                            <span
+                                *ngIf="warranty.status === 3"
+                                class="status status4"
                                 >Đã sửa xong</span
                             >
-                            <span *ngIf="warranty.status === 4"
+                            <span
+                                *ngIf="warranty.status === 4"
+                                class="status status5"
                                 >Đã trả khách</span
                             >
                         </td>
-
                         <td>
                             {{
                                 warranty.createdAt | date : "dd/MM/yyyy, HH:mm"

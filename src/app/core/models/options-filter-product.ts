@@ -9,4 +9,5 @@ export class OptionsFilterProduct {
     EndPrice: number | null = null;
     Status: number | null = null;
     Barcode: string | null = '';
+    BranchId: number | null = null;
 }

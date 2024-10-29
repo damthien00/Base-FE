@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WarrantyClaimsService } from 'src/app/core/services/warranty-claims.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-edit',
@@ -15,6 +16,8 @@ export class EditComponent implements OnInit {
     optionsStatus: any;
     warrantyClaimId: any;
     selectedStatus: any;
+    listImagesError: any;
+    imageUrl: string = environment.url;
     constructor(
         private route: ActivatedRoute,
         private warrantyClaimsService: WarrantyClaimsService,
@@ -23,6 +26,7 @@ export class EditComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        console.log(this.imageUrl);
         this.items = [
             { label: 'Kho hàng' },
             { label: 'Bảo hành', route: '/inputtext' },
@@ -36,32 +40,27 @@ export class EditComponent implements OnInit {
             { label: 'Đã trả khách', value: 4 },
         ];
         this.route.paramMap.subscribe((params) => {
-            this.id = params.get('id'); // 'id' là tên tham số trong route
+            this.id = params.get('id');
         });
         this.loadWarrantyClaim();
     }
 
     loadWarrantyClaim() {
-        console.log(this.id);
-
         this.warrantyClaimsService
             .getWarrantyClaimById(this.id)
             .subscribe((warrantyClaim) => {
                 this.warrantyClaimId = warrantyClaim.data;
-                console.log(this.warrantyClaimId);
+                this.listImagesError = this.splitString(
+                    this.warrantyClaimId.attachments
+                );
                 this.selectedStatus = this.warrantyClaimId.status;
             });
     }
     onStatusChange(event: any) {
-        console.log(event);
-
-        console.log('Selected Status:', this.selectedStatus);
-        // Hoặc bạn có thể xử lý dữ liệu khác ở đây
         this.selectedStatus = event.value;
     }
-    updateStatus() {
-        console.log(this.selectedStatus.value);
 
+    updateStatus() {
         const formData = {
             id: this.warrantyClaimId.id,
             status: this.selectedStatus,
@@ -79,5 +78,12 @@ export class EditComponent implements OnInit {
                     this.router.navigate(['/pages/warranty/warranty-request']);
                 }, 1000); // Thời gian trễ 2 giây
             });
+    }
+
+    splitString(inputString: string): string[] {
+        console.log(inputString);
+        const afterSplit = inputString?.split(',').map((str) => str.trim());
+        this.listImagesError = afterSplit;
+        return afterSplit;
     }
 }

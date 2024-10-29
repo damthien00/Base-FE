@@ -472,6 +472,9 @@
                                         <button
                                             type="button"
                                             pButton
+                                            *ngIf="
+                                                warrantyOrder.statusRequest != 1
+                                            "
                                             (click)="
                                                 warrantyRequest(warrantyOrder)
                                             "

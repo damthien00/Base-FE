@@ -59,6 +59,7 @@ export class ShowComponent implements OnInit {
         if (this.userCurrent.branchId != 1) {
             this.optionsFilterStockIn.branchId = this.userCurrent.branchId;
         }
+
         this.optionsFilterStockIn.pageIndex = this.pageNumber;
         this.optionsFilterStockIn.pageSize = this.pageSize;
         this.stockInService
@@ -66,7 +67,6 @@ export class ShowComponent implements OnInit {
             .subscribe((response) => {
                 this.totalRecordsCount = response.data.totalRecords;
                 this.stockInList = response.data.items;
-                console.log(this.totalRecordsCount);
             });
         this.isLoading = false;
     }
@@ -93,10 +93,13 @@ export class ShowComponent implements OnInit {
             this.optionsFilterStockIn.StartDate = undefined;
             this.optionsFilterStockIn.EndDate = undefined;
         }
+        console.log(this.deadlineRange);
     }
 
     EvenFilter() {
         if (this.deadlineRange) {
+            console.log(this.deadlineRange);
+
             this.optionsFilterStockIn.StartDate = this.deadlineRange[0] || null;
             this.optionsFilterStockIn.EndDate = this.deadlineRange[1] || null;
         } else {
@@ -105,7 +108,6 @@ export class ShowComponent implements OnInit {
         }
         this.pageNumber = 1;
         this.optionsFilterStockIn.CreateName = this.code;
-
         this.loadStockIn();
     }
 
@@ -151,11 +153,9 @@ export class ShowComponent implements OnInit {
     printOrder() {
         const printSection = document.getElementById('print-section');
         if (printSection) {
-            // Xóa nội dung cũ và thêm phần tử SVG mới
             printSection.innerHTML = `
                 <svg id="barcode"></svg>
             `;
-            // Tạo mã vạch sau khi thêm phần tử SVG
             JsBarcode('#barcode', this.selectedCodePrint, {
                 format: 'CODE128',
                 lineColor: '#0aa',

@@ -109,6 +109,28 @@
                                                             }}
                                                         </h1>
                                                         <span
+                                                            *ngIf="
+                                                                item.productType ==
+                                                                1
+                                                            "
+                                                            style="
+                                                                font-weight: 400;
+                                                            "
+                                                            >( Sản phẩm Emei
+                                                            )</span
+                                                        >
+                                                        <span
+                                                            *ngIf="
+                                                                item.productType ==
+                                                                0
+                                                            "
+                                                            style="
+                                                                font-weight: 400;
+                                                            "
+                                                            >( Sản phẩm thường
+                                                            )</span
+                                                        >
+                                                        <span
                                                             class="product-code"
                                                         >
                                                             <!-- {{

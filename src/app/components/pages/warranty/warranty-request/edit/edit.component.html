@@ -97,8 +97,10 @@
                                 <div
                                     class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-start"
                                 >
-                                    {{ warrantyClaimId?.customer.addressDetail
-                                    }}{{
+                                    {{
+                                        warrantyClaimId?.customer.addressDetail
+                                    }}
+                                    {{
                                         ", " +
                                             warrantyClaimId?.customer.wardName
                                     }}{{
@@ -117,7 +119,7 @@
                 <!-- listCart -->
                 <div class="card">
                     <p-table
-                        [value]="warrantyClaimId.warrrantyWarrantyClaims"
+                        [value]="warrantyClaimId?.warrrantyWarrantyClaims"
                         responsiveLayout="scroll"
                         [rowHover]="true"
                         dataKey="id"
@@ -216,7 +218,7 @@
                                         class="col-12 mb-2 md:col-7 md:mb-0 flex justify-content-end"
                                     >
                                         <span>{{
-                                            warrantyClaimId.branchName
+                                            warrantyClaimId?.branchName
                                         }}</span>
                                     </div>
                                 </div>
@@ -247,7 +249,17 @@
                                     <!-- [(ngModel)]="note" -->
                                 </div>
                                 <div class="field">
-                                    <div class="list-image"></div>
+                                    <div class="list-image-err">
+                                        <div
+                                            *ngFor="let url of listImagesError"
+                                        >
+                                            <img
+                                                width="100px"
+                                                [src]="imageUrl + url"
+                                                alt="Image"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="field mb-4">
                                     <label>Trạng thái</label>

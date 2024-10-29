@@ -2,3 +2,46 @@
     color:  var(--primary-color);
     text-decoration: underline;
 }
+
+.status{
+    padding: 5px 10px;
+    border-radius: 6px;
+    width: 130px;
+    display: block;
+    margin: auto;
+}
+
+.status1{
+    background-color: #ebf8e7;
+    color: #a8a7a7;
+}
+
+.status2 {
+    background-color: #ebebeb;
+    color: #497cb1;
+}
+
+.status3 {
+    background-color: #ffcfcf;
+    color: #c53f3c;
+}
+
+.status4 {
+    background-color: #ebf8e7;
+    color: #34b012;
+}
+
+.status5 {
+background-color: #b5e2a7;
+    color: #34ad12;
+}
+/* 
+.status6 {
+background-color: #ffcfcf;
+    color: #c53f3c;
+}
+
+.status7 {
+background-color: #ffcfcf;
+    color: #c53f3c;
+} */

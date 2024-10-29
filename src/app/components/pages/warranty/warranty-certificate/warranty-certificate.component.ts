@@ -13,6 +13,7 @@ import { OptionsFilterProduct } from 'src/app/core/models/options-filter-product
 import { OptionsFilterWarranty } from 'src/app/core/DTOs/warranty/optionFilterWarranty';
 import { an, dA } from '@fullcalendar/core/internal-common';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { Router } from '@angular/router';
 
 const warrantyOrders = [
     {
@@ -131,7 +132,8 @@ export class WarrantyCertificateComponent implements OnInit {
         private messageService: MessageService,
         private warrantyService: WarrantyService,
         private authService: AuthService,
-        private nodeService: NodeService
+        private nodeService: NodeService,
+        private router: Router
     ) {
         this.nodeService.getFiles().then((files) => (this.nodes = files));
         this.authService.userCurrent.subscribe((user) => {
@@ -179,35 +181,60 @@ export class WarrantyCertificateComponent implements OnInit {
             });
     }
 
+    // warrantyRequest(data: any) {
+    //     // const formData = new FormData();
+    //     // formData.append('Code', '');
+    //     // formData.append('CustomerId', data.customer.id.toString());
+    //     // formData.append('CustomerName', data.customer.name);
+    //     // formData.append('PhoneNumber', data.customer.phoneNumber);
+    //     // formData.append('BranchId', this.userCurrent.branchId);
+    //     // formData.append('BranchName', this.userCurrent.branchName);
+    //     // formData.append('TotalQuantity', '1');
+    //     // this.warrantyInfos = {
+    //     //     id: data.id,
+    //     //     dueDate: '',
+    //     // };
+
+    //     // const warrantyInfosJson = JSON.stringify(this.warrantyInfos);
+    //     // formData.append('WarrantyInfos', warrantyInfosJson);
+
+    //     // this.warrantyService.createWarrantyClaim(formData).subscribe(
+    //     //     (item) => {
+    //     //         this.messageService.add({
+    //     //             severity: 'success',
+    //     //             summary: 'Thành công',
+    //     //             detail: 'Tạo phiếu bảo hành hàng lỗi thành công',
+    //     //         });
+    //     //     },
+    //     //     (error) => {
+    //     //         console.error('Error:', error);
+    //     //     }
+    //     // );
+
+    //     this.router.navigate(['/pages/warranty/warranty-request/create']);
+    // }
+
     warrantyRequest(data: any) {
-        const formData = new FormData();
-        formData.append('Code', '');
-        formData.append('CustomerId', data.customer.id.toString());
-        formData.append('CustomerName', data.customer.name);
-        formData.append('PhoneNumber', data.customer.phoneNumber);
-        formData.append('BranchId', this.userCurrent.branchId);
-        formData.append('BranchName', this.userCurrent.branchName);
-        formData.append('TotalQuantity', '1');
-        this.warrantyInfos = {
-            id: data.id,
-            dueDate: '',
-        };
+        // Chuyển đổi dữ liệu cần lưu thành JSON string và lưu vào localStorage
+        // const warrantyData = {
+        //     code: '',
+        //     customerId: data.customer.id.toString(),
+        //     customerName: data.customer.name,
+        //     phoneNumber: data.customer.phoneNumber,
+        //     branchId: this.userCurrent.branchId,
+        //     branchName: this.userCurrent.branchName,
+        //     totalQuantity: '1',
+        //     warrantyInfos: {
+        //         id: data.id,
+        //         dueDate: '',
+        //     },
+        // };
 
-        const warrantyInfosJson = JSON.stringify(this.warrantyInfos);
-        formData.append('WarrantyInfos', warrantyInfosJson);
+        // Lưu dữ liệu vào localStorage
+        localStorage.setItem('warrantyRequestData', JSON.stringify(data));
 
-        this.warrantyService.createWarrantyClaim(formData).subscribe(
-            (item) => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Thành công',
-                    detail: 'Tạo phiếu bảo hành hàng lỗi thành công',
-                });
-            },
-            (error) => {
-                console.error('Error:', error);
-            }
-        );
+        // Điều hướng đến trang khác
+        this.router.navigate(['/pages/warranty/warranty-request/create']);
     }
 
     openNew() {
@@ -379,8 +406,6 @@ export class WarrantyCertificateComponent implements OnInit {
 
     //Paganation
     onPageChange(event: any): void {
-        console.log(event);
-
         this.pageSize = event.rows;
         this.pageNumber = event.page + 1;
         this.loadWarranty();

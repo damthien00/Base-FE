@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
 export class CustomerService {
     public url = environment.url;
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {}
 
     private handleError(error: HttpErrorResponse): Observable<any> {
         console.error('An error occurred:', error);
@@ -67,9 +67,11 @@ export class CustomerService {
     }
 
     filterCustomers(options: any): Observable<Customer[]> {
-        return this.http.post<Customer[]>(`${this.url}/api/customer/filter`, options);
+        return this.http.post<Customer[]>(
+            `${this.url}/api/customer/filter`,
+            options
+        );
     }
-
 
     // filterCustomers(
     //     optionsFilterCustomer: OptionsFilterCustomer

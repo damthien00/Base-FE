@@ -1,21 +1,5 @@
 import { OptionsFilterWarrantyClaims } from './../../../../../core/DTOs/warranty/optionFilterWarranty';
 import { WarrantyService } from './../../../../../core/services/warranty.service';
-// import { Component, OnInit } from '@angular/core';
-
-// @Component({
-//   selector: 'app-show',
-//   templateUrl: './show.component.html',
-//   styleUrls: ['./show.component.css']
-// })
-// export class ShowComponent implements OnInit {
-
-//   constructor() { }
-
-//   ngOnInit() {
-//   }
-
-// }
-
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { MenuItem } from 'primeng/api';
@@ -48,6 +32,8 @@ export class ShowComponent implements OnInit {
     ];
     selectedNodes: any;
     statusFilter: any;
+    deadlineRange: Date[] = [];
+    formatdate: string = 'dd/mm/yy';
     expandedRows = {};
 
     expandAll() {
@@ -83,8 +69,6 @@ export class ShowComponent implements OnInit {
     statuses: any[] = [];
 
     rowsPerPageOptions = [5, 10, 20];
-    // pageSize = 30;
-    // pageNumber = 1;
     totalRecords = 20;
     treeCategory: any[] = [];
 
@@ -109,18 +93,21 @@ export class ShowComponent implements OnInit {
 
     async ngOnInit() {
         this.items = [{ label: 'Danh sách yêu cầu bảo hành' }];
-        // let response = await this.productService.FilterProduct(
-        //     this.optionsFillerProduct
-        // );
-        // let responseGetTreeCategory =
-        //     await this.productCateogryService.getTreeCategory();
-        // this.treeCategory = responseGetTreeCategory.data;
-        // this.products = response.data;
-        // this.totalRecords = response.totalRecordsCount;
         this.loadWarrantyClaims();
     }
 
     loadWarrantyClaims() {
+        if (this.deadlineRange) {
+            console.log(this.deadlineRange);
+
+            this.optionsFilterWarrantyClaims.StartDate =
+                this.deadlineRange[0] || null;
+            this.optionsFilterWarrantyClaims.EndDate =
+                this.deadlineRange[1] || null;
+        } else {
+            this.optionsFilterWarrantyClaims.StartDate = null;
+            this.optionsFilterWarrantyClaims.EndDate = null;
+        }
         this.optionsFilterWarrantyClaims.pageIndex = this.pageNumber;
         this.optionsFilterWarrantyClaims.pageSize = this.pageSize;
 
@@ -280,18 +267,35 @@ export class ShowComponent implements OnInit {
             life: 3000,
         });
     }
-    async EvenFilter() {
-        this.optionsFillerProduct.Status = this.statusFilter
-            ? this.statusFilter.value
-            : null;
-        this.optionsFillerProduct.pageIndex = 1;
+    // async EvenFilter() {
+    //     this.optionsFillerProduct.Status = this.statusFilter
+    //         ? this.statusFilter.value
+    //         : null;
+    //     this.optionsFillerProduct.pageIndex = 1;
 
-        await this.productService
-            .FilterProduct(this.optionsFillerProduct)
-            .then((response) => {
-                this.products = response.data;
-                this.totalRecords = response.totalRecordsCount;
-            });
+    //     await this.productService
+    //         .FilterProduct(this.optionsFillerProduct)
+    //         .then((response) => {
+    //             this.products = response.data;
+    //             this.totalRecords = response.totalRecordsCount;
+    //         });
+    // }
+
+    blurDateRange($event: Event) {
+        if (this.deadlineRange && this.deadlineRange.length === 2) {
+            const [startDate, endDate] = this.deadlineRange;
+            if (startDate) {
+                startDate.setHours(startDate.getHours() + 7);
+                this.optionsFilterWarrantyClaims.StartDate = startDate;
+            }
+            if (endDate) {
+                endDate.setHours(endDate.getHours() + 7);
+                this.optionsFilterWarrantyClaims.EndDate = endDate;
+            }
+        } else {
+            this.optionsFilterWarrantyClaims.StartDate = undefined;
+            this.optionsFilterWarrantyClaims.EndDate = undefined;
+        }
     }
 
     //Paganation

@@ -78,6 +78,7 @@ export class CreateComponent implements OnInit {
     value: string | undefined;
     statusList: any[] = [];
     keyWord: any;
+    productCurrent: any;
     constructor(
         private nodeService: NodeService,
         private productService: ProductService,
@@ -93,11 +94,23 @@ export class CreateComponent implements OnInit {
     }
 
     ngOnInit() {
+        // Lấy dữ liệu từ Local Storage
+        const warrantyRequestData = JSON.parse(
+            localStorage.getItem('warrantyRequestData')
+        );
+        if (warrantyRequestData) {
+            this.listCart.push(warrantyRequestData);
+            this.selectedItem = warrantyRequestData.customer;
+            this.onCustomerSelect('');
+            localStorage.removeItem('warrantyRequestData');
+        }
+
         this.items = [
             { label: 'Kho hàng' },
             { label: 'Bảo hành', route: '/inputtext' },
             { label: 'Tạo phiếu bảo hành', route: '/inputtext' },
         ];
+
         this.statusList = [
             { label: 'Mới tạo', value: 0 },
             { label: 'Đã tiếp nhận', value: 1 },
@@ -339,16 +352,17 @@ export class CreateComponent implements OnInit {
     }
 
     onCustomerSelect(event: any) {
-        const customerId = event.value.id;
+        console.log(this.selectedItem);
+        const customerId = this.selectedItem?.id;
         this.warrantyService
             .getWarrantyByCustomer(customerId)
             .subscribe((data) => {
-                this.warrantyId = data.data.items[0].id;
+                this.warrantyId = data.data.items[0]?.id;
                 this.productList = data.data.items;
-                console.log(this.productList);
             });
 
-        this.listCart = [];
+        // this.listCart = [];
+        // if(this.)
     }
 
     onSubmit() {
@@ -413,6 +427,7 @@ export class CreateComponent implements OnInit {
         this.warrantyInfos = this.listCart.map((item) => {
             return {
                 id: item.warrantyProducts[0].warrantyId,
+                statusRequest: 1,
                 status: 0,
                 dueDate: item.returnDate,
             };

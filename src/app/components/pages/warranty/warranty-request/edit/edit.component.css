@@ -268,3 +268,24 @@ label.custom-file-upload {
     color: #ccc;
     cursor: not-allowed;
 }
+
+/* .list-image-err{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+} */
+
+
+.list-image-err {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 4 columns */
+    gap: 8px;
+    /* Adjust the gap between items */
+}
+
+.list-image-err img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}

@@ -57,33 +57,11 @@ import { AdminGuard } from './core/guards/admin.guard';
                         ).then((m) => m.LandingModule),
                 },
                 {
-                    path: 'activate-warranty',
-                    loadChildren: () =>
-                        import(
-                            'src/app/components/activate-warranty/activate-warranty.module'
-                        ).then((m) => m.ActivateWarrantyModule),
-                },
-                {
                     path: 'warranty-lookup',
                     loadChildren: () =>
                         import(
                             'src/app/components/pages/warranty/warranty-lookup/warranty-lookup.module'
                         ).then((m) => m.WarrantyLookupModule),
-                },
-                // tny code
-                {
-                    path: 'activate-success',
-                    loadChildren: () =>
-                        import(
-                            'src/app/components/activate-success/activate-success.module'
-                        ).then((m) => m.ActivateSuccessModule),
-                },
-                {
-                    path: 'warranty-mb',
-                    loadChildren: () =>
-                        import(
-                            'src/app/components/warranty-mb/warranty-mb.module'
-                        ).then((m) => m.WarrantyMbModule),
                 },
                 { path: 'notfound', component: NotfoundComponent },
                 { path: '**', redirectTo: '/notfound' },

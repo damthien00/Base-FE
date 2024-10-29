@@ -26,7 +26,14 @@
                         placeholder="Tìm kiếm khách hàng theo tên, SĐT, Mã khách hàng"
                         (completeMethod)="search($event)"
                         (onSelect)="onCustomerSelect($event)"
-                    />
+                    >
+                        <ng-template let-customer pTemplate="item">
+                            <div>
+                                <strong>{{ customer.name }}</strong> -
+                                {{ customer.phoneNumber }}
+                            </div>
+                        </ng-template>
+                    </p-autoComplete>
                 </div>
                 <div class="card" style="min-height: 525px">
                     <p-table

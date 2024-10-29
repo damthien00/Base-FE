@@ -51,8 +51,14 @@ export class AppMenuComponent implements OnInit {
         this.refreshTokenService.addActivityChangeRoleListener((activity) => {
             console.log(this.userCurrent.roleNames);
             console.log(activity);
-            console.log('ket qua  '+this.userCurrent.roleNames.includes(activity.normalizedName));
-            if (activity != null && this.userCurrent.roleNames.includes(activity.normalizedName)) {
+            console.log(
+                'ket qua  ' +
+                    this.userCurrent.roleNames.includes(activity.normalizedName)
+            );
+            if (
+                activity != null &&
+                this.userCurrent.roleNames.includes(activity.normalizedName)
+            ) {
                 // console.log(this.authToken);
                 this.authToken = this.authService.getAuthTokenLocalStorage();
                 this.authService
@@ -81,27 +87,6 @@ export class AppMenuComponent implements OnInit {
                     },
                 ],
             },
-            // {
-            //     label: '',
-            //     icon: 'pi pi-fw pi-user',
-            //     items: [
-            //         {
-            //             label: 'Login',
-            //             icon: 'pi pi-fw pi-sign-in',
-            //             routerLink: ['/auth/login'],
-            //         },
-            //         {
-            //             label: 'Error',
-            //             icon: 'pi pi-fw pi-times-circle',
-            //             routerLink: ['/auth/error'],
-            //         },
-            //         {
-            //             label: 'Access Denied',
-            //             icon: 'pi pi-fw pi-lock',
-            //             routerLink: ['/auth/access'],
-            //         },
-            //     ],
-            // },
             {
                 label: '',
                 items: [
@@ -237,17 +222,6 @@ export class AppMenuComponent implements OnInit {
                         label: 'Chi nhánh',
                         icon: 'pi pi-fw pi-map-marker',
                         routerLink: ['/pages/branch'],
-                    },
-                ],
-            },
-
-            {
-                label: '',
-                items: [
-                    {
-                        label: 'Kích hoạt bảo hành',
-                        icon: 'pi pi-fw pi-map-marker',
-                        routerLink: ['/warranty-mb'],
                     },
                 ],
             },
